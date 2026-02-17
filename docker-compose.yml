@@ -1,0 +1,15 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: financas-frontend
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+
+  postgres:
+    extends:
+      file: ./backend/docker-compose.yml
+      service: postgres
+
