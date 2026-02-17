@@ -34,4 +34,48 @@ export class ReportsPageComponent {
     }
     return (receita - this.totalDespesas()) / receita;
   });
+
+  protected readonly patrimonioSerie = computed(() => {
+    let acumulado = 0;
+    return this.serie().map((ponto) => {
+      acumulado += ponto.receita - ponto.despesa;
+      return { mes: ponto.mes, valor: acumulado };
+    });
+  });
+
+  protected readonly patrimonioMax = computed(() => {
+    const valores = this.patrimonioSerie().map((p) => p.valor);
+    return Math.max(...valores, 1);
+  });
+
+  protected readonly patrimonioPath = computed(() => {
+    const dados = this.patrimonioSerie();
+    if (!dados.length) {
+      return '';
+    }
+    const max = this.patrimonioMax();
+    const stepX = 100 / Math.max(dados.length - 1, 1);
+    const pontos = dados.map((p, index) => {
+      const x = index * stepX;
+      const y = 38 - (p.valor / max) * 30;
+      return `${x},${y}`;
+    });
+    return `M0,40 L${pontos.join(' L ')} L100,40 Z`;
+  });
+
+  protected readonly patrimonioLine = computed(() => {
+    const dados = this.patrimonioSerie();
+    if (!dados.length) {
+      return '';
+    }
+    const max = this.patrimonioMax();
+    const stepX = 100 / Math.max(dados.length - 1, 1);
+    return dados
+      .map((p, index) => {
+        const x = index * stepX;
+        const y = 38 - (p.valor / max) * 30;
+        return `${x},${y}`;
+      })
+      .join(' ');
+  });
 }
