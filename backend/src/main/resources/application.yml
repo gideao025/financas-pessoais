@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: financas-pessoais-backend
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/financas}
+    username: ${DB_USER:financas}
+    password: ${DB_PASSWORD:financas}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+server:
+  port: ${SERVER_PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:change-me-in-production-change-me-in-production-change-me}
+    access-expiration-ms: ${JWT_ACCESS_EXPIRATION:900000}
+    refresh-expiration-ms: ${JWT_REFRESH_EXPIRATION:1209600000}
