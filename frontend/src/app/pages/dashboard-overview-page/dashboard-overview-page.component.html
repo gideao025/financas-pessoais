@@ -1,0 +1,70 @@
+<section class="mx-auto flex w-full max-w-6xl flex-col gap-6">
+  <div>
+    <h2 class="text-3xl font-black tracking-tight">Visão Geral do Dashboard</h2>
+    <p class="text-sm text-[#64748b]">Acompanhe saldo, despesas e metas em um só lugar.</p>
+  </div>
+
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+    <article *ngFor="let card of cards" class="rounded-2xl border border-[#e3e8ef] bg-white p-5 dark:border-[#2a3441] dark:bg-[#1a242f]">
+      <div class="mb-2 flex items-center justify-between">
+        <p class="text-sm text-[#64748b]">{{ card.titulo }}</p>
+        <span class="material-symbols-outlined text-primary">{{ card.icone }}</span>
+      </div>
+      <h3 class="text-4xl font-black tracking-tight">{{ card.valor | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</h3>
+      <p class="mt-1 text-sm" [ngClass]="card.variacao >= 0 ? 'text-green-600' : 'text-red-500'">
+        <strong>{{ card.variacao / 100 | percent: '1.1-1' : 'pt-BR' }}</strong> vs mês anterior
+      </p>
+    </article>
+  </div>
+
+  <div class="grid grid-cols-1 gap-4 xl:grid-cols-[1.2fr_0.8fr]">
+    <article class="rounded-2xl border border-[#e3e8ef] bg-white p-5 dark:border-[#2a3441] dark:bg-[#1a242f]">
+      <div class="mb-4 flex items-center justify-between">
+        <div>
+          <h3 class="text-xl font-bold">Receitas vs. Despesas</h3>
+          <p class="text-xs text-[#64748b]">Análise dos últimos 6 meses</p>
+        </div>
+      </div>
+      <div class="flex h-48 items-end justify-between gap-3 px-3">
+        <div *ngFor="let m of ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN']" class="flex flex-1 flex-col items-center gap-2">
+          <div class="flex h-full items-end gap-1">
+            <div class="w-3 rounded-t bg-primary/20" style="height: 60%"></div>
+            <div class="w-3 rounded-t bg-primary" style="height: 82%"></div>
+          </div>
+          <span class="text-[10px] font-bold text-[#64748b]">{{ m }}</span>
+        </div>
+      </div>
+    </article>
+
+    <article class="rounded-2xl border border-[#e3e8ef] bg-white p-5 dark:border-[#2a3441] dark:bg-[#1a242f]">
+      <h3 class="mb-3 text-xl font-bold">Metas Financeiras</h3>
+      <div class="space-y-4">
+        <div *ngFor="let meta of metas">
+          <div class="mb-1 flex items-center justify-between text-sm">
+            <span class="font-semibold">{{ meta.nome }}</span>
+            <span class="font-bold text-primary">{{ meta.progresso }}%</span>
+          </div>
+          <div class="h-2 rounded-full bg-[#e2e8f0] dark:bg-[#24313f]">
+            <div class="h-2 rounded-full bg-primary" [style.width.%]="meta.progresso"></div>
+          </div>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <article class="rounded-2xl border border-[#e3e8ef] bg-white dark:border-[#2a3441] dark:bg-[#1a242f]">
+    <div class="flex items-center justify-between border-b border-[#e5e7eb] px-5 py-4 dark:border-[#2a3441]">
+      <h3 class="text-xl font-bold">Transações Recentes</h3>
+      <button class="text-sm font-bold text-primary" (click)="carregarMais()">Carregar mais</button>
+    </div>
+    <div *ngFor="let item of transacoesRecentes()" class="flex items-center justify-between border-b border-[#eef2f5] px-5 py-4 last:border-none dark:border-[#24313f]">
+      <div>
+        <p class="text-sm font-bold">{{ item.descricao }}</p>
+        <p class="text-xs text-[#64748b]">{{ item.categoria }} • {{ item.data | date: 'dd MMM, yyyy' : '' : 'pt-BR' }}</p>
+      </div>
+      <p class="text-sm font-black" [ngClass]="item.tipo === 'entrada' ? 'text-green-600' : 'text-red-500'">
+        {{ item.tipo === 'entrada' ? '+' : '-' }}{{ item.valor | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+      </p>
+    </div>
+  </article>
+</section>

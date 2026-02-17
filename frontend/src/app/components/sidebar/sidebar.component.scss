@@ -1,0 +1,31 @@
+:host {
+  display: block;
+}
+
+.menu-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-radius: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #617589;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.menu-link:hover {
+  background: #f0f2f4;
+  color: #111418;
+}
+
+:host-context(.dark) .menu-link:hover {
+  background: #2a3441;
+  color: #fff;
+}
+
+.menu-link-active {
+  background: rgb(19 127 236 / 0.1);
+  color: #137fec;
+  font-weight: 700;
+}

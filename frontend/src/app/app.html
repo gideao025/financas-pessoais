@@ -1,0 +1,62 @@
+<div class="flex min-h-screen bg-[#f3f4f6] text-[#111827] dark:bg-background-dark dark:text-white">
+  <aside class="hidden w-64 border-r border-[#e5e7eb] bg-white p-4 md:flex md:flex-col dark:border-[#2a3441] dark:bg-[#1a242f]">
+    <div class="mb-8 flex items-center gap-3 px-2">
+      <div class="rounded-lg bg-primary p-2 text-white">
+        <span class="material-symbols-outlined">account_balance_wallet</span>
+      </div>
+      <div>
+        <h2 class="text-lg font-bold">FinançasPro</h2>
+        <p class="text-xs text-[#64748b]">Conta Pessoal</p>
+      </div>
+    </div>
+
+    <nav class="space-y-1">
+      <a class="menu-link" routerLink="/dashboard" routerLinkActive="menu-link-active" [routerLinkActiveOptions]="{ exact: true }">
+        <span class="material-symbols-outlined">home</span>
+        <span>Início</span>
+      </a>
+      <a class="menu-link" routerLink="/transactions" routerLinkActive="menu-link-active">
+        <span class="material-symbols-outlined">receipt_long</span>
+        <span>Transações</span>
+      </a>
+      <a class="menu-link" routerLink="/reports" routerLinkActive="menu-link-active">
+        <span class="material-symbols-outlined">bar_chart</span>
+        <span>Relatórios</span>
+      </a>
+      <a class="menu-link" routerLink="/cards" routerLinkActive="menu-link-active">
+        <span class="material-symbols-outlined">credit_card</span>
+        <span>Cartões</span>
+      </a>
+      <a class="menu-link" routerLink="/settings" routerLinkActive="menu-link-active">
+        <span class="material-symbols-outlined">settings</span>
+        <span>Configurações</span>
+      </a>
+    </nav>
+
+    <div class="mt-auto space-y-3">
+      <button class="w-full rounded-xl bg-primary py-2.5 text-sm font-bold text-white hover:bg-primary/90">+ Nova Entrada</button>
+      <div class="rounded-xl bg-[#eef2f6] p-3 dark:bg-[#24313f]">
+        <p class="text-sm font-bold">Alex Morgan</p>
+        <p class="text-xs text-[#64748b]">Membro Premium</p>
+      </div>
+    </div>
+  </aside>
+
+  <div class="min-w-0 flex-1">
+    <header class="sticky top-0 z-10 flex items-center justify-between border-b border-[#e5e7eb] bg-[#f3f4f6] px-6 py-3 dark:border-[#2a3441] dark:bg-background-dark">
+      <h1 class="text-xl font-bold">Dashboard Financeiro</h1>
+      <div class="flex items-center gap-3">
+        <label class="relative hidden md:block">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#64748b] text-[18px]">search</span>
+          <input class="w-72 rounded-xl border-none bg-[#e8ecf3] py-2 pl-9 pr-3 text-sm focus:ring-2 focus:ring-primary" placeholder="Buscar transações..." />
+        </label>
+        <button class="rounded-xl bg-[#e8ecf3] p-2 text-[#64748b]"><span class="material-symbols-outlined">notifications</span></button>
+        <button class="rounded-xl bg-[#e8ecf3] p-2 text-[#64748b]"><span class="material-symbols-outlined">mail</span></button>
+      </div>
+    </header>
+
+    <main class="p-6 md:p-8">
+      <router-outlet />
+    </main>
+  </div>
+</div>

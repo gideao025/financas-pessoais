@@ -1,0 +1,51 @@
+<section class="mx-auto flex w-full max-w-6xl flex-col gap-6">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h2 class="text-3xl font-black tracking-tight">Transações e Registros</h2>
+      <p class="text-sm text-[#64748b]">Histórico completo de movimentações com filtros.</p>
+    </div>
+    <button class="rounded-xl bg-primary px-4 py-2 text-sm font-bold text-white hover:bg-primary/90" (click)="adicionarMock()">Adicionar Nova Transação</button>
+  </div>
+
+  <div class="rounded-2xl border border-[#dbe0e6] bg-white p-4 dark:border-[#2a3441] dark:bg-[#1a242f]">
+    <div class="flex flex-wrap items-center gap-2">
+      <label class="relative min-w-[220px] flex-1">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#64748b] text-lg">search</span>
+        <input class="w-full rounded-lg border-none bg-[#f0f2f4] py-2 pl-10 pr-3 text-sm focus:ring-2 focus:ring-primary dark:bg-[#24313f]" placeholder="Pesquisar transações..." [value]="busca()" (input)="busca.set(($any($event.target)).value)" />
+      </label>
+      <select class="h-9 rounded-lg bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" [value]="tipoSelecionado()" (change)="tipoSelecionado.set(($any($event.target)).value)">
+        <option value="todos">Tipo: Todos</option>
+        <option value="entrada">Tipo: Entrada</option>
+        <option value="saida">Tipo: Saída</option>
+      </select>
+      <select class="h-9 rounded-lg bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" [value]="statusSelecionado()" (change)="statusSelecionado.set(($any($event.target)).value)">
+        <option value="todos">Status: Todos</option>
+        <option value="concluida">Status: Concluída</option>
+        <option value="pendente">Status: Pendente</option>
+      </select>
+    </div>
+  </div>
+
+  <article class="overflow-hidden rounded-2xl border border-[#dbe0e6] bg-white dark:border-[#2a3441] dark:bg-[#1a242f]">
+    <table class="w-full min-w-[760px] text-left">
+      <thead class="bg-[#fcfcfd] dark:bg-[#24313f]">
+        <tr class="border-b border-[#dbe0e6] dark:border-[#2a3441] text-xs uppercase tracking-wider text-[#64748b]">
+          <th class="px-5 py-4">Data</th>
+          <th class="px-5 py-4">Descrição</th>
+          <th class="px-5 py-4">Categoria</th>
+          <th class="px-5 py-4">Conta</th>
+          <th class="px-5 py-4 text-right">Valor</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-[#dbe0e6] dark:divide-[#2a3441]">
+        <tr *ngFor="let item of filtradas()" class="hover:bg-[#f8fafc] dark:hover:bg-[#24313f]">
+          <td class="px-5 py-4 text-sm">{{ item.data | date: 'dd MMM, yyyy' : '' : 'pt-BR' }}</td>
+          <td class="px-5 py-4 text-sm font-semibold">{{ item.descricao }}</td>
+          <td class="px-5 py-4"><span class="rounded-full bg-[#eef2f5] px-2.5 py-0.5 text-xs dark:bg-[#24313f]">{{ item.categoria }}</span></td>
+          <td class="px-5 py-4 text-sm text-[#64748b]">{{ item.conta }}</td>
+          <td class="px-5 py-4 text-right text-sm font-bold" [ngClass]="item.tipo === 'entrada' ? 'text-green-600' : 'text-red-500'">{{ item.tipo === 'entrada' ? '+' : '-' }}{{ item.valor | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </article>
+</section>
