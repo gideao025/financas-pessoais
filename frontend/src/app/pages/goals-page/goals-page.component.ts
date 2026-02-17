@@ -18,6 +18,10 @@ export class GoalsPageComponent {
   protected readonly alvo = signal(0);
   protected readonly atual = signal(0);
   protected readonly prazo = signal<string>(new Date().toISOString().slice(0, 10));
+  protected toNumber(valor: unknown): number {
+    const n = Number(valor ?? 0);
+    return Number.isNaN(n) ? 0 : n;
+  }
 
   protected readonly progressoTotal = computed(() => {
     const lista = this.metas();
