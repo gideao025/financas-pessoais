@@ -3,7 +3,7 @@ spring:
     name: financas-pessoais-backend
 
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/financas}
+    url: ${DB_URL:jdbc:postgresql://localhost:5440/financas}
     username: ${DB_USER:financas}
     password: ${DB_PASSWORD:financas}
 

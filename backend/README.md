@@ -18,7 +18,7 @@ docker compose up -d
 ```
 
 ## Variáveis de ambiente
-- `DB_URL` (default: `jdbc:postgresql://localhost:5432/financas`)
+- `DB_URL` (default: `jdbc:postgresql://localhost:5440/financas`)
 - `DB_USER` (default: `financas`)
 - `DB_PASSWORD` (default: `financas`)
 - `JWT_SECRET` (default dev no `application.yml`)
