@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html class="light" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Configurações da Conta | FinanceDash</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "primary": "#137fec",
+                "background-light": "#f6f7f8",
+                "background-dark": "#101922",
+              },
+              fontFamily: {
+                "display": ["Manrope", "sans-serif"]
+              },
+              borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-[#111418] dark:text-white transition-colors duration-200">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-[#e5e7eb] dark:border-[#2a3441] bg-white dark:bg-[#1a242f] px-10 py-3 sticky top-0 z-50">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4 text-[#111418] dark:text-white">
+<div class="size-6 text-primary">
+<span class="material-symbols-outlined text-3xl">account_balance_wallet</span>
+</div>
+<h2 class="text-lg font-bold leading-tight tracking-[-0.015em]">FinanceDash</h2>
+</div>
+<label class="flex flex-col min-w-40 !h-10 max-w-64">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full">
+<div class="text-[#617589] flex border-none bg-[#f0f2f4] dark:bg-[#2a3441] items-center justify-center pl-4 rounded-l-lg" data-icon="search">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 border-none bg-[#f0f2f4] dark:bg-[#2a3441] h-full placeholder:text-[#617589] px-4 rounded-r-lg focus:ring-0 text-base font-normal leading-normal" placeholder="Buscar configurações..." value=""/>
+</div>
+</label>
+</div>
+<div class="flex flex-1 justify-end gap-6 items-center">
+<div class="flex gap-2">
+<button class="flex items-center justify-center rounded-lg h-10 w-10 bg-[#f0f2f4] dark:bg-[#2a3441] text-[#111418] dark:text-white">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="flex items-center justify-center rounded-lg h-10 w-10 bg-[#f0f2f4] dark:bg-[#2a3441] text-[#111418] dark:text-white">
+<span class="material-symbols-outlined">help</span>
+</button>
+</div>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-primary/20" data-alt="Avatar do usuário Alex Johnson" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBCqJ62XzAJ3aQRnmPvTgOmXUXN6Wg_HJmRNL5vQub5VsgZf1kAw0dMeOI_MscPNPS_jfhZ0SJtq1OyC3OTZxUXfmlqQ9FiC_a8HbEQ2AohhojNjRNWIUA0dCKNjv9WlGCgmEl1n5agpjOsSaS-b3jI9At34ho_k7cYCuVpWg3s8lgQKaVXKXxMQbdS4AyrnYG2YRqQopnMQOLfqP7JjjJ1UlUropbF-P58dPwngDG3zdR2iFUNSHtarhrGr6SQ9aGWokitz5aDu6TT");'></div>
+</div>
+</header>
+<div class="layout-container flex h-full grow">
+<aside class="w-72 border-r border-[#e5e7eb] dark:border-[#2a3441] bg-white dark:bg-[#1a242f] p-4 flex flex-col gap-6">
+<div class="flex flex-col">
+<h1 class="text-[#111418] dark:text-white text-base font-bold leading-normal px-3">Configurações Financeiras</h1>
+<p class="text-[#617589] text-xs font-normal leading-normal px-3">Gestão Pessoal</p>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#617589] hover:bg-[#f0f2f4] dark:hover:bg-[#2a3441] transition-all" href="#">
+<span class="material-symbols-outlined">grid_view</span>
+<p class="text-sm font-medium">Painel</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#617589] hover:bg-[#f0f2f4] dark:hover:bg-[#2a3441] transition-all" href="#">
+<span class="material-symbols-outlined">swap_horiz</span>
+<p class="text-sm font-medium">Transações</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings</span>
+<p class="text-sm font-bold">Configurações</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#617589] hover:bg-[#f0f2f4] dark:hover:bg-[#2a3441] transition-all" href="#">
+<span class="material-symbols-outlined">shield_person</span>
+<p class="text-sm font-medium">Segurança</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#617589] hover:bg-[#f0f2f4] dark:hover:bg-[#2a3441] transition-all" href="#">
+<span class="material-symbols-outlined">logout</span>
+<p class="text-sm font-medium">Sair</p>
+</a>
+</nav>
+</aside>
+<main class="flex-1 overflow-y-auto pb-12">
+<div class="max-w-[1000px] mx-auto px-8 py-8">
+<div class="flex flex-wrap justify-between gap-3 mb-8">
+<div class="flex min-w-72 flex-col gap-1">
+<p class="text-[#111418] dark:text-white text-3xl font-black leading-tight tracking-[-0.033em]">Configurações da Conta</p>
+<p class="text-[#617589] text-base font-normal leading-normal">Gerencie seu perfil, segurança e conexões bancárias.</p>
+</div>
+</div>
+<div class="border-b border-[#e5e7eb] dark:border-[#2a3441] mb-8">
+<div class="flex gap-8 overflow-x-auto">
+<a class="flex flex-col items-center justify-center border-b-[3px] border-primary text-primary pb-[13px] pt-2" href="#">
+<p class="text-sm font-bold leading-normal">Detalhes do Perfil</p>
+</a>
+<a class="flex flex-col items-center justify-center border-b-[3px] border-transparent text-[#617589] pb-[13px] pt-2 hover:text-primary transition-colors" href="#">
+<p class="text-sm font-bold leading-normal">Segurança da Conta</p>
+</a>
+<a class="flex flex-col items-center justify-center border-b-[3px] border-transparent text-[#617589] pb-[13px] pt-2 hover:text-primary transition-colors" href="#">
+<p class="text-sm font-bold leading-normal">Preferências de Notificação</p>
+</a>
+<a class="flex flex-col items-center justify-center border-b-[3px] border-transparent text-[#617589] pb-[13px] pt-2 hover:text-primary transition-colors" href="#">
+<p class="text-sm font-bold leading-normal">Contas Bancárias Vinculadas</p>
+</a>
+<a class="flex flex-col items-center justify-center border-b-[3px] border-transparent text-[#617589] pb-[13px] pt-2 hover:text-primary transition-colors" href="#">
+<p class="text-sm font-bold leading-normal">Aparência</p>
+</a>
+</div>
+</div>
+<div class="space-y-10">
+<section class="bg-white dark:bg-[#1a242f] p-6 rounded-xl border border-[#e5e7eb] dark:border-[#2a3441] shadow-sm">
+<div class="flex @container">
+<div class="flex w-full flex-col gap-6 @[520px]:flex-row @[520px]:justify-between @[520px]:items-center">
+<div class="flex items-center gap-6">
+<div class="relative">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-28 border-4 border-background-light dark:border-background-dark" data-alt="Avatar de Alex Johnson" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBJTpsxptCgAGIDT7vxQi0slEzuxFACGgLY0CSY7RvVazTnYv458MlNdr9x1o51G4FeSo-n0ajuKFeuJBZ6nUnOXf5t6SYao-M119P-Djoov8SNHUImuLfcLy2poyr_KsDwaX1V7_oU8OxouLtxwV7wmt1cct3kwzu2gSWCFgBftCdvMF3Cygb7YYxET_-UfDhPYjgLRvn8OJ0T0vMv9s5U3D9Ldp4mE37qGDq-0K_XMxRNBy8fZ0v7dGpFz6ld5LuxZTs_iUdTXPkb");'></div>
+<button class="absolute bottom-0 right-0 p-1.5 bg-primary text-white rounded-full shadow-lg border-2 border-white dark:border-[#1a242f]">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-[#111418] dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">Alex Johnson</p>
+<p class="text-[#617589] text-base font-normal leading-normal">alex.johnson@exemplo.com.br</p>
+<div class="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+                                            Membro Premium
+                                        </div>
+</div>
+</div>
+<div class="flex gap-3">
+<button class="flex min-w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#f0f2f4] dark:bg-[#2a3441] text-[#111418] dark:text-white text-sm font-bold hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+<span>Trocar Avatar</span>
+</button>
+<button class="flex min-w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold hover:bg-primary/90 shadow-md transition-colors">
+<span>Salvar Alterações</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<section class="space-y-4">
+<div class="flex items-center gap-2 px-1">
+<span class="material-symbols-outlined text-primary">person</span>
+<h3 class="text-lg font-bold">Perfil</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white dark:bg-[#1a242f] p-6 rounded-xl border border-[#e5e7eb] dark:border-[#2a3441]">
+<div class="flex flex-col gap-2">
+<label class="text-sm font-bold">Nome</label>
+<input class="rounded-lg border-[#dbe0e6] dark:border-[#2a3441] bg-transparent focus:border-primary focus:ring-1 focus:ring-primary h-10" placeholder="Seu nome" type="text" value="Alex Johnson"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-sm font-bold">E-mail</label>
+<input class="rounded-lg border-[#dbe0e6] dark:border-[#2a3441] bg-transparent focus:border-primary focus:ring-1 focus:ring-primary h-10" placeholder="seuemail@exemplo.com" type="email" value="alex.johnson@exemplo.com.br"/>
+</div>
+</div>
+</section>
+<section class="space-y-4">
+<div class="flex items-center gap-2 px-1">
+<span class="material-symbols-outlined text-primary">security</span>
+<h3 class="text-lg font-bold">Segurança da Conta</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white dark:bg-[#1a242f] p-6 rounded-xl border border-[#e5e7eb] dark:border-[#2a3441]">
+<div class="flex flex-col gap-2">
+<label class="text-sm font-bold">Senha Atual</label>
+<input class="rounded-lg border-[#dbe0e6] dark:border-[#2a3441] bg-transparent focus:border-primary focus:ring-1 focus:ring-primary h-10" placeholder="••••••••" type="password"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-sm font-bold">Alterar Senha</label>
+<input class="rounded-lg border-[#dbe0e6] dark:border-[#2a3441] bg-transparent focus:border-primary focus:ring-1 focus:ring-primary h-10" placeholder="Nova senha" type="password"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-sm font-bold">Confirmar Nova Senha</label>
+<input class="rounded-lg border-[#dbe0e6] dark:border-[#2a3441] bg-transparent focus:border-primary focus:ring-1 focus:ring-primary h-10" placeholder="Confirme a nova senha" type="password"/>
+</div>
+<div class="flex items-end">
+<button class="flex items-center justify-center h-10 px-6 rounded-lg border-2 border-primary text-primary font-bold hover:bg-primary/5 transition-colors w-full md:w-auto">
+                                    Atualizar Senha
+                                </button>
+</div>
+</div>
+</section>
+<section class="space-y-4">
+<div class="flex items-center gap-2 px-1">
+<span class="material-symbols-outlined text-primary">notifications_active</span>
+<h3 class="text-lg font-bold">Preferências de Notificação</h3>
+</div>
+<div class="bg-white dark:bg-[#1a242f] rounded-xl border border-[#e5e7eb] dark:border-[#2a3441] divide-y divide-[#e5e7eb] dark:divide-[#2a3441]">
+<div class="flex items-center justify-between p-4">
+<div class="flex flex-col">
+<p class="font-bold text-sm">Resumos Mensais</p>
+<p class="text-xs text-[#617589]">Receba um relatório detalhado dos seus gastos todos os meses.</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-gray-200 dark:bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="flex items-center justify-between p-4">
+<div class="flex flex-col">
+<p class="font-bold text-sm">Alertas de Saldo Baixo</p>
+<p class="text-xs text-[#617589]">Notifique-me quando o saldo de qualquer conta for inferior a R$ 500.</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-gray-200 dark:bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="flex items-center justify-between p-4">
+<div class="flex flex-col">
+<p class="font-bold text-sm">Avisos de Segurança</p>
+<p class="text-xs text-[#617589]">Alertas instantâneos para novos logins ou atividades suspeitas.</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-gray-200 dark:bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+</section>
+<section class="space-y-4">
+<div class="flex items-center justify-between px-1">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">account_balance</span>
+<h3 class="text-lg font-bold">Contas Bancárias Vinculadas</h3>
+</div>
+<button class="flex items-center gap-1 text-sm font-bold text-primary hover:underline">
+<span class="material-symbols-outlined text-sm">add</span>
+                                Adicionar Novo Banco
+                            </button>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="bg-white dark:bg-[#1a242f] p-4 rounded-xl border border-[#e5e7eb] dark:border-[#2a3441] flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="size-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<div>
+<p class="font-bold text-sm">Conta Corrente Nubank</p>
+<p class="text-xs text-[#617589]">•••• 8821 • <span class="text-green-500">Sincronizado</span></p>
+</div>
+</div>
+<button class="p-2 text-[#617589] hover:bg-[#f0f2f4] dark:hover:bg-[#2a3441] rounded-lg">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div class="bg-white dark:bg-[#1a242f] p-4 rounded-xl border border-[#e5e7eb] dark:border-[#2a3441] flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="size-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">credit_card</span>
+</div>
+<div>
+<p class="font-bold text-sm">Itaú Platinum</p>
+<p class="text-xs text-[#617589]">•••• 4002 • <span class="text-green-500">Sincronizado</span></p>
+</div>
+</div>
+<button class="p-2 text-[#617589] hover:bg-[#f0f2f4] dark:hover:bg-[#2a3441] rounded-lg">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+</section>
+<section class="space-y-4">
+<div class="flex items-center gap-2 px-1">
+<span class="material-symbols-outlined text-primary">palette</span>
+<h3 class="text-lg font-bold">Aparência</h3>
+</div>
+<div class="bg-white dark:bg-[#1a242f] p-6 rounded-xl border border-[#e5e7eb] dark:border-[#2a3441]">
+<div class="flex items-center justify-between">
+<div>
+<p class="font-bold text-sm">Modo de Interface</p>
+<p class="text-xs text-[#617589]">Alternar entre os temas claro e escuro para o painel.</p>
+</div>
+<div class="flex bg-[#f0f2f4] dark:bg-[#2a3441] p-1 rounded-lg">
+<button class="flex items-center gap-2 px-4 py-1.5 rounded-md bg-white dark:bg-[#1a242f] shadow-sm text-sm font-bold">
+<span class="material-symbols-outlined text-sm">light_mode</span>
+                                        Claro
+                                    </button>
+<button class="flex items-center gap-2 px-4 py-1.5 rounded-md text-[#617589] text-sm font-bold hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm">dark_mode</span>
+                                        Modo Escuro
+                                    </button>
+</div>
+</div>
+</div>
+</section>
+<section class="pt-8 border-t border-[#e5e7eb] dark:border-[#2a3441]">
+<div class="bg-red-50 dark:bg-red-900/10 p-6 rounded-xl border border-red-100 dark:border-red-900/30 flex items-center justify-between">
+<div>
+<p class="text-red-600 dark:text-red-400 font-bold">Excluir Conta</p>
+<p class="text-xs text-red-500/80">Depois de excluir sua conta, não há volta. Por favor, tenha certeza.</p>
+</div>
+<button class="px-4 py-2 bg-red-600 text-white text-sm font-bold rounded-lg hover:bg-red-700 transition-colors">
+                                Desativar Conta
+                            </button>
+</div>
+</section>
+</div>
+</div>
+</main>
+</div>
+</div>
+
+</body></html>

@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html class="light" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Gerenciador de Cartões de Crédito - FinanceHub</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: 'Manrope', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .card-gradient-blue {
+            background: linear-gradient(135deg, #137fec 0%, #0a4d8f 100%);
+        }
+        .card-gradient-dark {
+            background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+        }
+        .card-gradient-purple {
+            background: linear-gradient(135deg, #6b46c1 0%, #44337a 100%);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen text-[#111418] dark:text-white">
+<div class="flex h-screen overflow-hidden">
+<aside class="w-72 bg-white dark:bg-[#1a242f] border-r border-[#f0f2f4] dark:border-gray-800 flex flex-col justify-between p-6">
+<div class="flex flex-col gap-8">
+<div class="flex items-center gap-3">
+<div class="bg-primary size-10 rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<div class="flex flex-col">
+<h1 class="text-[#111418] dark:text-white text-base font-bold leading-none">FinanceHub</h1>
+<p class="text-[#617589] text-xs font-normal">Finanças Pessoais</p>
+</div>
+</div>
+<nav class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#617589] hover:bg-[#f0f2f4] dark:hover:bg-gray-800 transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<p class="text-sm font-medium">Visão Geral</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">credit_card</span>
+<p class="text-sm font-bold">Meus Cartões</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#617589] hover:bg-[#f0f2f4] dark:hover:bg-gray-800 transition-colors" href="#">
+<span class="material-symbols-outlined">description</span>
+<p class="text-sm font-medium">Extratos</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#617589] hover:bg-[#f0f2f4] dark:hover:bg-gray-800 transition-colors" href="#">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<p class="text-sm font-medium">Planejamento</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#617589] hover:bg-[#f0f2f4] dark:hover:bg-gray-800 transition-colors mt-4" href="#">
+<span class="material-symbols-outlined">settings</span>
+<p class="text-sm font-medium">Configurações</p>
+</a>
+</nav>
+</div>
+<div class="flex items-center gap-3 p-3 bg-[#f0f2f4] dark:bg-gray-800 rounded-xl">
+<div class="size-10 rounded-full bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDVXgtuSxPn3K6Y7n0UfbgBYrGnS_bgm442c2_xDEFUOSQxCX43moZpxC0dhweSkN-4Y6J_kbKzBH_lA1HECz6vpvfYydPFoiOtThwNFCcHhYitTJR6J1UZcwzuyCs4ziDrDHYzuPUG4dissFlUsFN39MHxlebU0iD9hBjLVdRdyfYf9OCEv3v19izOLbbRep_Hfa9ex2v-FV878kfuImDSsqwR9jJbWiwzx7O28PnfaJaJQ4LCyqa02Cha3XxS9W776MhDA2lM4HGy");'></div>
+<div class="flex flex-col">
+<p class="text-sm font-bold text-[#111418] dark:text-white leading-none">Alex Rivera</p>
+<p class="text-xs text-[#617589]">Membro Pro</p>
+</div>
+</div>
+</aside>
+<main class="flex-1 flex flex-col overflow-y-auto">
+<header class="flex items-center justify-between px-8 py-4 bg-white dark:bg-background-dark border-b border-[#f0f2f4] dark:border-gray-800 sticky top-0 z-10">
+<div class="flex items-center gap-8 flex-1">
+<label class="flex items-center w-full max-w-md bg-[#f0f2f4] dark:bg-gray-800 rounded-lg px-4 py-2">
+<span class="material-symbols-outlined text-[#617589] text-xl">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-full placeholder:text-[#617589] dark:text-white" placeholder="Buscar transações..." type="text"/>
+</label>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-[#617589] hover:bg-[#f0f2f4] dark:hover:bg-gray-800 rounded-full">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="bg-primary text-white text-sm font-bold px-5 py-2.5 rounded-lg flex items-center gap-2 hover:bg-opacity-90 transition-all shadow-sm">
+<span class="material-symbols-outlined text-lg">add</span>
+                    Novo Cartão
+                </button>
+</div>
+</header>
+<div class="p-8 max-w-6xl mx-auto w-full">
+<div class="mb-8">
+<h2 class="text-3xl font-black tracking-tight text-[#111418] dark:text-white">Gerenciador de Cartões de Crédito</h2>
+<p class="text-[#617589] mt-1 text-base">Gerencie seus saldos, limites e pagamentos futuros de seus 3 cartões ativos.</p>
+</div>
+<div class="flex overflow-x-auto pb-6 gap-6 scrollbar-hide">
+<div class="flex-shrink-0 w-[400px] flex flex-col gap-4">
+<div class="card-gradient-blue rounded-2xl p-6 text-white h-56 flex flex-col justify-between shadow-xl relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-20">
+<span class="material-symbols-outlined text-6xl">credit_card</span>
+</div>
+<div class="flex justify-between items-start z-10">
+<div>
+<p class="text-xs font-medium opacity-80 uppercase tracking-widest">Visa Platinum</p>
+<p class="text-xl font-bold mt-1 tracking-wider">**** 1234</p>
+</div>
+<div class="text-2xl italic font-black">VISA</div>
+</div>
+<div class="z-10">
+<p class="text-xs opacity-80 mb-1">Saldo Devedor</p>
+<p class="text-3xl font-extrabold">R$ 2.450,00</p>
+</div>
+<div class="flex justify-between items-end z-10">
+<div>
+<p class="text-[10px] opacity-70 uppercase">Titular do Cartão</p>
+<p class="text-sm font-medium">ALEX RIVERA</p>
+</div>
+<div>
+<p class="text-[10px] opacity-70 uppercase text-right">Válido até</p>
+<p class="text-sm font-medium">12/26</p>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-[#1a242f] p-5 rounded-xl border border-[#f0f2f4] dark:border-gray-800 shadow-sm">
+<div class="flex justify-between items-center mb-4">
+<div>
+<p class="text-xs text-[#617589] font-semibold uppercase tracking-wider">Saldo Disponível</p>
+<p class="text-lg font-bold text-primary">R$ 7.550 / R$ 10.000</p>
+</div>
+<div class="bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 text-[10px] font-bold px-2 py-1 rounded">ATIVO</div>
+</div>
+<div class="w-full bg-[#f0f2f4] dark:bg-gray-700 h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 24.5%"></div>
+</div>
+<div class="mt-4 pt-4 border-t border-[#f0f2f4] dark:border-gray-800 flex justify-between items-center">
+<div>
+<p class="text-[10px] text-[#617589] uppercase font-bold">Vencimento da Fatura</p>
+<p class="text-sm font-bold text-red-500">Em 3 dias (24 Set)</p>
+</div>
+<button class="bg-primary px-4 py-2 rounded-lg text-white text-xs font-bold hover:shadow-md transition-shadow">Pagar Fatura</button>
+</div>
+</div>
+</div>
+<div class="flex-shrink-0 w-[400px] flex flex-col gap-4 opacity-70 hover:opacity-100 transition-opacity">
+<div class="card-gradient-dark rounded-2xl p-6 text-white h-56 flex flex-col justify-between shadow-lg relative overflow-hidden">
+<div class="flex justify-between items-start z-10">
+<div>
+<p class="text-xs font-medium opacity-80 uppercase tracking-widest">Mastercard Gold</p>
+<p class="text-xl font-bold mt-1 tracking-wider">**** 5678</p>
+</div>
+<div class="flex gap-1">
+<div class="size-8 rounded-full bg-red-500 opacity-80"></div>
+<div class="size-8 rounded-full bg-yellow-500 -ml-4 opacity-80"></div>
+</div>
+</div>
+<div class="z-10">
+<p class="text-xs opacity-80 mb-1">Saldo Devedor</p>
+<p class="text-3xl font-extrabold">R$ 840,12</p>
+</div>
+<div class="flex justify-between items-end z-10">
+<div>
+<p class="text-[10px] opacity-70 uppercase">Titular do Cartão</p>
+<p class="text-sm font-medium">ALEX RIVERA</p>
+</div>
+<div>
+<p class="text-[10px] opacity-70 uppercase text-right">Válido até</p>
+<p class="text-sm font-medium">08/25</p>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-[#1a242f] p-5 rounded-xl border border-[#f0f2f4] dark:border-gray-800 shadow-sm">
+<div class="flex justify-between items-center mb-4">
+<div>
+<p class="text-xs text-[#617589] font-semibold uppercase tracking-wider">Saldo Disponível</p>
+<p class="text-lg font-bold text-[#111418] dark:text-white">R$ 4.159 / R$ 5.000</p>
+</div>
+<div class="bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 text-[10px] font-bold px-2 py-1 rounded">ATIVO</div>
+</div>
+<div class="w-full bg-[#f0f2f4] dark:bg-gray-700 h-2 rounded-full overflow-hidden">
+<div class="bg-[#111418] dark:bg-gray-500 h-full rounded-full" style="width: 16.8%"></div>
+</div>
+<div class="mt-4 pt-4 border-t border-[#f0f2f4] dark:border-gray-800 flex justify-between items-center">
+<div>
+<p class="text-[10px] text-[#617589] uppercase font-bold">Vencimento da Fatura</p>
+<p class="text-sm font-bold">12 Out</p>
+</div>
+<button class="border border-primary text-primary px-4 py-2 rounded-lg text-xs font-bold hover:bg-primary hover:text-white transition-colors">Gerenciar</button>
+</div>
+</div>
+</div>
+<div class="flex-shrink-0 w-[400px] flex flex-col gap-4 opacity-70 hover:opacity-100 transition-opacity">
+<div class="card-gradient-purple rounded-2xl p-6 text-white h-56 flex flex-col justify-between shadow-lg relative overflow-hidden">
+<div class="flex justify-between items-start z-10">
+<div>
+<p class="text-xs font-medium opacity-80 uppercase tracking-widest">Travel Rewards</p>
+<p class="text-xl font-bold mt-1 tracking-wider">**** 9012</p>
+</div>
+<div class="text-2xl font-black tracking-tighter">AMEX</div>
+</div>
+<div class="z-10">
+<p class="text-xs opacity-80 mb-1">Saldo Devedor</p>
+<p class="text-3xl font-extrabold">R$ 12.100,50</p>
+</div>
+<div class="flex justify-between items-end z-10">
+<div>
+<p class="text-[10px] opacity-70 uppercase">Titular do Cartão</p>
+<p class="text-sm font-medium">ALEX RIVERA</p>
+</div>
+<div>
+<p class="text-[10px] opacity-70 uppercase text-right">Válido até</p>
+<p class="text-sm font-medium">11/27</p>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-[#1a242f] p-5 rounded-xl border border-[#f0f2f4] dark:border-gray-800 shadow-sm">
+<div class="flex justify-between items-center mb-4">
+<div>
+<p class="text-xs text-[#617589] font-semibold uppercase tracking-wider">Saldo Disponível</p>
+<p class="text-lg font-bold text-[#111418] dark:text-white">R$ 7.899 / R$ 20.000</p>
+</div>
+<div class="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 text-[10px] font-bold px-2 py-1 rounded">USO ELEVADO</div>
+</div>
+<div class="w-full bg-[#f0f2f4] dark:bg-gray-700 h-2 rounded-full overflow-hidden">
+<div class="bg-yellow-500 h-full rounded-full" style="width: 60.5%"></div>
+</div>
+<div class="mt-4 pt-4 border-t border-[#f0f2f4] dark:border-gray-800 flex justify-between items-center">
+<div>
+<p class="text-[10px] text-[#617589] uppercase font-bold">Vencimento da Fatura</p>
+<p class="text-sm font-bold">05 Out</p>
+</div>
+<button class="border border-primary text-primary px-4 py-2 rounded-lg text-xs font-bold hover:bg-primary hover:text-white transition-colors">Gerenciar</button>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
+<div class="lg:col-span-2 space-y-4">
+<div class="flex items-center justify-between px-2">
+<h3 class="text-xl font-bold">Transações do Cartão</h3>
+<button class="text-primary text-sm font-bold hover:underline">Ver Tudo</button>
+</div>
+<div class="bg-white dark:bg-[#1a242f] rounded-xl border border-[#f0f2f4] dark:border-gray-800 overflow-hidden">
+<div class="flex items-center justify-between p-4 hover:bg-[#f8fafc] dark:hover:bg-gray-800/50 border-b border-[#f0f2f4] dark:border-gray-800 transition-colors">
+<div class="flex items-center gap-4">
+<div class="size-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
+<span class="material-symbols-outlined">restaurant</span>
+</div>
+<div>
+<p class="text-sm font-bold">Restaurante The Grillhouse</p>
+<p class="text-xs text-[#617589]">20 Set, 2023 • Alimentação</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-sm font-bold text-red-500">-R$ 154,20</p>
+<p class="text-[10px] text-[#617589]">Visa Platinum</p>
+</div>
+</div>
+<div class="flex items-center justify-between p-4 hover:bg-[#f8fafc] dark:hover:bg-gray-800/50 border-b border-[#f0f2f4] dark:border-gray-800 transition-colors">
+<div class="flex items-center gap-4">
+<div class="size-12 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400">
+<span class="material-symbols-outlined">shopping_bag</span>
+</div>
+<div>
+<p class="text-sm font-bold">Loja Online Apple</p>
+<p class="text-xs text-[#617589]">18 Set, 2023 • Eletrônicos</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-sm font-bold text-red-500">-R$ 1.299,00</p>
+<p class="text-[10px] text-[#617589]">Mastercard Gold</p>
+</div>
+</div>
+<div class="flex items-center justify-between p-4 hover:bg-[#f8fafc] dark:hover:bg-gray-800/50 border-b border-[#f0f2f4] dark:border-gray-800 transition-colors">
+<div class="flex items-center gap-4">
+<div class="size-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400">
+<span class="material-symbols-outlined">account_balance</span>
+</div>
+<div>
+<p class="text-sm font-bold">Pagamento da Fatura</p>
+<p class="text-xs text-[#617589]">15 Set, 2023 • Pagamento</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-sm font-bold text-green-600">+R$ 2.000,00</p>
+<p class="text-[10px] text-[#617589]">Visa Platinum</p>
+</div>
+</div>
+<div class="flex items-center justify-between p-4 hover:bg-[#f8fafc] dark:hover:bg-gray-800/50 transition-colors">
+<div class="flex items-center gap-4">
+<div class="size-12 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 dark:text-orange-400">
+<span class="material-symbols-outlined">local_gas_station</span>
+</div>
+<div>
+<p class="text-sm font-bold">Posto Shell</p>
+<p class="text-xs text-[#617589]">14 Set, 2023 • Transporte</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-sm font-bold text-red-500">-R$ 62,45</p>
+<p class="text-[10px] text-[#617589]">Travel Rewards</p>
+</div>
+</div>
+</div>
+</div>
+<div class="space-y-6">
+<h3 class="text-xl font-bold px-2">Insights do Cartão</h3>
+<div class="bg-white dark:bg-[#1a242f] rounded-xl border border-[#f0f2f4] dark:border-gray-800 p-6 space-y-6">
+<div>
+<div class="flex justify-between items-center mb-2">
+<p class="text-sm text-[#617589]">Limite Atual Usado</p>
+<p class="text-sm font-bold">44%</p>
+</div>
+<div class="w-full bg-[#f0f2f4] dark:bg-gray-700 h-3 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 44%"></div>
+</div>
+</div>
+<div class="pt-4 border-t border-[#f0f2f4] dark:border-gray-800">
+<h4 class="text-xs font-bold text-[#617589] uppercase tracking-wider mb-4">Próximos Vencimentos</h4>
+<div class="space-y-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="size-2 rounded-full bg-red-500"></div>
+<p class="text-sm font-medium">Visa Platinum</p>
+</div>
+<p class="text-sm font-bold">24 Set</p>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="size-2 rounded-full bg-gray-300"></div>
+<p class="text-sm font-medium">Travel Rewards</p>
+</div>
+<p class="text-sm font-bold">05 Out</p>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="size-2 rounded-full bg-gray-300"></div>
+<p class="text-sm font-medium">Mastercard Gold</p>
+</div>
+<p class="text-sm font-bold">12 Out</p>
+</div>
+</div>
+</div>
+<div class="bg-primary/5 rounded-lg p-4 flex flex-col items-center text-center">
+<span class="material-symbols-outlined text-primary mb-2">auto_awesome</span>
+<p class="text-xs font-bold text-primary mb-1">Dica de Economia</p>
+<p class="text-[11px] text-[#617589]">Pagar R$ 1.200 do saldo do seu Travel Rewards reduzirá seu uso de limite para 38%.</p>
+<button class="mt-3 text-xs font-bold text-primary hover:underline">Aplicar Agora</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>

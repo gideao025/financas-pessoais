@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html class="light" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Relatórios e Análises Financeiras - FinTrack</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Manrope', sans-serif;
+        }
+        .chart-gradient-line {
+            background: linear-gradient(180deg, rgba(19, 127, 236, 0.1) 0%, rgba(19, 127, 236, 0) 100%);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-[#111418] dark:text-white font-display">
+<div class="flex flex-col min-h-screen">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-[#f0f2f4] dark:border-gray-800 bg-white dark:bg-gray-900 px-8 py-3 sticky top-0 z-50">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4 text-primary">
+<div class="size-8 flex items-center justify-center rounded-lg bg-primary/10">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<h2 class="text-[#111418] dark:text-white text-lg font-bold leading-tight tracking-tight">FinTrack Analytics</h2>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white text-sm font-medium transition-colors" href="#">Dashboard</a>
+<a class="text-primary text-sm font-bold border-b-2 border-primary pb-1" href="#">Relatórios</a>
+<a class="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white text-sm font-medium transition-colors" href="#">Orçamentos</a>
+<a class="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white text-sm font-medium transition-colors" href="#">Investimentos</a>
+<a class="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white text-sm font-medium transition-colors" href="#">Configurações</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">search</span>
+<input class="w-64 pl-10 pr-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 border-none focus:ring-2 focus:ring-primary text-sm" placeholder="Buscar análises..." type="text"/>
+</div>
+<button class="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="size-10 rounded-full border-2 border-white dark:border-gray-800 overflow-hidden">
+<img alt="Avatar do usuário" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBht3-Sn_nx0rBN8WzV-5e3t8HBjYPSiqgDR0FB3P9OMTUzvIYM9CXFCzy02jgHHP0mI5Ra72qZMDuhS4hs827C6zA6pFiRtOw-UaFyHxCsj4kWcMloLodGY4HwErHHcAN1rqa3EyXzeRo2LUe9PvfXKKMIO0AJub2gd5gko7fT9ciIQ2QvcCTaOU6yFRC6QpT0z1S0iROtQj7f6NDXeNltfsosKEGGjQQmqg7oearu4YkVot-6vqNjcww5DGjOGrkvVKvkylXABYTS"/>
+</div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<aside class="w-64 hidden lg:flex flex-col bg-white dark:bg-gray-900 border-r border-[#f0f2f4] dark:border-gray-800 p-6 gap-8">
+<div class="flex flex-col gap-1">
+<h1 class="text-[#111418] dark:text-white text-base font-bold">Finanças Pessoais</h1>
+<p class="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase tracking-wider">Console de Gerenciamento</p>
+</div>
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-3 px-3 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer transition-all">
+<span class="material-symbols-outlined">dashboard</span>
+<p class="text-sm font-medium">Visão Geral</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 text-primary border-l-4 border-primary">
+<span class="material-symbols-outlined font-fill">analytics</span>
+<p class="text-sm font-bold">Relatórios</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer transition-all">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<p class="text-sm font-medium">Orçamentos</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer transition-all">
+<span class="material-symbols-outlined">trending_up</span>
+<p class="text-sm font-medium">Investimentos</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer transition-all">
+<span class="material-symbols-outlined">history</span>
+<p class="text-sm font-medium">Transações</p>
+</div>
+</div>
+<div class="mt-auto flex flex-col gap-4">
+<div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
+<p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Armazenamento</p>
+<div class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+<div class="w-3/4 h-full bg-primary"></div>
+</div>
+<p class="text-[10px] mt-2 text-gray-500">7.5 GB de 10 GB usados</p>
+</div>
+<button class="w-full flex items-center justify-center gap-2 bg-primary text-white py-3 rounded-lg font-bold text-sm hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-sm">download</span>
+                    Exportar Relatório
+                </button>
+</div>
+</aside>
+<main class="flex-1 overflow-y-auto bg-background-light dark:bg-background-dark p-8">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+<div class="space-y-1">
+<h1 class="text-[#111418] dark:text-white text-3xl font-black tracking-tight">Relatórios e Análises Financeiras</h1>
+<p class="text-gray-500 dark:text-gray-400 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">sync</span>
+                        Última sincronização: há 2 minutos
+                    </p>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-xs font-bold text-gray-400 uppercase tracking-widest mr-2">Filtros:</span>
+<button class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 transition-all">
+<span class="material-symbols-outlined text-lg">calendar_today</span>
+                        Intervalo de Datas
+                        <span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 transition-all">
+<span class="material-symbols-outlined text-lg">filter_alt</span>
+                        Categoria
+                        <span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+<button class="p-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-700 dark:text-gray-200">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+<div class="bg-white dark:bg-gray-900 p-6 rounded-xl border border-[#f0f2f4] dark:border-gray-800 shadow-sm">
+<p class="text-gray-500 dark:text-gray-400 text-sm font-medium mb-1">Patrimônio Líquido Total</p>
+<div class="flex items-end gap-3">
+<h3 class="text-2xl font-black text-[#111418] dark:text-white">R$ 142.500,00</h3>
+<span class="text-green-500 text-sm font-bold flex items-center mb-1">
+<span class="material-symbols-outlined text-sm">arrow_upward</span>
+                            12.4%
+                        </span>
+</div>
+</div>
+<div class="bg-white dark:bg-gray-900 p-6 rounded-xl border border-[#f0f2f4] dark:border-gray-800 shadow-sm">
+<p class="text-gray-500 dark:text-gray-400 text-sm font-medium mb-1">Variação Mensal</p>
+<div class="flex items-end gap-3">
+<h3 class="text-2xl font-black text-[#111418] dark:text-white">+R$ 3.240,50</h3>
+<span class="text-green-500 text-sm font-bold flex items-center mb-1">
+<span class="material-symbols-outlined text-sm">arrow_upward</span>
+                            2.1%
+                        </span>
+</div>
+</div>
+<div class="bg-white dark:bg-gray-900 p-6 rounded-xl border border-[#f0f2f4] dark:border-gray-800 shadow-sm">
+<p class="text-gray-500 dark:text-gray-400 text-sm font-medium mb-1">Taxa de Poupança %</p>
+<div class="flex items-end gap-3">
+<h3 class="text-2xl font-black text-[#111418] dark:text-white">28.5%</h3>
+<span class="text-red-500 text-sm font-bold flex items-center mb-1">
+<span class="material-symbols-outlined text-sm">arrow_downward</span>
+                            0.5%
+                        </span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-8">
+<div class="bg-white dark:bg-gray-900 p-6 rounded-xl border border-[#f0f2f4] dark:border-gray-800 shadow-sm">
+<div class="flex items-center justify-between mb-8">
+<div>
+<h4 class="text-lg font-bold text-[#111418] dark:text-white">Crescimento de Patrimônio</h4>
+<p class="text-sm text-gray-500 dark:text-gray-400">Patrimônio líquido acumulado ao longo do tempo</p>
+</div>
+<div class="flex gap-2">
+<button class="px-3 py-1 text-xs font-bold rounded bg-primary/10 text-primary">6M</button>
+<button class="px-3 py-1 text-xs font-bold rounded text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800">1A</button>
+<button class="px-3 py-1 text-xs font-bold rounded text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800">TUDO</button>
+</div>
+</div>
+<div class="h-64 relative flex items-end justify-between gap-1 px-2">
+<svg class="absolute bottom-0 left-0 w-full h-full" preserveAspectRatio="none" viewBox="0 0 400 150">
+<path class="fill-primary/5" d="M0,130 C40,120 80,140 120,100 C160,60 200,80 240,50 C280,20 320,40 360,10 L400,0 L400,150 L0,150 Z"></path>
+<path d="M0,130 C40,120 80,140 120,100 C160,60 200,80 240,50 C280,20 320,40 360,10 L400,0" fill="none" stroke="#137fec" stroke-width="3"></path>
+</svg>
+<div class="flex-1 border-r border-gray-100 dark:border-gray-800 h-full"></div>
+<div class="flex-1 border-r border-gray-100 dark:border-gray-800 h-full"></div>
+<div class="flex-1 border-r border-gray-100 dark:border-gray-800 h-full"></div>
+<div class="flex-1 border-r border-gray-100 dark:border-gray-800 h-full"></div>
+<div class="flex-1 border-r border-gray-100 dark:border-gray-800 h-full"></div>
+<div class="flex-1 h-full"></div>
+</div>
+<div class="flex justify-between mt-4 text-[10px] text-gray-400 font-bold uppercase tracking-widest px-2">
+<span>Out</span>
+<span>Nov</span>
+<span>Dez</span>
+<span>Jan</span>
+<span>Fev</span>
+<span>Mar</span>
+</div>
+</div>
+<div class="bg-white dark:bg-gray-900 p-6 rounded-xl border border-[#f0f2f4] dark:border-gray-800 shadow-sm">
+<div class="flex items-center justify-between mb-8">
+<div>
+<h4 class="text-lg font-bold text-[#111418] dark:text-white">Gastos Mensais (Últimos 6 meses)</h4>
+<p class="text-sm text-gray-500 dark:text-gray-400">Tendências de despesas mensais vs orçamento</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<div class="size-2 rounded-full bg-primary"></div>
+<span class="text-[10px] font-bold text-gray-400 uppercase">Real</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="size-2 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+<span class="text-[10px] font-bold text-gray-400 uppercase">Orçado</span>
+</div>
+</div>
+</div>
+<div class="h-64 flex items-end justify-between gap-6 px-4">
+<div class="flex-1 flex flex-col items-center gap-1 group">
+<div class="w-full flex items-end justify-center gap-1 h-full relative">
+<div class="w-4 bg-gray-200 dark:bg-gray-700 rounded-t h-[70%]"></div>
+<div class="w-4 bg-primary rounded-t h-[65%] group-hover:bg-primary/80 transition-all"></div>
+</div>
+<span class="text-[10px] font-bold text-gray-400 mt-2">OUT</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-1 group">
+<div class="w-full flex items-end justify-center gap-1 h-full relative">
+<div class="w-4 bg-gray-200 dark:bg-gray-700 rounded-t h-[75%]"></div>
+<div class="w-4 bg-primary rounded-t h-[80%] group-hover:bg-primary/80 transition-all"></div>
+</div>
+<span class="text-[10px] font-bold text-gray-400 mt-2">NOV</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-1 group">
+<div class="w-full flex items-end justify-center gap-1 h-full relative">
+<div class="w-4 bg-gray-200 dark:bg-gray-700 rounded-t h-[65%]"></div>
+<div class="w-4 bg-primary rounded-t h-[60%] group-hover:bg-primary/80 transition-all"></div>
+</div>
+<span class="text-[10px] font-bold text-gray-400 mt-2">DEZ</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-1 group">
+<div class="w-full flex items-end justify-center gap-1 h-full relative">
+<div class="w-4 bg-gray-200 dark:bg-gray-700 rounded-t h-[80%]"></div>
+<div class="w-4 bg-primary rounded-t h-[75%] group-hover:bg-primary/80 transition-all"></div>
+</div>
+<span class="text-[10px] font-bold text-gray-400 mt-2">JAN</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-1 group">
+<div class="w-full flex items-end justify-center gap-1 h-full relative">
+<div class="w-4 bg-gray-200 dark:bg-gray-700 rounded-t h-[70%]"></div>
+<div class="w-4 bg-primary rounded-t h-[68%] group-hover:bg-primary/80 transition-all"></div>
+</div>
+<span class="text-[10px] font-bold text-gray-400 mt-2">FEV</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-1 group">
+<div class="w-full flex items-end justify-center gap-1 h-full relative">
+<div class="w-4 bg-gray-200 dark:bg-gray-700 rounded-t h-[85%]"></div>
+<div class="w-4 bg-primary rounded-t h-[90%] group-hover:bg-primary/80 transition-all"></div>
+</div>
+<span class="text-[10px] font-bold text-gray-400 mt-2">MAR</span>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-gray-900 rounded-xl border border-[#f0f2f4] dark:border-gray-800 shadow-sm overflow-hidden">
+<div class="p-6 border-b border-[#f0f2f4] dark:border-gray-800 flex justify-between items-center">
+<h4 class="text-lg font-bold text-[#111418] dark:text-white">Resumo Mensal</h4>
+<button class="text-primary text-sm font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-base">download</span>
+                        Baixar CSV
+                    </button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-gray-50 dark:bg-gray-800/50">
+<th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Mês</th>
+<th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Renda</th>
+<th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Despesas</th>
+<th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-right">Economia</th>
+<th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-right">Retorno de Investimento</th>
+<th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-right">Variação Líquida</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-all">
+<td class="px-6 py-4 font-bold text-[#111418] dark:text-white">Março 2024</td>
+<td class="px-6 py-4 text-sm">R$ 8.450,00</td>
+<td class="px-6 py-4 text-sm">R$ 5.210,40</td>
+<td class="px-6 py-4 text-sm text-right text-green-600 font-bold">R$ 3.239,60</td>
+<td class="px-6 py-4 text-sm text-right text-green-600">+1.24%</td>
+<td class="px-6 py-4 text-sm text-right font-black">+R$ 3.540,20</td>
+</tr>
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-all">
+<td class="px-6 py-4 font-bold text-[#111418] dark:text-white">Fevereiro 2024</td>
+<td class="px-6 py-4 text-sm">R$ 8.100,00</td>
+<td class="px-6 py-4 text-sm">R$ 5.640,20</td>
+<td class="px-6 py-4 text-sm text-right text-green-600 font-bold">R$ 2.459,80</td>
+<td class="px-6 py-4 text-sm text-right text-green-600">+0.85%</td>
+<td class="px-6 py-4 text-sm text-right font-black">+R$ 2.680,15</td>
+</tr>
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-all">
+<td class="px-6 py-4 font-bold text-[#111418] dark:text-white">Janeiro 2024</td>
+<td class="px-6 py-4 text-sm">R$ 8.600,00</td>
+<td class="px-6 py-4 text-sm">R$ 6.100,00</td>
+<td class="px-6 py-4 text-sm text-right text-green-600 font-bold">R$ 2.500,00</td>
+<td class="px-6 py-4 text-sm text-right text-red-500">-0.42%</td>
+<td class="px-6 py-4 text-sm text-right font-black">+R$ 2.240,30</td>
+</tr>
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-all">
+<td class="px-6 py-4 font-bold text-[#111418] dark:text-white">Dezembro 2023</td>
+<td class="px-6 py-4 text-sm">R$ 9.200,00</td>
+<td class="px-6 py-4 text-sm">R$ 7.450,10</td>
+<td class="px-6 py-4 text-sm text-right text-green-600 font-bold">R$ 1.749,90</td>
+<td class="px-6 py-4 text-sm text-right text-green-600">+2.15%</td>
+<td class="px-6 py-4 text-sm text-right font-black">+R$ 3.120,40</td>
+</tr>
+</tbody>
+<tfoot>
+<tr class="bg-gray-100 dark:bg-gray-800/80 font-black">
+<td class="px-6 py-4">Total no Período</td>
+<td class="px-6 py-4">R$ 34.350,00</td>
+<td class="px-6 py-4">R$ 24.401,10</td>
+<td class="px-6 py-4 text-right text-green-600">R$ 9.948,90</td>
+<td class="px-6 py-4 text-right text-green-600">Média +0.95%</td>
+<td class="px-6 py-4 text-right">+R$ 11.581,05</td>
+</tr>
+</tfoot>
+</table>
+</div>
+</div>
+</main>
+</div>
+</div>
+
+</body></html>

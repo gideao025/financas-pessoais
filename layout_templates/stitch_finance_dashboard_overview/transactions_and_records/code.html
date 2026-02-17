@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html class="light" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Transações e Registros | FinancePro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: 'Manrope', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-[#111418] dark:text-white transition-colors duration-200">
+<div class="flex h-screen overflow-hidden">
+<aside class="w-64 flex-shrink-0 border-r border-solid border-[#dbe0e6] dark:border-gray-800 bg-white dark:bg-[#15202b] flex flex-col justify-between">
+<div class="p-4 flex flex-col gap-8">
+<div class="flex items-center gap-3">
+<div class="bg-primary rounded-lg p-2 text-white">
+<span class="material-symbols-outlined block">account_balance_wallet</span>
+</div>
+<div class="flex flex-col">
+<h1 class="text-[#111418] dark:text-white text-base font-bold leading-none">FinancePro</h1>
+<p class="text-[#617589] dark:text-gray-400 text-xs mt-1">Plano Premium</p>
+</div>
+</div>
+<nav class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-[#617589] dark:text-gray-400 hover:bg-[#f0f2f4] dark:hover:bg-gray-800 transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<p class="text-sm font-medium">Dashboard</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">receipt_long</span>
+<p class="text-sm font-bold">Transações</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-[#617589] dark:text-gray-400 hover:bg-[#f0f2f4] dark:hover:bg-gray-800 transition-colors" href="#">
+<span class="material-symbols-outlined">account_balance</span>
+<p class="text-sm font-medium">Contas</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-[#617589] dark:text-gray-400 hover:bg-[#f0f2f4] dark:hover:bg-gray-800 transition-colors" href="#">
+<span class="material-symbols-outlined">target</span>
+<p class="text-sm font-medium">Orçamentos</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-[#617589] dark:text-gray-400 hover:bg-[#f0f2f4] dark:hover:bg-gray-800 transition-colors" href="#">
+<span class="material-symbols-outlined">bar_chart</span>
+<p class="text-sm font-medium">Relatórios</p>
+</a>
+</nav>
+</div>
+<div class="p-4 border-t border-[#dbe0e6] dark:border-gray-800">
+<div class="flex items-center gap-3 p-2">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-8" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAbZgvj-Z4iD046dwm05MefSIXo2j6Wxqw0XNxg233dHA7cZY3N0ZlcSjVIGmZAcUOou6dg4gpbxRsK2M3cYxMkqd8yebKR0N8NRqznpCm1euHNIJ3tMLNuORc80ZoedYDPS0gr5ced67fog5Io8Kt8CZSqPEJTqep_7FDvlWRfRfV_xKMMPVfRfCUHDJfQTqCsA6IYozGdbUVpPIQ0FYUILbPwavimKxw6GqDqmFFaTVoC8x1lMkhzaV32twGEmGYimMU0Beh1nrhz");'></div>
+<div class="flex flex-col">
+<p class="text-sm font-bold dark:text-white">Alex Morgan</p>
+<p class="text-xs text-[#617589] dark:text-gray-400">Configurações e Perfil</p>
+</div>
+</div>
+</div>
+</aside>
+<main class="flex-1 flex flex-col overflow-y-auto">
+<header class="sticky top-0 z-10 flex items-center justify-between whitespace-nowrap border-b border-solid border-[#dbe0e6] dark:border-gray-800 bg-white dark:bg-[#15202b] px-8 py-4">
+<div class="flex items-center gap-6 flex-1">
+<h2 class="text-[#111418] dark:text-white text-xl font-bold tracking-tight">Transações e Registros</h2>
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#617589] text-xl">search</span>
+<input class="w-full pl-10 pr-4 py-2 rounded-lg border-none bg-[#f0f2f4] dark:bg-gray-800 text-[#111418] dark:text-white focus:ring-2 focus:ring-primary placeholder:text-[#617589] text-sm" placeholder="Pesquisar transações..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center justify-center rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold gap-2 hover:bg-primary/90 transition-colors">
+<span class="material-symbols-outlined text-xl">add_circle</span>
+<span class="truncate">Adicionar Nova Transação</span>
+</button>
+<button class="flex items-center justify-center rounded-lg h-10 w-10 bg-[#f0f2f4] dark:bg-gray-800 text-[#111418] dark:text-white hover:bg-[#dbe0e6] dark:hover:bg-gray-700">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="flex items-center justify-center rounded-lg h-10 w-10 bg-[#f0f2f4] dark:bg-gray-800 text-[#111418] dark:text-white hover:bg-[#dbe0e6] dark:hover:bg-gray-700">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</header>
+<div class="px-8 py-4 bg-white dark:bg-[#15202b] border-b border-[#dbe0e6] dark:border-gray-800">
+<div class="flex gap-3 flex-wrap">
+<button class="flex h-9 items-center gap-2 rounded-lg bg-[#f0f2f4] dark:bg-gray-800 px-4 text-sm font-medium dark:text-gray-200">
+<span class="material-symbols-outlined text-lg">calendar_today</span>
+<span>Período: Este Mês</span>
+<span class="material-symbols-outlined text-lg">expand_more</span>
+</button>
+<button class="flex h-9 items-center gap-2 rounded-lg bg-[#f0f2f4] dark:bg-gray-800 px-4 text-sm font-medium dark:text-gray-200">
+<span class="material-symbols-outlined text-lg">category</span>
+<span>Categoria: Todas</span>
+<span class="material-symbols-outlined text-lg">expand_more</span>
+</button>
+<button class="flex h-9 items-center gap-2 rounded-lg bg-[#f0f2f4] dark:bg-gray-800 px-4 text-sm font-medium dark:text-gray-200">
+<span class="material-symbols-outlined text-lg">account_balance_wallet</span>
+<span>Conta: Todas</span>
+<span class="material-symbols-outlined text-lg">expand_more</span>
+</button>
+<button class="flex h-9 items-center gap-2 rounded-lg bg-[#f0f2f4] dark:bg-gray-800 px-4 text-sm font-medium dark:text-gray-200">
+<span class="material-symbols-outlined text-lg">payments</span>
+<span>Tipo: Todos</span>
+<span class="material-symbols-outlined text-lg">expand_more</span>
+</button>
+<div class="ml-auto flex gap-2">
+<button class="flex h-9 items-center gap-2 rounded-lg border border-[#dbe0e6] dark:border-gray-700 px-4 text-sm font-medium dark:text-gray-200 hover:bg-[#f0f2f4] dark:hover:bg-gray-800 transition-colors">
+<span class="material-symbols-outlined text-lg">download</span>
+<span>Exportar CSV</span>
+</button>
+</div>
+</div>
+</div>
+<div class="px-8 py-6">
+<div class="bg-white dark:bg-[#15202b] rounded-xl border border-[#dbe0e6] dark:border-gray-800 shadow-sm overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-[#fcfcfd] dark:bg-gray-800/50">
+<tr class="border-b border-[#dbe0e6] dark:border-gray-800">
+<th class="px-6 py-4 text-xs font-bold text-[#617589] dark:text-gray-400 uppercase tracking-wider">Data</th>
+<th class="px-6 py-4 text-xs font-bold text-[#617589] dark:text-gray-400 uppercase tracking-wider">Descrição</th>
+<th class="px-6 py-4 text-xs font-bold text-[#617589] dark:text-gray-400 uppercase tracking-wider">Categoria</th>
+<th class="px-6 py-4 text-xs font-bold text-[#617589] dark:text-gray-400 uppercase tracking-wider">Conta</th>
+<th class="px-6 py-4 text-xs font-bold text-[#617589] dark:text-gray-400 uppercase tracking-wider text-right">Valor</th>
+<th class="px-6 py-4 w-10"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-[#dbe0e6] dark:divide-gray-800">
+<tr class="hover:bg-[#f8f9fa] dark:hover:bg-gray-800/30 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap text-sm text-[#111418] dark:text-gray-300">24 Out, 2023</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-lg bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 flex items-center justify-center">
+<span class="material-symbols-outlined text-lg">work</span>
+</div>
+<span class="text-sm font-semibold text-[#111418] dark:text-white">Salário Mensal</span>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#f0f2f4] dark:bg-gray-700 text-[#111418] dark:text-gray-300">Receitas</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-[#617589] dark:text-gray-400">Poupança Principal</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-bold text-green-600 dark:text-green-400">+R$ 5.000,00</td>
+<td class="px-6 py-4 text-right">
+<button class="text-[#617589] dark:text-gray-500 hover:text-primary"><span class="material-symbols-outlined">more_vert</span></button>
+</td>
+</tr>
+<tr class="hover:bg-[#f8f9fa] dark:hover:bg-gray-800/30 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap text-sm text-[#111418] dark:text-gray-300">23 Out, 2023</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-lg bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 flex items-center justify-center">
+<span class="material-symbols-outlined text-lg">shopping_basket</span>
+</div>
+<span class="text-sm font-semibold text-[#111418] dark:text-white">Mercado Central</span>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#f0f2f4] dark:bg-gray-700 text-[#111418] dark:text-gray-300">Despesas</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-[#617589] dark:text-gray-400">Conta Corrente</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-bold text-red-600 dark:text-red-400">-R$ 152,40</td>
+<td class="px-6 py-4 text-right">
+<button class="text-[#617589] dark:text-gray-500 hover:text-primary"><span class="material-symbols-outlined">more_vert</span></button>
+</td>
+</tr>
+<tr class="hover:bg-[#f8f9fa] dark:hover:bg-gray-800/30 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap text-sm text-[#111418] dark:text-gray-300">22 Out, 2023</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+<span class="material-symbols-outlined text-lg">movie</span>
+</div>
+<span class="text-sm font-semibold text-[#111418] dark:text-white">Assinatura de Streaming</span>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#f0f2f4] dark:bg-gray-700 text-[#111418] dark:text-gray-300">Entretenimento</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-[#617589] dark:text-gray-400">Cartão de Crédito</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-bold text-red-600 dark:text-red-400">-R$ 15,99</td>
+<td class="px-6 py-4 text-right">
+<button class="text-[#617589] dark:text-gray-500 hover:text-primary"><span class="material-symbols-outlined">more_vert</span></button>
+</td>
+</tr>
+<tr class="hover:bg-[#f8f9fa] dark:hover:bg-gray-800/30 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap text-sm text-[#111418] dark:text-gray-300">21 Out, 2023</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-lg bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 flex items-center justify-center">
+<span class="material-symbols-outlined text-lg">computer</span>
+</div>
+<span class="text-sm font-semibold text-[#111418] dark:text-white">Projeto Freelance UI</span>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#f0f2f4] dark:bg-gray-700 text-[#111418] dark:text-gray-300">Receitas</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-[#617589] dark:text-gray-400">Carteira Digital</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-bold text-green-600 dark:text-green-400">+R$ 1.200,00</td>
+<td class="px-6 py-4 text-right">
+<button class="text-[#617589] dark:text-gray-500 hover:text-primary"><span class="material-symbols-outlined">more_vert</span></button>
+</td>
+</tr>
+<tr class="hover:bg-[#f8f9fa] dark:hover:bg-gray-800/30 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap text-sm text-[#111418] dark:text-gray-300">20 Out, 2023</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-lg bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 flex items-center justify-center">
+<span class="material-symbols-outlined text-lg">coffee</span>
+</div>
+<span class="text-sm font-semibold text-[#111418] dark:text-white">Cafeteria Gourmet</span>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#f0f2f4] dark:bg-gray-700 text-[#111418] dark:text-gray-300">Alimentação</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-[#617589] dark:text-gray-400">Conta Corrente</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-bold text-red-600 dark:text-red-400">-R$ 6,50</td>
+<td class="px-6 py-4 text-right">
+<button class="text-[#617589] dark:text-gray-500 hover:text-primary"><span class="material-symbols-outlined">more_vert</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="flex items-center justify-between mt-6">
+<p class="text-sm text-[#617589] dark:text-gray-400">Exibindo 1 a 5 de 64 transações</p>
+<div class="flex items-center gap-1">
+<button class="flex size-10 items-center justify-center rounded-lg text-[#111418] dark:text-gray-300 hover:bg-[#f0f2f4] dark:hover:bg-gray-800 transition-colors">
+<span class="material-symbols-outlined text-lg">chevron_left</span>
+</button>
+<button class="text-sm font-bold flex size-10 items-center justify-center text-white rounded-lg bg-primary">1</button>
+<button class="text-sm font-medium flex size-10 items-center justify-center text-[#111418] dark:text-gray-300 rounded-lg hover:bg-[#f0f2f4] dark:hover:bg-gray-800 transition-colors">2</button>
+<button class="text-sm font-medium flex size-10 items-center justify-center text-[#111418] dark:text-gray-300 rounded-lg hover:bg-[#f0f2f4] dark:hover:bg-gray-800 transition-colors">3</button>
+<span class="text-sm flex size-10 items-center justify-center text-[#617589] dark:text-gray-500">...</span>
+<button class="text-sm font-medium flex size-10 items-center justify-center text-[#111418] dark:text-gray-300 rounded-lg hover:bg-[#f0f2f4] dark:hover:bg-gray-800 transition-colors">12</button>
+<button class="flex size-10 items-center justify-center rounded-lg text-[#111418] dark:text-gray-300 hover:bg-[#f0f2f4] dark:hover:bg-gray-800 transition-colors">
+<span class="material-symbols-outlined text-lg">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<div class="hidden w-[400px] border-l border-[#dbe0e6] dark:border-gray-800 bg-white dark:bg-[#15202b] flex-col flex-shrink-0 lg:flex">
+<div class="p-6 border-b border-[#dbe0e6] dark:border-gray-800 flex justify-between items-center">
+<h3 class="text-lg font-bold dark:text-white">Adicionar Transação</h3>
+<button class="text-[#617589] hover:text-[#111418] dark:hover:text-white">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="p-6 flex flex-col gap-6 overflow-y-auto">
+<div class="space-y-2">
+<label class="text-xs font-bold text-[#617589] dark:text-gray-400 uppercase">Valor</label>
+<div class="relative">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-bold text-[#111418] dark:text-white">R$</span>
+<input class="w-full pl-12 pr-4 py-3 bg-[#f0f2f4] dark:bg-gray-800 border-none rounded-xl text-2xl font-bold focus:ring-primary focus:ring-2 dark:text-white" placeholder="0,00" type="text"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-bold text-[#617589] dark:text-gray-400 uppercase">Tipo de Transação</label>
+<div class="flex gap-2">
+<button class="flex-1 py-2 px-4 rounded-lg bg-primary/10 text-primary border border-primary/20 font-bold text-sm">Despesas</button>
+<button class="flex-1 py-2 px-4 rounded-lg bg-[#f0f2f4] dark:bg-gray-800 text-[#617589] dark:text-gray-400 font-medium text-sm hover:bg-[#dbe0e6] dark:hover:bg-gray-700 transition-colors">Receitas</button>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-bold text-[#617589] dark:text-gray-400 uppercase">Data</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#617589]">calendar_month</span>
+<input class="w-full pl-10 pr-4 py-2 bg-[#f0f2f4] dark:bg-gray-800 border-none rounded-lg text-sm focus:ring-primary focus:ring-2 dark:text-white" type="date" value="2023-10-25"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-bold text-[#617589] dark:text-gray-400 uppercase">Descrição</label>
+<input class="w-full px-4 py-2 bg-[#f0f2f4] dark:bg-gray-800 border-none rounded-lg text-sm focus:ring-primary focus:ring-2 dark:text-white" placeholder="Onde você gastou?" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-bold text-[#617589] dark:text-gray-400 uppercase">Categoria</label>
+<select class="w-full px-4 py-2 bg-[#f0f2f4] dark:bg-gray-800 border-none rounded-lg text-sm focus:ring-primary focus:ring-2 dark:text-white">
+<option>Selecionar Categoria</option>
+<option>Mercado</option>
+<option>Entretenimento</option>
+<option>Contas Fixas</option>
+<option>Alimentação</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-bold text-[#617589] dark:text-gray-400 uppercase">Conta</label>
+<select class="w-full px-4 py-2 bg-[#f0f2f4] dark:bg-gray-800 border-none rounded-lg text-sm focus:ring-primary focus:ring-2 dark:text-white">
+<option>Conta Corrente</option>
+<option>Poupança</option>
+<option>Cartão de Crédito</option>
+</select>
+</div>
+<div class="pt-4 mt-auto">
+<button class="w-full bg-primary text-white py-3 rounded-xl font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-[0.98]">
+                    Salvar Transação
+                </button>
+</div>
+</div>
+</div>
+</div>
+
+</body></html>
