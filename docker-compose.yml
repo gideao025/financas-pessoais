@@ -14,17 +14,15 @@ services:
       dockerfile: Dockerfile
     container_name: financas-backend
     environment:
-      DB_URL: jdbc:postgresql://postgres:5432/financas
+      DB_URL: jdbc:postgresql://postgres:5440/financas
       DB_USER: financas
       DB_PASSWORD: financas
       SERVER_PORT: 8080
     ports:
       - "9091:8080"
+<<<<<<< HEAD
     depends_on:
       - postgres
+=======
+>>>>>>> d062e5b (docker compose ajusts)
     restart: unless-stopped
-
-  postgres:
-    extends:
-      file: ./backend/docker-compose.yml
-      service: postgres
