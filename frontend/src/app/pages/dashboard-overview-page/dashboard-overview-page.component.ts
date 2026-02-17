@@ -44,6 +44,42 @@ export class DashboardOverviewPageComponent {
     { nome: 'Viagem de Férias', progresso: 45 }
   ];
 
+  protected readonly gastosPorCategoria = computed(() => {
+    const mapa = new Map<string, number>();
+    for (const t of this.transacoes()) {
+      if (t.tipo !== 'saida') continue;
+      mapa.set(t.categoria, (mapa.get(t.categoria) ?? 0) + t.valor);
+    }
+    const total = Array.from(mapa.values()).reduce((a, b) => a + b, 0) || 1;
+    const lista = Array.from(mapa.entries())
+      .map(([categoria, totalCategoria]) => ({
+        categoria,
+        total: totalCategoria,
+        porcentagem: Math.round((totalCategoria / total) * 100)
+      }))
+      .sort((a, b) => b.total - a.total);
+    return lista.slice(0, 3);
+  });
+
+  protected readonly donutBackground = computed(() => {
+    const categorias = this.gastosPorCategoria();
+    if (!categorias.length) {
+      return '#e2e8f0';
+    }
+    const cores = ['#1e40af', '#475569', '#94a3b8'];
+    let inicio = 0;
+    const partes: string[] = [];
+    categorias.forEach((item, idx) => {
+      const fim = inicio + item.porcentagem;
+      partes.push(`${cores[idx]} ${inicio}% ${fim}%`);
+      inicio = fim;
+    });
+    if (inicio < 100) {
+      partes.push(`#e2e8f0 ${inicio}% 100%`);
+    }
+    return `conic-gradient(${partes.join(',')})`;
+  });
+
   protected carregarMais(): void {
     this.limite.update((valor) => Math.min(valor + 2, this.transacoes().length));
   }
