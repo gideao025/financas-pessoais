@@ -55,7 +55,6 @@ public class AuthService {
     userRepository.save(user);
 
     userSettingsRepository.save(UserSettingsEntity.builder()
-        .userId(user.getId())
         .user(user)
         .monthlySummary(true)
         .lowBalanceAlert(false)
