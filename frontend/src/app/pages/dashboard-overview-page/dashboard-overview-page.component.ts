@@ -1,16 +1,11 @@
-import { CurrencyPipe, DatePipe, NgClass, NgFor, PercentPipe } from '@angular/common';
+import { CurrencyPipe, DatePipe, NgClass, NgFor, NgIf, PercentPipe } from '@angular/common';
 import { Component, computed, signal } from '@angular/core';
 
-import { summaryCardsMock, transactionsMock, type SummaryCard, type Transaction } from '../../mocks/finance.mock';
-
-interface MetaFinanceira {
-  nome: string;
-  progresso: number;
-}
+import { goalsSignal, monthlyDataMock, summaryCardsMock, type Goal, type MonthlyPoint, type SummaryCard, transactionsMock, type Transaction } from '../../mocks/finance.mock';
 
 @Component({
   selector: 'app-dashboard-overview-page',
-  imports: [NgFor, NgClass, CurrencyPipe, PercentPipe, DatePipe],
+  imports: [NgFor, NgClass, NgIf, CurrencyPipe, PercentPipe, DatePipe],
   templateUrl: './dashboard-overview-page.component.html',
   styleUrl: './dashboard-overview-page.component.scss'
 })
@@ -38,11 +33,15 @@ export class DashboardOverviewPageComponent {
   protected readonly concluidas = computed(
     () => this.transacoes().filter((item) => item.status === 'concluida').length
   );
-  protected readonly metas: MetaFinanceira[] = [
-    { nome: 'Reserva de Emergência', progresso: 82 },
-    { nome: 'Casa Própria', progresso: 12 },
-    { nome: 'Viagem de Férias', progresso: 45 }
-  ];
+  protected readonly metas = goalsSignal;
+  protected readonly metasResumo = computed(() =>
+    this.metas()
+      .map((meta: Goal) => ({
+        nome: meta.nome,
+        progresso: Math.round((meta.atual / Math.max(meta.alvo, 1)) * 100)
+      }))
+      .slice(0, 3)
+  );
 
   protected readonly gastosPorCategoria = computed(() => {
     const mapa = new Map<string, number>();
@@ -78,6 +77,25 @@ export class DashboardOverviewPageComponent {
       partes.push(`#e2e8f0 ${inicio}% 100%`);
     }
     return `conic-gradient(${partes.join(',')})`;
+  });
+
+  protected readonly serie6m = computed<MonthlyPoint[]>(() => monthlyDataMock['6m']);
+  protected readonly maiorValor6m = computed(() => {
+    const valores = this.serie6m().flatMap((p) => [p.receita, p.despesa]);
+    return Math.max(...valores, 1);
+  });
+  protected readonly hoverIndex6m = signal<number | null>(null);
+  protected readonly hovered6m = computed(() => {
+    const idx = this.hoverIndex6m();
+    if (idx === null) return null;
+    const pontos = this.serie6m();
+    if (idx < 0 || idx >= pontos.length) return null;
+    return { idx, ponto: pontos[idx] };
+  });
+  protected readonly hoverX6m = computed(() => {
+    const data = this.hovered6m();
+    if (!data) return 0;
+    return data.idx * 16 + 10;
   });
 
   protected carregarMais(): void {

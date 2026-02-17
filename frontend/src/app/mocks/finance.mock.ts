@@ -1,3 +1,5 @@
+import { signal } from '@angular/core';
+
 export type TransactionType = 'entrada' | 'saida';
 export type TransactionStatus = 'concluida' | 'pendente';
 
@@ -43,6 +45,15 @@ export interface LinkedBank {
   tipo: string;
   final: string;
   sincronizado: boolean;
+}
+
+export interface Goal {
+  id: string;
+  nome: string;
+  descricao: string;
+  alvo: number;
+  atual: number;
+  prazo: string;
 }
 
 export const summaryCardsMock: SummaryCard[] = [
@@ -101,3 +112,32 @@ export const linkedBanksMock: LinkedBank[] = [
   { id: 'b2', nome: 'Banco Inter', tipo: 'Conta digital', final: '4002', sincronizado: true },
   { id: 'b3', nome: 'C6 Bank', tipo: 'Conta salario', final: '1190', sincronizado: false }
 ];
+
+export const goalsMock: Goal[] = [
+  {
+    id: 'g1',
+    nome: 'Reserva de Emergência',
+    descricao: 'Guardar o equivalente a 6 meses de despesas fixas.',
+    alvo: 20000,
+    atual: 16400,
+    prazo: '2026-12-31'
+  },
+  {
+    id: 'g2',
+    nome: 'Casa Própria',
+    descricao: 'Entrada para apartamento.',
+    alvo: 80000,
+    atual: 9500,
+    prazo: '2028-06-30'
+  },
+  {
+    id: 'g3',
+    nome: 'Viagem de Férias',
+    descricao: 'Viagem internacional em família.',
+    alvo: 15000,
+    atual: 6700,
+    prazo: '2027-01-15'
+  }
+];
+
+export const goalsSignal = signal<Goal[]>(goalsMock);

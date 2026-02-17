@@ -32,17 +32,69 @@
           <p class="text-xs text-[#64748b]">Análise dos últimos 6 meses</p>
         </div>
       </div>
-      <div class="flex h-48 items-end justify-between gap-3 px-3">
-        <div
-          *ngFor="let m of ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN']"
-          class="flex flex-1 flex-col items-center gap-2"
-        >
-          <div class="flex h-full items-end gap-1">
-            <div class="w-3 rounded-t bg-primary/20" style="height: 60%"></div>
-            <div class="w-3 rounded-t bg-primary" style="height: 82%"></div>
-          </div>
-          <span class="text-[10px] font-bold text-[#64748b]">{{ m }}</span>
-        </div>
+      <div class="h-48 px-3 relative">
+        <svg viewBox="0 0 100 40" class="h-full w-full">
+          <g *ngFor="let ponto of serie6m(); let i = index">
+            <rect
+              [attr.x]="i * 16 + 4"
+              [attr.y]="40 - (ponto.despesa / maiorValor6m()) * 35"
+              width="3"
+              [attr.height]="(ponto.despesa / maiorValor6m()) * 35"
+              fill="#93c5fd"
+              rx="1"
+              (mouseenter)="hoverIndex6m.set(i)"
+              (mouseleave)="hoverIndex6m.set(null)"
+            ></rect>
+            <rect
+              [attr.x]="i * 16 + 8"
+              [attr.y]="40 - (ponto.receita / maiorValor6m()) * 35"
+              width="3"
+              [attr.height]="(ponto.receita / maiorValor6m()) * 35"
+              fill="#2563eb"
+              rx="1"
+              (mouseenter)="hoverIndex6m.set(i)"
+              (mouseleave)="hoverIndex6m.set(null)"
+            ></rect>
+            <text
+              [attr.x]="i * 16 + 6"
+              y="38"
+              text-anchor="middle"
+              class="fill-[#64748b]"
+              style="font-size: 2.5px; font-weight: 700"
+            >
+              {{ ponto.mes }}
+            </text>
+          </g>
+          <g *ngIf="hovered6m()">
+            <rect
+              [attr.x]="hoverX6m() - 14"
+              y="4"
+              width="28"
+              height="12"
+              rx="2"
+              fill="#ffffff"
+              opacity="0.9"
+            ></rect>
+            <text
+              [attr.x]="hoverX6m()"
+              y="9"
+              text-anchor="middle"
+              style="font-size: 3px; font-weight: 700"
+              class="fill-[#111418]"
+            >
+              {{ hovered6m()!.ponto.receita | currency: 'BRL' : 'symbol' : '1.0-0' : 'pt-BR' }}
+            </text>
+            <text
+              [attr.x]="hoverX6m()"
+              y="14"
+              text-anchor="middle"
+              style="font-size: 3px; font-weight: 700"
+              class="fill-[#64748b]"
+            >
+              {{ hovered6m()!.ponto.despesa | currency: 'BRL' : 'symbol' : '1.0-0' : 'pt-BR' }}
+            </text>
+          </g>
+        </svg>
       </div>
     </article>
 
@@ -51,7 +103,7 @@
     >
       <h3 class="mb-3 text-xl font-bold">Metas Financeiras</h3>
       <div class="space-y-4">
-        <div *ngFor="let meta of metas">
+        <div *ngFor="let meta of metasResumo()">
           <div class="mb-1 flex items-center justify-between text-sm">
             <span class="font-semibold">{{ meta.nome }}</span>
             <span class="font-bold text-primary">{{ meta.progresso }}%</span>
@@ -72,7 +124,10 @@
         <h3 class="text-xl font-bold">Gastos por Categoria</h3>
       </div>
       <div class="flex items-center gap-10">
-        <div class="relative size-40 rounded-full bg-[#e2e8f0]" [style.background-image]="donutBackground()">
+        <div
+          class="relative size-40 rounded-full bg-[#e2e8f0]"
+          [style.background-image]="donutBackground()"
+        >
           <div
             class="absolute inset-4 rounded-full bg-white dark:bg-[#1a242f] flex flex-col items-center justify-center"
           >

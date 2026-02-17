@@ -78,4 +78,6 @@ export class ReportsPageComponent {
       })
       .join(' ');
   });
+
+  protected readonly hoverIndexMensal = signal<number | null>(null);
 }
