@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     container_name: financas-frontend
     ports:
-      - "8080:80"
+      - "9090:80"
     restart: unless-stopped
 
   backend:
@@ -19,7 +19,7 @@ services:
       DB_PASSWORD: financas
       SERVER_PORT: 8080
     ports:
-      - "8081:8080"
+      - "9091:8080"
     depends_on:
       - postgres
     restart: unless-stopped

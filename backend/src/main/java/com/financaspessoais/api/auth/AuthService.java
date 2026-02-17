@@ -12,6 +12,7 @@ import com.financaspessoais.api.jwt.JwtService;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HexFormat;
 import java.util.UUID;
@@ -107,7 +108,7 @@ public class AuthService {
         .id(UUID.randomUUID())
         .user(user)
         .tokenHash(sha256(refreshToken))
-        .expiresAt(LocalDateTime.now().plusMillis(appProperties.refreshExpirationMs()))
+        .expiresAt(LocalDateTime.now().plus(Duration.ofMillis(appProperties.refreshExpirationMs())))
         .revoked(false)
         .createdAt(LocalDateTime.now())
         .build());
