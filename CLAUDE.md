@@ -105,10 +105,11 @@ npm start   # http://localhost:4200
 - Porta `9090` → `http://localhost:9091/api`
 - Qualquer outra → `http://localhost:8080/api`
 
-**Rotas:**
+**Rotas** (todas sob `ShellLayoutComponent` + `authGuard`, exceto `/auth`):
 ```
-/auth         → AuthPageComponent        (login + registro)
-/dashboard    → DashboardOverviewPage    (protegida por authGuard)
+/auth         → AuthPageComponent        (login + registro, público)
+/dashboard    → DashboardOverviewPage
+/accounts     → AccountsPage             (gestão de contas bancárias)
 /transactions → TransactionsPage
 /reports      → ReportsPage
 /goals        → GoalsPage
@@ -118,13 +119,15 @@ npm start   # http://localhost:4200
 
 **Camada de serviços HTTP** (`core/services/`):
 - `auth.service.ts` — login, registro, refresh token, logout
-- `accounts.service.ts`, `transactions.service.ts`, `goals.service.ts`, `reports.service.ts`
+- `accounts.service.ts` (list/create/update), `transactions.service.ts`, `goals.service.ts`, `cards.service.ts`, `reports.service.ts`, `settings.service.ts`
 
 **Interceptor e guard** (`core/auth/`):
 - `auth.interceptor.ts` — injeta Bearer token em todas as requisições
 - `auth.guard.ts` — redireciona para `/auth` se não autenticado
 
-**Mocks:** `app/mocks/finance.mock.ts` — dados estáticos ainda usados em algumas telas
+**Navegação:** a sidebar real é inline no `layouts/shell-layout/shell-layout.component.html`. O `components/sidebar/` é código morto (não importado) — não editar.
+
+**Mocks:** `app/mocks/finance.mock.ts` — código morto, nenhuma página importa.
 
 **Layout templates** em `layout_templates/stitch_finance_dashboard_overview/` — referência visual para cada tela (HTML + screenshot PNG).
 
@@ -151,6 +154,7 @@ Configuração em `WebConfig.java`. Se adicionar nova origem, atualizar aqui.
 | Backend (auth, accounts, transactions, goals, cards, reports, settings) | Implementado |
 | Frontend — auth page | Integrado |
 | Frontend — dashboard | Integrado |
+| Frontend — accounts (gestão de contas) | Integrado (Task 17) |
 | Frontend — transactions | Integrado |
 | Frontend — goals | Integrado |
 | Frontend — cards | Integrado |
@@ -159,7 +163,7 @@ Configuração em `WebConfig.java`. Se adicionar nova origem, atualizar aqui.
 | CORS docker (porta 9090) | Configurado |
 | Sem mvnw | Usar `mvn` direto |
 
-Teste ponta a ponta executado e aprovado (API + UI). Nenhuma tela do app importa mais `finance.mock.ts`.
+Teste ponta a ponta executado e aprovado (API + UI). Nenhuma tela do app importa mais `finance.mock.ts`. Todas as telas da POC consomem a API real.
 
 ## Problemas conhecidos
 
