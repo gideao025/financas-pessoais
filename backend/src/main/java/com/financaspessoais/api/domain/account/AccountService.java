@@ -41,7 +41,7 @@ public class AccountService {
         .type(request.type())
         .institution(request.institution())
         .balance(request.balance())
-        .active(request.active())
+        .active(true)
         .createdAt(now)
         .updatedAt(now)
         .build();
