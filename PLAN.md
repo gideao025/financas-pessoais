@@ -160,8 +160,13 @@ Critérios:
 
 ## Fase 5: Evolução pós-POC
 
-### Task 17
+### Task 17 — CONCLUÍDA
 Criar tela dedicada de gerenciamento de contas bancárias.
+
+Entregue: rota `/accounts` (authGuard), listagem com saldo/tipo/instituição/status,
+criação e edição via `PUT /api/accounts/{id}`, toggle ativa/inativa, cards de resumo,
+`AccountsService.update` e item "Contas" na navegação do shell-layout. Validado por
+teste de API e UI (Playwright).
 
 Contexto:
 - hoje contas só podem ser criadas inline na tela de transações (`criarConta` em `transactions-page`)
