@@ -4,32 +4,81 @@
       <h2 class="text-3xl font-black tracking-tight">Gerenciador de Cartões de Crédito</h2>
       <p class="text-sm text-[#64748b]">Gerencie saldos, limites e vencimentos dos seus cartões ativos.</p>
     </div>
-    <button class="rounded-xl bg-primary px-4 py-2 text-sm font-bold text-white" (click)="adicionarCartaoMock()">Novo Cartão</button>
+    <button class="rounded-xl bg-primary px-4 py-2 text-sm font-bold text-white" (click)="painelAberto.set(true)">Novo Cartão</button>
   </div>
 
-  <div class="flex gap-6 overflow-x-auto pb-2">
+  <p *ngIf="erro()" class="rounded-lg bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 dark:bg-red-900/20 dark:text-red-400">{{ erro() }}</p>
+  <p *ngIf="mensagem()" class="rounded-lg bg-green-50 px-4 py-2 text-sm font-semibold text-green-600 dark:bg-green-900/20 dark:text-green-400">{{ mensagem() }}</p>
+
+  <div *ngIf="carregando()" class="py-16 text-center text-sm text-[#64748b]">Carregando cartões...</div>
+
+  <div *ngIf="!carregando() && !cartoes().length && !painelAberto()" class="rounded-xl border border-dashed border-[#dbe0e6] py-16 text-center text-sm text-[#64748b] dark:border-[#2a3441]">
+    Nenhum cartão cadastrado. Clique em <strong>Novo Cartão</strong> para adicionar.
+  </div>
+
+  <article *ngIf="painelAberto()" class="rounded-xl border border-[#e5e7eb] bg-white p-5 dark:border-[#2a3441] dark:bg-[#1a242f]">
+    <h3 class="mb-4 text-lg font-bold">Novo Cartão</h3>
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <label class="flex flex-col gap-1 text-xs font-bold">
+        Nome do cartão
+        <input class="h-10 rounded-lg border border-[#dbe0e6] px-3 text-sm font-normal dark:border-[#2a3441] dark:bg-[#24313f]" placeholder="Ex: Nubank Ultravioleta" [value]="formNome()" (input)="formNome.set($any($event.target).value)" />
+      </label>
+      <label class="flex flex-col gap-1 text-xs font-bold">
+        Bandeira
+        <select class="h-10 rounded-lg border border-[#dbe0e6] px-3 text-sm font-normal dark:border-[#2a3441] dark:bg-[#24313f]" [value]="formBandeira()" (change)="formBandeira.set($any($event.target).value)">
+          <option>Mastercard</option>
+          <option>Visa</option>
+          <option>Elo</option>
+          <option>Amex</option>
+          <option>Hipercard</option>
+        </select>
+      </label>
+      <label class="flex flex-col gap-1 text-xs font-bold">
+        4 últimos dígitos
+        <input class="h-10 rounded-lg border border-[#dbe0e6] px-3 text-sm font-normal dark:border-[#2a3441] dark:bg-[#24313f]" placeholder="0000" maxlength="4" [value]="formFinal()" (input)="formFinal.set($any($event.target).value)" />
+      </label>
+      <label class="flex flex-col gap-1 text-xs font-bold">
+        Dia de vencimento
+        <input type="number" min="1" max="31" class="h-10 rounded-lg border border-[#dbe0e6] px-3 text-sm font-normal dark:border-[#2a3441] dark:bg-[#24313f]" [value]="formVencimento()" (input)="formVencimento.set($any($event.target).value)" />
+      </label>
+      <label class="flex flex-col gap-1 text-xs font-bold">
+        Limite total (R$)
+        <input class="h-10 rounded-lg border border-[#dbe0e6] px-3 text-sm font-normal dark:border-[#2a3441] dark:bg-[#24313f]" placeholder="0,00" [value]="formLimite()" (input)="formLimite.set($any($event.target).value)" />
+      </label>
+      <label class="flex flex-col gap-1 text-xs font-bold">
+        Limite usado (R$)
+        <input class="h-10 rounded-lg border border-[#dbe0e6] px-3 text-sm font-normal dark:border-[#2a3441] dark:bg-[#24313f]" placeholder="0,00" [value]="formUsado()" (input)="formUsado.set($any($event.target).value)" />
+      </label>
+    </div>
+    <div class="mt-4 flex gap-2">
+      <button class="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white" (click)="salvarCartao()">Salvar</button>
+      <button class="rounded-lg border border-[#dbe0e6] px-4 py-2 text-sm font-bold dark:border-[#2a3441]" (click)="painelAberto.set(false); erro.set('')">Cancelar</button>
+    </div>
+  </article>
+
+  <div *ngIf="!carregando()" class="flex gap-6 overflow-x-auto pb-2">
     <article *ngFor="let card of cartoes()" class="w-[360px] shrink-0 space-y-4">
-      <div class="h-52 rounded-2xl p-6 text-white shadow-xl" [ngClass]="card.bloqueado ? 'card-gradient-dark' : 'card-gradient-blue'">
+      <div class="h-52 rounded-2xl p-6 text-white shadow-xl" [ngClass]="card.blocked ? 'card-gradient-dark' : 'card-gradient-blue'">
         <div class="flex h-full flex-col justify-between">
           <div class="flex items-center justify-between">
-            <p class="text-xs uppercase tracking-widest">{{ card.bandeira }}</p>
-            <p class="text-lg font-black">{{ card.bandeira }}</p>
+            <p class="text-xs uppercase tracking-widest">{{ card.brand }}</p>
+            <p class="text-lg font-black">{{ card.name }}</p>
           </div>
           <div>
             <p class="text-xs opacity-80">Saldo Devedor</p>
-            <p class="text-4xl font-black">{{ card.usado | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</p>
+            <p class="text-4xl font-black">{{ card.usedLimit | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</p>
           </div>
-          <p class="text-sm">**** {{ card.final }}</p>
+          <p class="text-sm">**** {{ card.lastFour }}</p>
         </div>
       </div>
 
       <div class="rounded-xl border border-[#e5e7eb] bg-white p-5 dark:border-[#2a3441] dark:bg-[#1a242f]">
         <p class="text-xs font-bold uppercase tracking-wider text-[#64748b]">Saldo Disponível</p>
-        <p class="text-lg font-bold text-primary">{{ (card.limite - card.usado) | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }} / {{ card.limite | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</p>
-        <div class="mt-3 h-2 rounded-full bg-[#eef2f6] dark:bg-[#24313f]"><div class="h-2 rounded-full bg-primary" [style.width.%]="(card.usado / card.limite) * 100"></div></div>
+        <p class="text-lg font-bold text-primary">{{ (card.creditLimit - card.usedLimit) | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }} / {{ card.creditLimit | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</p>
+        <div class="mt-3 h-2 rounded-full bg-[#eef2f6] dark:bg-[#24313f]"><div class="h-2 rounded-full bg-primary" [style.width.%]="(card.usedLimit / card.creditLimit) * 100"></div></div>
         <div class="mt-4 flex items-center justify-between text-sm">
-          <span>Vencimento dia {{ card.vencimento }}</span>
-          <button class="rounded-lg border border-primary px-3 py-1.5 text-xs font-bold text-primary" (click)="alternarBloqueio(card.id)">{{ card.bloqueado ? 'Desbloquear' : 'Bloquear' }}</button>
+          <span>Vencimento dia {{ card.dueDay }}</span>
+          <button class="rounded-lg border border-primary px-3 py-1.5 text-xs font-bold text-primary" (click)="alternarBloqueio(card.id)">{{ card.blocked ? 'Desbloquear' : 'Bloquear' }}</button>
         </div>
       </div>
     </article>

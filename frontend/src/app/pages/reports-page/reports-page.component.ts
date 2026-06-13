@@ -1,18 +1,51 @@
-import { CurrencyPipe, NgClass, NgFor, PercentPipe } from '@angular/common';
-import { Component, computed, signal } from '@angular/core';
+import { CurrencyPipe, NgClass, NgFor, NgIf, PercentPipe } from '@angular/common';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 
-import { monthlyDataMock, type MonthlyPoint } from '../../mocks/finance.mock';
+import type { DashboardSummaryResponse, MonthlyReportItem } from '../../core/models/api.models';
+import { ReportsService } from '../../core/services/reports.service';
+
+interface MonthlyPoint {
+  mes: string;
+  receita: number;
+  despesa: number;
+}
 
 @Component({
   selector: 'app-reports-page',
-  imports: [NgFor, NgClass, CurrencyPipe, PercentPipe],
+  imports: [NgFor, NgClass, NgIf, CurrencyPipe, PercentPipe],
   templateUrl: './reports-page.component.html',
   styleUrl: './reports-page.component.scss'
 })
-export class ReportsPageComponent {
-  protected readonly periodo = signal<'3m' | '6m' | '12m'>('6m');
+export class ReportsPageComponent implements OnInit {
+  private readonly reportsService = inject(ReportsService);
 
-  protected readonly serie = computed<MonthlyPoint[]>(() => monthlyDataMock[this.periodo()]);
+  protected readonly carregando = signal(true);
+  protected readonly erro = signal('');
+  protected readonly periodo = signal<'3m' | '6m' | '12m'>('6m');
+  protected readonly resumo = signal<DashboardSummaryResponse | null>(null);
+
+  protected readonly todaSerie = computed<MonthlyPoint[]>(() =>
+    (this.resumo()?.monthlySeries ?? []).map((item: MonthlyReportItem) => ({
+      mes: item.month,
+      receita: item.income,
+      despesa: item.expense
+    }))
+  );
+
+  protected readonly serie = computed<MonthlyPoint[]>(() => {
+    const todos = this.todaSerie();
+    if (this.periodo() === '3m') return todos.slice(-3);
+    return todos;
+  });
+
+  protected readonly patrimonio = computed(() => this.resumo()?.balance ?? 0);
+
+  protected readonly variacaoMensal = computed(() => {
+    const serie = this.todaSerie();
+    if (!serie.length) return 0;
+    const ultimo = serie[serie.length - 1];
+    return ultimo.receita - ultimo.despesa;
+  });
 
   protected readonly maiorValor = computed(() => {
     const valores = this.serie().flatMap((ponto) => [ponto.receita, ponto.despesa]);
@@ -29,9 +62,7 @@ export class ReportsPageComponent {
 
   protected readonly margem = computed(() => {
     const receita = this.totalReceitas();
-    if (!receita) {
-      return 0;
-    }
+    if (!receita) return 0;
     return (receita - this.totalDespesas()) / receita;
   });
 
@@ -50,9 +81,7 @@ export class ReportsPageComponent {
 
   protected readonly patrimonioPath = computed(() => {
     const dados = this.patrimonioSerie();
-    if (!dados.length) {
-      return '';
-    }
+    if (!dados.length) return '';
     const max = this.patrimonioMax();
     const stepX = 100 / Math.max(dados.length - 1, 1);
     const pontos = dados.map((p, index) => {
@@ -65,9 +94,7 @@ export class ReportsPageComponent {
 
   protected readonly patrimonioLine = computed(() => {
     const dados = this.patrimonioSerie();
-    if (!dados.length) {
-      return '';
-    }
+    if (!dados.length) return '';
     const max = this.patrimonioMax();
     const stepX = 100 / Math.max(dados.length - 1, 1);
     return dados
@@ -80,4 +107,17 @@ export class ReportsPageComponent {
   });
 
   protected readonly hoverIndexMensal = signal<number | null>(null);
+
+  ngOnInit(): void {
+    this.reportsService.dashboardSummary().subscribe({
+      next: (resumo) => {
+        this.resumo.set(resumo);
+        this.carregando.set(false);
+      },
+      error: (error: { error?: { message?: string } }) => {
+        this.carregando.set(false);
+        this.erro.set(error.error?.message ?? 'Nao foi possivel carregar os relatorios.');
+      }
+    });
+  }
 }
