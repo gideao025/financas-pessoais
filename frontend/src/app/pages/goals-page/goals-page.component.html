@@ -14,6 +14,19 @@
     </button>
   </div>
 
+  <p *ngIf="mensagem()" class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+    {{ mensagem() }}
+  </p>
+
+  <div *ngIf="erro()" class="flex items-center justify-between gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+    <span>{{ erro() }}</span>
+    <button class="font-bold text-red-700 hover:underline" (click)="recarregar()">Tentar novamente</button>
+  </div>
+
+  <div *ngIf="carregando()" class="rounded-2xl border border-[#e5e7eb] bg-white px-4 py-3 text-sm text-[#64748b] dark:border-[#2a3441] dark:bg-[#1a242f] dark:text-slate-300">
+    Carregando metas...
+  </div>
+
   <div class="grid grid-cols-1 gap-6 lg:grid-cols-[1.2fr_0.8fr]">
     <article
       class="rounded-xl border border-[#e5e7eb] bg-white p-5 dark:border-[#2a3441] dark:bg-[#1a242f]"
@@ -32,17 +45,17 @@
         >
           <div class="mb-1 flex items-center justify-between gap-2">
             <div>
-              <p class="text-sm font-bold">{{ meta.nome }}</p>
-              <p class="text-xs text-[#64748b] line-clamp-2">{{ meta.descricao }}</p>
+              <p class="text-sm font-bold">{{ meta.name }}</p>
+              <p class="text-xs text-[#64748b] line-clamp-2">{{ meta.description }}</p>
             </div>
             <div class="text-right">
               <p class="text-xs text-[#64748b]">Alvo</p>
               <p class="text-sm font-bold">
-                {{ meta.atual | currency: 'BRL' : 'symbol' : '1.0-0' : 'pt-BR' }} /
-                {{ meta.alvo | currency: 'BRL' : 'symbol' : '1.0-0' : 'pt-BR' }}
+                {{ meta.currentAmount | currency: 'BRL' : 'symbol' : '1.0-0' : 'pt-BR' }} /
+                {{ meta.targetAmount | currency: 'BRL' : 'symbol' : '1.0-0' : 'pt-BR' }}
               </p>
               <p class="text-[10px] text-[#64748b]">
-                Prazo: {{ meta.prazo | date: 'dd/MM/yyyy' : '' : 'pt-BR' }}
+                Prazo: {{ meta.dueDate | date: 'dd/MM/yyyy' : '' : 'pt-BR' }}
               </p>
             </div>
           </div>
@@ -148,4 +161,8 @@
       </div>
     </article>
   </div>
+
+  <article *ngIf="!carregando() && !metas().length" class="rounded-xl border border-dashed border-[#cbd5e1] bg-white p-6 text-sm text-[#64748b] dark:border-[#334155] dark:bg-[#1a242f] dark:text-slate-300">
+    Nenhuma meta cadastrada ainda. Use o formulário para criar a primeira.
+  </article>
 </section>

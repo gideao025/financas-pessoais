@@ -52,10 +52,10 @@ public class AuthService {
         .updatedAt(now)
         .build();
 
-    userRepository.save(user);
+    UserEntity savedUser = userRepository.save(user);
 
     userSettingsRepository.save(UserSettingsEntity.builder()
-        .user(user)
+        .user(savedUser)
         .monthlySummary(true)
         .lowBalanceAlert(false)
         .securityAlert(true)
@@ -63,7 +63,7 @@ public class AuthService {
         .updatedAt(now)
         .build());
 
-    return issueTokens(user);
+    return issueTokens(savedUser);
   }
 
   public AuthResponse login(LoginRequest request) {

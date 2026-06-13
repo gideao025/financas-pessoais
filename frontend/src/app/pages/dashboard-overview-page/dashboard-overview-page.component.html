@@ -4,9 +4,18 @@
     <p class="text-sm text-[#64748b]">Acompanhe saldo, despesas e metas em um só lugar.</p>
   </div>
 
+  <div *ngIf="erro()" class="flex items-center justify-between gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+    <span>{{ erro() }}</span>
+    <button class="font-bold text-red-700 hover:underline" (click)="recarregar()">Tentar novamente</button>
+  </div>
+
+  <div *ngIf="carregando()" class="rounded-2xl border border-[#e3e8ef] bg-white px-5 py-4 text-sm text-[#64748b] dark:border-[#2a3441] dark:bg-[#1a242f] dark:text-slate-300">
+    Carregando dashboard...
+  </div>
+
   <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
     <article
-      *ngFor="let card of cards"
+      *ngFor="let card of cards()"
       class="rounded-2xl border border-[#e3e8ef] bg-white p-5 dark:border-[#2a3441] dark:bg-[#1a242f]"
     >
       <div class="mb-2 flex items-center justify-between">
@@ -180,5 +189,9 @@
         }}{{ item.valor | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
       </p>
     </div>
+  </article>
+
+  <article *ngIf="!carregando() && !cards().length" class="rounded-2xl border border-dashed border-[#cbd5e1] bg-white px-5 py-10 text-center text-sm text-[#64748b] dark:border-[#334155] dark:bg-[#1a242f] dark:text-slate-300">
+    Ainda nao existem dados suficientes para montar o dashboard. Cadastre uma conta, lance transacoes e volte aqui.
   </article>
 </section>

@@ -1,0 +1,68 @@
+<div class="flex min-h-screen bg-[#f3f4f6] text-[#111827] dark:bg-background-dark dark:text-white">
+  <aside class="hidden w-64 border-r border-[#e5e7eb] bg-white p-4 md:flex md:flex-col dark:border-[#2a3441] dark:bg-[#1a242f]">
+    <div class="mb-8 flex items-center gap-3 px-2">
+      <div class="rounded-lg bg-primary p-2 text-white">
+        <span class="material-symbols-outlined">account_balance_wallet</span>
+      </div>
+      <div>
+        <h2 class="text-lg font-bold">FinançasPro</h2>
+        <p class="text-xs text-[#64748b]">POC local integrada</p>
+      </div>
+    </div>
+
+    <nav class="space-y-1">
+      <a class="menu-link" routerLink="/dashboard" routerLinkActive="menu-link-active" [routerLinkActiveOptions]="{ exact: true }">
+        <span class="material-symbols-outlined">home</span>
+        <span>Início</span>
+      </a>
+      <a class="menu-link" routerLink="/transactions" routerLinkActive="menu-link-active">
+        <span class="material-symbols-outlined">receipt_long</span>
+        <span>Transações</span>
+      </a>
+      <a class="menu-link" routerLink="/reports" routerLinkActive="menu-link-active">
+        <span class="material-symbols-outlined">bar_chart</span>
+        <span>Relatórios</span>
+      </a>
+      <a class="menu-link" routerLink="/goals" routerLinkActive="menu-link-active">
+        <span class="material-symbols-outlined">flag</span>
+        <span>Metas</span>
+      </a>
+      <a class="menu-link" routerLink="/cards" routerLinkActive="menu-link-active">
+        <span class="material-symbols-outlined">credit_card</span>
+        <span>Cartões</span>
+      </a>
+      <a class="menu-link" routerLink="/settings" routerLinkActive="menu-link-active">
+        <span class="material-symbols-outlined">settings</span>
+        <span>Configurações</span>
+      </a>
+    </nav>
+
+    <div class="mt-auto space-y-3">
+      <a class="block w-full rounded-xl bg-primary py-2.5 text-center text-sm font-bold text-white hover:bg-primary/90" routerLink="/transactions">
+        + Nova Transação
+      </a>
+      <div class="rounded-xl bg-[#eef2f6] p-3 dark:bg-[#24313f]">
+        <p class="truncate text-sm font-bold">{{ authService.session()?.email }}</p>
+        <button class="mt-2 text-xs font-semibold text-primary hover:underline" (click)="logout()">Sair</button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="min-w-0 flex-1">
+    <header class="sticky top-0 z-10 flex items-center justify-between border-b border-[#e5e7eb] bg-[#f3f4f6] px-6 py-3 dark:border-[#2a3441] dark:bg-background-dark">
+      <div>
+        <h1 class="text-xl font-bold">Dashboard Financeiro</h1>
+        <p class="text-xs text-[#64748b]">Autenticação real e consumo da API Spring Boot</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="hidden rounded-xl bg-[#e8ecf3] px-3 py-2 text-xs font-semibold text-[#475569] md:block">
+          {{ authService.session()?.email }}
+        </span>
+      </div>
+    </header>
+
+    <main class="p-6 md:p-8">
+      <router-outlet />
+    </main>
+  </div>
+</div>

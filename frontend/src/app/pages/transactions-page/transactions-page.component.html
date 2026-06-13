@@ -5,9 +5,41 @@
       <p class="text-sm text-[#64748b]">Histórico completo de movimentações com filtros.</p>
     </div>
     <div class="flex items-center gap-2">
-      <button class="rounded-xl bg-primary px-4 py-2 text-sm font-bold text-white hover:bg-primary/90" (click)="painelAberto.set(true)">Adicionar Nova Transação</button>
-      <button class="rounded-xl bg-[#eef2f6] px-4 py-2 text-sm font-bold dark:bg-[#24313f]" (click)="adicionarMock()">+ Mock</button>
+      <button class="rounded-xl bg-primary px-4 py-2 text-sm font-bold text-white hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60" [disabled]="!contas().length" (click)="painelAberto.set(true); limparMensagens()">Adicionar Nova Transação</button>
     </div>
+  </div>
+
+  <p *ngIf="mensagem()" class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+    {{ mensagem() }}
+  </p>
+
+  <p *ngIf="erro()" class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+    {{ erro() }}
+  </p>
+
+  <article *ngIf="!carregando() && !contas().length" class="rounded-2xl border border-[#dbe0e6] bg-white p-5 dark:border-[#2a3441] dark:bg-[#1a242f]">
+    <div class="mb-4">
+      <h3 class="text-xl font-bold">Crie sua primeira conta</h3>
+      <p class="mt-1 text-sm text-[#64748b]">Antes de lançar transações, a POC precisa de pelo menos uma conta financeira.</p>
+    </div>
+
+    <div class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+      <input class="h-11 rounded-xl bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" placeholder="Nome da conta" [value]="contaNome()" (input)="contaNome.set(($any($event.target)).value)" />
+      <input class="h-11 rounded-xl bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" placeholder="Instituição" [value]="contaInstituicao()" (input)="contaInstituicao.set(($any($event.target)).value)" />
+      <input class="h-11 rounded-xl bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" placeholder="Saldo inicial" [value]="contaSaldo()" (input)="contaSaldo.set(($any($event.target)).value)" />
+      <select class="h-11 rounded-xl bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" [value]="contaTipo()" (change)="contaTipo.set(($any($event.target)).value)">
+        <option value="CHECKING">Conta corrente</option>
+        <option value="SAVINGS">Poupança</option>
+        <option value="WALLET">Carteira</option>
+        <option value="INVESTMENT">Investimento</option>
+      </select>
+    </div>
+
+    <button class="mt-4 rounded-xl bg-primary px-4 py-2 text-sm font-bold text-white hover:bg-primary/90" (click)="criarConta()">Criar conta</button>
+  </article>
+
+  <div *ngIf="carregando()" class="rounded-2xl border border-[#dbe0e6] bg-white px-4 py-3 text-sm text-[#64748b] dark:border-[#2a3441] dark:bg-[#1a242f] dark:text-slate-300">
+    Carregando transacoes...
   </div>
 
   <div class="rounded-2xl border border-[#dbe0e6] bg-white p-4 dark:border-[#2a3441] dark:bg-[#1a242f]">
@@ -26,7 +58,7 @@
       </select>
       <select class="h-9 rounded-lg bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" [value]="contaSelecionada()" (change)="contaSelecionada.set(($any($event.target)).value); pageIndex.set(1)">
         <option value="todas">Conta: Todas</option>
-        <option *ngFor="let c of contasDisponiveis()" [value]="c">{{ c }}</option>
+        <option *ngFor="let conta of contas()" [value]="conta.name">{{ conta.name }}</option>
       </select>
       <select class="h-9 rounded-lg bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" [value]="tipoSelecionado()" (change)="tipoSelecionado.set(($any($event.target)).value); pageIndex.set(1)">
         <option value="todos">Tipo: Todos</option>
@@ -48,11 +80,11 @@
     </div>
   </div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6">
+  <div *ngIf="contas().length" class="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
     <article class="overflow-hidden rounded-2xl border border-[#dbe0e6] bg-white dark:border-[#2a3441] dark:bg-[#1a242f]">
       <table class="w-full min-w-[760px] text-left">
         <thead class="bg-[#fcfcfd] dark:bg-[#24313f]">
-          <tr class="border-b border-[#dbe0e6] dark:border-[#2a3441] text-xs uppercase tracking-wider text-[#64748b]">
+          <tr class="border-b border-[#dbe0e6] text-xs uppercase tracking-wider text-[#64748b] dark:border-[#2a3441]">
             <th class="px-5 py-4">Data</th>
             <th class="px-5 py-4">Descrição</th>
             <th class="px-5 py-4">Categoria</th>
@@ -70,17 +102,15 @@
           </tr>
         </tbody>
       </table>
-      <div class="flex items-center justify-between px-5 py-4 border-t border-[#dbe0e6] dark:border-[#2a3441]">
+      <div class="flex items-center justify-between border-t border-[#dbe0e6] px-5 py-4 dark:border-[#2a3441]">
         <p class="text-sm text-[#64748b]">Exibindo {{ inicioExibido() }} a {{ fimExibido() }} de {{ totalFiltradas() }} transações</p>
         <div class="flex items-center gap-1">
           <button class="flex size-9 items-center justify-center rounded-lg hover:bg-[#eef2f6] dark:hover:bg-[#24313f]" (click)="antPagina()">
             <span class="material-symbols-outlined text-lg">chevron_left</span>
           </button>
-          <button class="flex size-9 items-center justify-center rounded-lg bg-primary text-white text-xs font-bold" (click)="setPage(1)">1</button>
-          <button class="flex size-9 items-center justify-center rounded-lg hover:bg-[#eef2f6] dark:hover:bg-[#24313f]" (click)="setPage(2)">2</button>
-          <button class="flex size-9 items-center justify-center rounded-lg hover:bg-[#eef2f6] dark:hover:bg-[#24313f]" (click)="setPage(3)">3</button>
-          <span class="size-9 flex items-center justify-center text-[#64748b]">...</span>
-          <button class="flex size-9 items-center justify-center rounded-lg hover:bg-[#eef2f6] dark:hover:bg-[#24313f]" (click)="setPage(totalPages())">{{ totalPages() }}</button>
+          <button *ngFor="let page of pageButtons()" class="flex size-9 items-center justify-center rounded-lg text-xs font-bold" [ngClass]="pageIndex() === page ? 'bg-primary text-white' : 'hover:bg-[#eef2f6] dark:hover:bg-[#24313f]'" (click)="setPage(page)">{{ page }}</button>
+          <span *ngIf="totalPages() > pageButtons().length" class="flex size-9 items-center justify-center text-[#64748b]">...</span>
+          <button *ngIf="totalPages() > pageButtons().length" class="flex size-9 items-center justify-center rounded-lg hover:bg-[#eef2f6] dark:hover:bg-[#24313f]" (click)="setPage(totalPages())">{{ totalPages() }}</button>
           <button class="flex size-9 items-center justify-center rounded-lg hover:bg-[#eef2f6] dark:hover:bg-[#24313f]" (click)="proxPagina()">
             <span class="material-symbols-outlined text-lg">chevron_right</span>
           </button>
@@ -88,40 +118,47 @@
       </div>
     </article>
 
-    <aside *ngIf="painelAberto()" class="hidden w-[360px] lg:flex flex-col rounded-2xl border border-[#dbe0e6] bg-white dark:border-[#2a3441] dark:bg-[#1a242f]">
-      <div class="flex items-center justify-between px-4 py-3 border-b border-[#dbe0e6] dark:border-[#2a3441]">
+    <aside *ngIf="painelAberto()" class="hidden w-[360px] flex-col rounded-2xl border border-[#dbe0e6] bg-white dark:border-[#2a3441] dark:bg-[#1a242f] lg:flex">
+      <div class="flex items-center justify-between border-b border-[#dbe0e6] px-4 py-3 dark:border-[#2a3441]">
         <h3 class="text-lg font-bold">Adicionar Transação</h3>
-        <button class="rounded-lg hover:bg-[#eef2f6] dark:hover:bg-[#24313f] p-1" (click)="painelAberto.set(false)">
+        <button class="rounded-lg p-1 hover:bg-[#eef2f6] dark:hover:bg-[#24313f]" (click)="painelAberto.set(false)">
           <span class="material-symbols-outlined">close</span>
         </button>
       </div>
-      <div class="p-4 space-y-4">
+      <div class="space-y-4 p-4">
         <label class="space-y-1">
           <span class="text-xs font-bold">Valor</span>
-          <input class="w-full rounded-lg bg-[#f0f2f4] dark:bg-[#24313f] border-none h-10 px-3 text-sm" placeholder="0,00" [value]="formValor()" (input)="formValor.set(($any($event.target)).value)" />
+          <input class="h-10 w-full rounded-lg border-none bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" placeholder="0,00" [value]="formValor()" (input)="formValor.set(($any($event.target)).value)" />
         </label>
         <div class="flex gap-2">
           <button class="flex-1 rounded-lg border px-3 py-2 text-xs font-bold" [ngClass]="formTipo() === 'saida' ? 'border-primary text-primary' : 'text-[#64748b]'" (click)="formTipo.set('saida')">Despesas</button>
           <button class="flex-1 rounded-lg border px-3 py-2 text-xs font-bold" [ngClass]="formTipo() === 'entrada' ? 'border-primary text-primary' : 'text-[#64748b]'" (click)="formTipo.set('entrada')">Receitas</button>
         </div>
         <label class="space-y-1">
+          <span class="text-xs font-bold">Status</span>
+          <select class="h-10 w-full rounded-lg border-none bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" [value]="formStatus()" (change)="formStatus.set(($any($event.target)).value)">
+            <option value="concluida">Concluída</option>
+            <option value="pendente">Pendente</option>
+          </select>
+        </label>
+        <label class="space-y-1">
           <span class="text-xs font-bold">Data</span>
-          <input class="w-full rounded-lg bg-[#f0f2f4] dark:bg-[#24313f] border-none h-10 px-3 text-sm" type="date" [value]="formData()" (input)="formData.set(($any($event.target)).value)" />
+          <input class="h-10 w-full rounded-lg border-none bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" type="date" [value]="formData()" (input)="formData.set(($any($event.target)).value)" />
         </label>
         <label class="space-y-1">
           <span class="text-xs font-bold">Descrição</span>
-          <input class="w-full rounded-lg bg-[#f0f2f4] dark:bg-[#24313f] border-none h-10 px-3 text-sm" placeholder="Onde você gastou?" [value]="formDescricao()" (input)="formDescricao.set(($any($event.target)).value)" />
+          <input class="h-10 w-full rounded-lg border-none bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" placeholder="Onde voce gastou?" [value]="formDescricao()" (input)="formDescricao.set(($any($event.target)).value)" />
         </label>
         <label class="space-y-1">
           <span class="text-xs font-bold">Categoria</span>
-          <select class="w-full rounded-lg bg-[#f0f2f4] dark:bg-[#24313f] border-none h-10 px-3 text-sm" [value]="formCategoria()" (change)="formCategoria.set(($any($event.target)).value)">
+          <select class="h-10 w-full rounded-lg border-none bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" [value]="formCategoria()" (change)="formCategoria.set(($any($event.target)).value)">
             <option *ngFor="let c of categoriasDisponiveis()" [value]="c">{{ c }}</option>
           </select>
         </label>
         <label class="space-y-1">
           <span class="text-xs font-bold">Conta</span>
-          <select class="w-full rounded-lg bg-[#f0f2f4] dark:bg-[#24313f] border-none h-10 px-3 text-sm" [value]="formConta()" (change)="formConta.set(($any($event.target)).value)">
-            <option *ngFor="let c of contasDisponiveis()" [value]="c">{{ c }}</option>
+          <select class="h-10 w-full rounded-lg border-none bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" [value]="formContaId()" (change)="formContaId.set(($any($event.target)).value)">
+            <option *ngFor="let conta of contas()" [value]="conta.id">{{ conta.name }}</option>
           </select>
         </label>
         <div class="pt-2">
@@ -130,4 +167,8 @@
       </div>
     </aside>
   </div>
+
+  <article *ngIf="!carregando() && contas().length && !totalFiltradas()" class="rounded-2xl border border-dashed border-[#cbd5e1] bg-white px-5 py-8 text-center text-sm text-[#64748b] dark:border-[#334155] dark:bg-[#1a242f] dark:text-slate-300">
+    Nenhuma transacao encontrada com os filtros atuais.
+  </article>
 </section>

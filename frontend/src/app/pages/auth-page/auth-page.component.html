@@ -1,0 +1,102 @@
+<section class="flex min-h-screen items-center justify-center bg-[#0f172a] px-4 py-10 text-white">
+  <div class="grid w-full max-w-5xl overflow-hidden rounded-3xl bg-[#111827] shadow-2xl lg:grid-cols-[1.05fr_0.95fr]">
+    <div class="hidden flex-col justify-between bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.35),_transparent_45%),linear-gradient(160deg,#172554,#0f172a)] p-10 lg:flex">
+      <div>
+        <div class="mb-6 inline-flex rounded-2xl bg-white/10 p-3">
+          <span class="material-symbols-outlined text-3xl">account_balance_wallet</span>
+        </div>
+        <h1 class="text-4xl font-black tracking-tight">Finanças Pessoais</h1>
+        <p class="mt-4 max-w-md text-sm text-slate-300">
+          Entre com um usuário real, crie suas contas, registre transações e acompanhe metas consumindo a API Spring Boot local.
+        </p>
+      </div>
+
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-5">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-sky-300">Fluxo da POC</p>
+        <ul class="mt-4 space-y-3 text-sm text-slate-200">
+          <li>1. Registrar ou entrar</li>
+          <li>2. Criar conta</li>
+          <li>3. Lançar transações</li>
+          <li>4. Visualizar dashboard</li>
+          <li>5. Gerenciar metas</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="bg-white p-6 text-[#111827] md:p-10">
+      <div class="mx-auto max-w-md">
+        <div class="mb-8 flex rounded-2xl bg-[#eef2ff] p-1">
+          <button
+            class="flex-1 rounded-xl px-4 py-2 text-sm font-bold"
+            [ngClass]="modo() === 'login' ? 'bg-primary text-white' : 'text-[#475569]'"
+            (click)="alternarModo('login')"
+          >
+            Entrar
+          </button>
+          <button
+            class="flex-1 rounded-xl px-4 py-2 text-sm font-bold"
+            [ngClass]="modo() === 'register' ? 'bg-primary text-white' : 'text-[#475569]'"
+            (click)="alternarModo('register')"
+          >
+            Criar conta
+          </button>
+        </div>
+
+        <div>
+          <h2 class="text-3xl font-black tracking-tight">
+            {{ modo() === 'login' ? 'Acesse sua POC' : 'Cadastre um novo usuário' }}
+          </h2>
+          <p class="mt-2 text-sm text-[#64748b]">
+            {{ modo() === 'login' ? 'Use suas credenciais para entrar no fluxo real.' : 'O cadastro já retorna tokens e abre a aplicação autenticada.' }}
+          </p>
+        </div>
+
+        <div class="mt-8 space-y-4">
+          <label *ngIf="modo() === 'register'" class="block space-y-1">
+            <span class="text-xs font-bold uppercase tracking-[0.16em] text-[#64748b]">Nome completo</span>
+            <input
+              class="h-12 w-full rounded-2xl border border-[#dbe4f0] bg-[#f8fafc] px-4 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+              [value]="nome()"
+              (input)="nome.set($any($event.target).value)"
+              placeholder="Seu nome"
+            />
+          </label>
+
+          <label class="block space-y-1">
+            <span class="text-xs font-bold uppercase tracking-[0.16em] text-[#64748b]">E-mail</span>
+            <input
+              class="h-12 w-full rounded-2xl border border-[#dbe4f0] bg-[#f8fafc] px-4 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+              [value]="email()"
+              (input)="email.set($any($event.target).value)"
+              placeholder="voce@exemplo.com"
+              type="email"
+            />
+          </label>
+
+          <label class="block space-y-1">
+            <span class="text-xs font-bold uppercase tracking-[0.16em] text-[#64748b]">Senha</span>
+            <input
+              class="h-12 w-full rounded-2xl border border-[#dbe4f0] bg-[#f8fafc] px-4 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+              [value]="senha()"
+              (input)="senha.set($any($event.target).value)"
+              placeholder="Minimo de 8 caracteres"
+              type="password"
+            />
+          </label>
+
+          <p *ngIf="erro()" class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+            {{ erro() }}
+          </p>
+
+          <button
+            class="h-12 w-full rounded-2xl bg-primary text-sm font-bold text-white transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+            [disabled]="carregando()"
+            (click)="enviar()"
+          >
+            {{ carregando() ? 'Processando...' : modo() === 'login' ? 'Entrar agora' : 'Criar conta e entrar' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

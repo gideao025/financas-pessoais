@@ -1,28 +1,46 @@
 services:
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: financas-frontend
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: financas
+      POSTGRES_USER: financas
+      POSTGRES_PASSWORD: financas
     ports:
-      - "9090:80"
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U financas -d financas"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
 
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: financas-backend
     environment:
-      DB_URL: jdbc:postgresql://postgres:5440/financas
+      DB_URL: jdbc:postgresql://postgres:5432/financas
       DB_USER: financas
       DB_PASSWORD: financas
       SERVER_PORT: 8080
     ports:
       - "9091:8080"
-<<<<<<< HEAD
     depends_on:
-      - postgres
-=======
->>>>>>> d062e5b (docker compose ajusts)
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "9090:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
