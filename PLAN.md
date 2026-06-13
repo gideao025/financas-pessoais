@@ -11,6 +11,19 @@ Colocar a aplicação Finanças Pessoais para rodar localmente como POC funciona
 - visualização de resumo/dashboard
 - cadastro e listagem de metas
 
+## Estado atual (atualizado em 2026-06-13)
+
+POC concluída — fluxo ponta a ponta validado (API + UI) via teste manual.
+
+- **Fase 1 (bootstrap)**: concluída — `docker compose up --build` sobe postgres + backend + frontend.
+- **Fase 2 (backend)**: concluída — migrations Flyway aplicadas, `/actuator/health` OK, todos os endpoints da POC testados.
+- **Fase 3 (integração frontend)**: concluída — auth, dashboard, transações, metas, cartões, relatórios e settings consomem a API real. Nenhuma tela importa mais `finance.mock.ts`.
+- **Fase 4 (fechar POC)**: teste ponta a ponta executado e aprovado (Task 14). Falta consolidar backlog (Task 15) e checklist final (Task 16).
+
+Bug corrigido na validação: `POST /api/accounts` agora cria conta sempre ativa.
+
+Pendências mapeadas: ver Fase 5.
+
 ## Fase 1: Corrigir bootstrap local
 
 ### Task 1
@@ -145,12 +158,40 @@ Critérios:
 - credenciais/exemplos
 - limitações conhecidas da POC
 
+## Fase 5: Evolução pós-POC
+
+### Task 17
+Criar tela dedicada de gerenciamento de contas bancárias.
+
+Contexto:
+- hoje contas só podem ser criadas inline na tela de transações (`criarConta` em `transactions-page`)
+- não existe rota nem listagem própria de contas
+- backend já expõe `GET /api/accounts`, `POST /api/accounts` e `PUT /api/accounts/{id}`
+
+Escopo:
+- nova rota `/accounts` protegida por `authGuard`, dentro do `ShellLayoutComponent`
+- listar contas do usuário com saldo, tipo, instituição e status (ativa/inativa)
+- criar nova conta (nome, tipo, instituição, saldo inicial)
+- editar conta existente via `PUT /api/accounts/{id}` (inclui ativar/desativar)
+- estados de loading, erro e sucesso seguindo o padrão das demais telas
+- item de navegação na sidebar
+- reaproveitar `AccountsService`; adicionar método `update(id, payload)`
+
+Critérios de pronto:
+- usuário cria, lista e edita contas sem passar pela tela de transações
+- toggle de ativa/inativa reflete no backend
+- nenhuma dependência de mock
+
+Referência:
+- seguir convenções da skill `frontend` (`.claude/skills/frontend/SKILL.md`)
+
 ## Dependências entre tasks
 - Tasks 1 a 4 desbloqueiam 5 e 6
 - Tasks 5 a 8 desbloqueiam 10 a 12
 - Task 11 é dependência de 12
 - Tasks 12 e 13 desbloqueiam 14
 - Task 14 deve acontecer antes de 16
+- Task 17 depende da Fase 3 concluída (camada de serviços e auth do frontend)
 
 ## Riscos atuais
 - compose raiz inválido
