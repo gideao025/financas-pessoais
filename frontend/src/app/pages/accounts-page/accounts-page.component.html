@@ -1,0 +1,99 @@
+<section class="mx-auto flex w-full max-w-6xl flex-col gap-6">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h2 class="text-3xl font-black tracking-tight">Contas Bancárias</h2>
+      <p class="text-sm text-[#64748b]">Cadastre e gerencie suas contas, saldos e status.</p>
+    </div>
+    <button class="rounded-xl bg-primary px-4 py-2 text-sm font-bold text-white hover:bg-primary/90" (click)="abrirNova()">+ Nova Conta</button>
+  </div>
+
+  <p *ngIf="erro()" class="rounded-lg bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 dark:bg-red-900/20 dark:text-red-400">{{ erro() }}</p>
+  <p *ngIf="mensagem()" class="rounded-lg bg-green-50 px-4 py-2 text-sm font-semibold text-green-600 dark:bg-green-900/20 dark:text-green-400">{{ mensagem() }}</p>
+
+  <div *ngIf="!carregando()" class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <article class="rounded-xl border border-[#e5e7eb] bg-white p-5 dark:border-[#2a3441] dark:bg-[#1a242f]">
+      <p class="text-sm text-[#64748b]">Saldo total (contas ativas)</p>
+      <p class="text-3xl font-black">{{ saldoTotal() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</p>
+    </article>
+    <article class="rounded-xl border border-[#e5e7eb] bg-white p-5 dark:border-[#2a3441] dark:bg-[#1a242f]">
+      <p class="text-sm text-[#64748b]">Contas ativas</p>
+      <p class="text-3xl font-black">{{ totalAtivas() }}</p>
+    </article>
+  </div>
+
+  <article *ngIf="painelAberto()" class="rounded-xl border border-[#e5e7eb] bg-white p-5 dark:border-[#2a3441] dark:bg-[#1a242f]">
+    <h3 class="mb-4 text-lg font-bold">{{ contaEditando() ? 'Editar Conta' : 'Nova Conta' }}</h3>
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <label class="flex flex-col gap-1 text-xs font-bold">
+        Nome
+        <input class="h-10 rounded-lg border border-[#dbe0e6] px-3 text-sm font-normal dark:border-[#2a3441] dark:bg-[#24313f]" placeholder="Ex: Conta Corrente Nubank" [value]="formNome()" (input)="formNome.set($any($event.target).value)" />
+      </label>
+      <label class="flex flex-col gap-1 text-xs font-bold">
+        Tipo
+        <select class="h-10 rounded-lg border border-[#dbe0e6] px-3 text-sm font-normal dark:border-[#2a3441] dark:bg-[#24313f]" [value]="formTipo()" (change)="formTipo.set($any($event.target).value)">
+          <option *ngFor="let t of tipos" [value]="t.value">{{ t.label }}</option>
+        </select>
+      </label>
+      <label class="flex flex-col gap-1 text-xs font-bold">
+        Instituição
+        <input class="h-10 rounded-lg border border-[#dbe0e6] px-3 text-sm font-normal dark:border-[#2a3441] dark:bg-[#24313f]" placeholder="Ex: Nubank" [value]="formInstituicao()" (input)="formInstituicao.set($any($event.target).value)" />
+      </label>
+      <label class="flex flex-col gap-1 text-xs font-bold">
+        Saldo (R$)
+        <input class="h-10 rounded-lg border border-[#dbe0e6] px-3 text-sm font-normal dark:border-[#2a3441] dark:bg-[#24313f]" placeholder="0,00" [value]="formSaldo()" (input)="formSaldo.set($any($event.target).value)" />
+      </label>
+      <label class="flex items-center gap-2 text-sm font-bold md:col-span-2">
+        <input type="checkbox" class="size-4 rounded border-[#dbe0e6]" [checked]="formAtiva()" (change)="formAtiva.set($any($event.target).checked)" />
+        Conta ativa
+      </label>
+    </div>
+    <div class="mt-4 flex gap-2">
+      <button class="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white disabled:opacity-60" [disabled]="salvando()" (click)="salvar()">
+        {{ salvando() ? 'Salvando...' : 'Salvar' }}
+      </button>
+      <button class="rounded-lg border border-[#dbe0e6] px-4 py-2 text-sm font-bold dark:border-[#2a3441]" (click)="fecharPainel()">Cancelar</button>
+    </div>
+  </article>
+
+  <div *ngIf="carregando()" class="py-16 text-center text-sm text-[#64748b]">Carregando contas...</div>
+
+  <div *ngIf="!carregando() && !contas().length && !painelAberto()" class="rounded-xl border border-dashed border-[#dbe0e6] py-16 text-center text-sm text-[#64748b] dark:border-[#2a3441]">
+    Nenhuma conta cadastrada. Clique em <strong>Nova Conta</strong> para começar.
+  </div>
+
+  <article *ngIf="!carregando() && contas().length" class="overflow-hidden rounded-xl border border-[#e5e7eb] bg-white dark:border-[#2a3441] dark:bg-[#1a242f]">
+    <table class="w-full min-w-[680px] text-left">
+      <thead class="text-xs uppercase tracking-wider text-[#64748b]">
+        <tr>
+          <th class="px-5 py-3">Nome</th>
+          <th class="px-5 py-3">Tipo</th>
+          <th class="px-5 py-3">Instituição</th>
+          <th class="px-5 py-3">Saldo</th>
+          <th class="px-5 py-3">Status</th>
+          <th class="px-5 py-3 text-right">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let conta of contas()" class="border-t border-[#eef2f6] dark:border-[#2a3441]">
+          <td class="px-5 py-3 font-bold">{{ conta.name }}</td>
+          <td class="px-5 py-3">{{ labelTipo(conta.type) }}</td>
+          <td class="px-5 py-3">{{ conta.institution }}</td>
+          <td class="px-5 py-3 font-semibold">{{ conta.balance | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</td>
+          <td class="px-5 py-3">
+            <span class="rounded-full px-2 py-0.5 text-xs font-bold" [ngClass]="conta.active ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-[#eef2f6] text-[#64748b] dark:bg-[#24313f]'">
+              {{ conta.active ? 'Ativa' : 'Inativa' }}
+            </span>
+          </td>
+          <td class="px-5 py-3">
+            <div class="flex justify-end gap-2">
+              <button class="rounded-lg border border-primary px-3 py-1.5 text-xs font-bold text-primary" (click)="abrirEdicao(conta)">Editar</button>
+              <button class="rounded-lg border border-[#dbe0e6] px-3 py-1.5 text-xs font-bold dark:border-[#2a3441]" (click)="alternarStatus(conta)">
+                {{ conta.active ? 'Desativar' : 'Ativar' }}
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </article>
+</section>

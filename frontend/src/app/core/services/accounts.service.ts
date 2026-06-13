@@ -17,4 +17,8 @@ export class AccountsService {
   create(payload: AccountRequest): Observable<AccountResponse> {
     return this.http.post<AccountResponse>(`${this.apiBaseUrl}/accounts`, payload);
   }
+
+  update(id: string, payload: AccountRequest): Observable<AccountResponse> {
+    return this.http.put<AccountResponse>(`${this.apiBaseUrl}/accounts/${id}`, payload);
+  }
 }
