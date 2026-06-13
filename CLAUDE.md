@@ -10,8 +10,18 @@ financas-pessoais/
 ├── backend/           # Spring Boot 3.4.2 / Java 21
 ├── docker-compose.yml # Stack completa (postgres + backend + frontend)
 ├── PLAN.md            # Fases e tasks do roadmap
-└── AGENTS.md          # Regras e escopo para agentes
+├── AGENTS.md          # Regras e escopo para agentes
+└── .claude/skills/    # Skills do projeto (convenções de frontend e backend)
 ```
+
+## Skills do projeto
+
+Convenções e templates concretos derivados deste código. Consulte a skill correspondente antes de mexer em cada camada:
+
+- **`frontend`** (`.claude/skills/frontend/SKILL.md`) — Angular 21: standalone components, estado em signals, serviços HTTP, padrão de página (loading/erro/mensagem), Tailwind pt-BR, auth já cabeada. Use ao criar/editar qualquer coisa sob `frontend/src/app`.
+- **`backend`** (`.claude/skills/backend/SKILL.md`) — Spring Boot: um pacote por domínio, scoping por usuário, camadas Controller→Service→Repository, DTOs como records, `BusinessException`, migrations Flyway. Use ao criar/editar qualquer coisa sob `backend/src/main/java`.
+
+As duas compartilham o mesmo contrato de DTOs (`core/models/api.models.ts` ↔ records do backend) e o mesmo loop de verificação via Docker.
 
 ## Como rodar localmente
 
@@ -138,16 +148,20 @@ Configuração em `WebConfig.java`. Se adicionar nova origem, atualizar aqui.
 | Área | Status |
 |---|---|
 | Banco / Flyway | OK no Docker |
-| Backend (auth, accounts, transactions, goals) | Implementado |
+| Backend (auth, accounts, transactions, goals, cards, reports, settings) | Implementado |
 | Frontend — auth page | Integrado |
-| Frontend — dashboard | Parcialmente integrado |
-| Frontend — transactions | Parcialmente integrado |
-| Frontend — goals | Parcialmente integrado |
-| Frontend — cards, reports, settings | Ainda com mocks |
+| Frontend — dashboard | Integrado |
+| Frontend — transactions | Integrado |
+| Frontend — goals | Integrado |
+| Frontend — cards | Integrado |
+| Frontend — reports | Integrado |
+| Frontend — settings | Integrado |
 | CORS docker (porta 9090) | Configurado |
 | Sem mvnw | Usar `mvn` direto |
+
+Teste ponta a ponta executado e aprovado (API + UI). Nenhuma tela do app importa mais `finance.mock.ts`.
 
 ## Problemas conhecidos
 
 - Backend não possui `mvnw` — depende de Maven instalado no host para rodar fora do Docker
-- Alguns componentes do frontend ainda importam `finance.mock.ts`
+- `frontend/src/app/mocks/finance.mock.ts` ainda existe no repo, mas é código morto (nenhuma página importa)
