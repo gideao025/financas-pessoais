@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { resolveApiBaseUrl } from '../api.config';
-import type { DashboardSummaryResponse } from '../models/api.models';
+import type { CashFlowResponse, DashboardSummaryResponse } from '../models/api.models';
 
 @Injectable({ providedIn: 'root' })
 export class ReportsService {
@@ -12,5 +12,11 @@ export class ReportsService {
 
   dashboardSummary(): Observable<DashboardSummaryResponse> {
     return this.http.get<DashboardSummaryResponse>(`${this.apiBaseUrl}/reports/dashboard-summary`);
+  }
+
+  cashFlow(days: number): Observable<CashFlowResponse> {
+    return this.http.get<CashFlowResponse>(`${this.apiBaseUrl}/reports/cash-flow`, {
+      params: { days: String(days) }
+    });
   }
 }

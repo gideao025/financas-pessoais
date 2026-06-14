@@ -1,30 +1,15 @@
-import { CurrencyPipe, DatePipe, NgClass, NgFor, NgIf, PercentPipe } from '@angular/common';
+import { CurrencyPipe, DatePipe, NgClass, NgFor, NgIf } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { forkJoin } from 'rxjs';
 
 import type {
-  DashboardSummaryResponse,
+  CashFlowResponse,
   GoalResponse,
-  MonthlyReportItem,
   TransactionResponse
 } from '../../core/models/api.models';
 import { GoalsService } from '../../core/services/goals.service';
 import { ReportsService } from '../../core/services/reports.service';
 import { TransactionsService } from '../../core/services/transactions.service';
-
-interface SummaryCard {
-  id: string;
-  titulo: string;
-  valor: number;
-  variacao: number;
-  icone: string;
-}
-
-interface MonthlyPoint {
-  mes: string;
-  receita: number;
-  despesa: number;
-}
 
 interface UiTransaction {
   id: string;
@@ -33,145 +18,125 @@ interface UiTransaction {
   data: string;
   valor: number;
   tipo: 'entrada' | 'saida';
-  status: 'concluida' | 'pendente';
+}
+
+interface UiEvento {
+  data: string;
+  tipo: 'RECEITA' | 'DESPESA' | 'FATURA';
+  label: string;
+  valor: number;
 }
 
 @Component({
   selector: 'app-dashboard-overview-page',
-  imports: [NgFor, NgClass, NgIf, CurrencyPipe, PercentPipe, DatePipe],
+  imports: [NgFor, NgClass, NgIf, CurrencyPipe, DatePipe],
   templateUrl: './dashboard-overview-page.component.html',
   styleUrl: './dashboard-overview-page.component.scss'
 })
 export class DashboardOverviewPageComponent implements OnInit {
-  private readonly transactionsService = inject(TransactionsService);
-  private readonly goalsService = inject(GoalsService);
   private readonly reportsService = inject(ReportsService);
+  private readonly goalsService = inject(GoalsService);
+  private readonly transactionsService = inject(TransactionsService);
 
   protected readonly carregando = signal(true);
+  protected readonly atualizandoGrafico = signal(false);
   protected readonly erro = signal('');
-  protected readonly limite = signal(4);
-  protected readonly resumo = signal<DashboardSummaryResponse | null>(null);
-  protected readonly transacoes = signal<UiTransaction[]>([]);
+  protected readonly horizonte = signal(90);
+  protected readonly fluxo = signal<CashFlowResponse | null>(null);
   protected readonly metas = signal<GoalResponse[]>([]);
+  protected readonly transacoes = signal<UiTransaction[]>([]);
 
-  protected readonly cards = computed<SummaryCard[]>(() => {
-    const resumo = this.resumo();
-    if (!resumo) {
-      return [];
-    }
+  protected readonly saldoHoje = computed(() => this.fluxo()?.startBalance ?? 0);
+  protected readonly menorSaldo = computed(() => this.fluxo()?.minBalance ?? null);
+  protected readonly saldoFinal = computed(() => {
+    const dias = this.fluxo()?.days ?? [];
+    return dias.length ? dias[dias.length - 1].balance : 0;
+  });
+  protected readonly entradasPrevistas = computed(() =>
+    (this.fluxo()?.days ?? []).reduce((acc, d) => acc + d.inflow, 0)
+  );
+  protected readonly saidasPrevistas = computed(() =>
+    (this.fluxo()?.days ?? []).reduce((acc, d) => acc + d.outflow, 0)
+  );
+  protected readonly cartoes = computed(() => this.fluxo()?.cards ?? []);
 
-    return [
-      {
-        id: 'saldo',
-        titulo: 'Saldo total',
-        valor: resumo.balance,
-        variacao: 0,
-        icone: 'account_balance_wallet'
-      },
-      {
-        id: 'receita',
-        titulo: 'Receitas do mês',
-        valor: resumo.totalIncome,
-        variacao: 0,
-        icone: 'trending_up'
-      },
-      {
-        id: 'despesa',
-        titulo: 'Despesas do mês',
-        valor: resumo.totalExpense,
-        variacao: 0,
-        icone: 'trending_down'
+  protected readonly proximosEventos = computed<UiEvento[]>(() => {
+    const eventos: UiEvento[] = [];
+    for (const dia of this.fluxo()?.days ?? []) {
+      for (const e of dia.events) {
+        eventos.push({ data: dia.date, tipo: e.type, label: e.label, valor: e.amount });
       }
-    ];
+    }
+    return eventos.slice(0, 12);
   });
 
-  protected readonly totalEntradas = computed(() => this.resumo()?.totalIncome ?? 0);
-  protected readonly totalSaidas = computed(() => this.resumo()?.totalExpense ?? 0);
-  protected readonly pendentes = computed(() => this.resumo()?.pendingCount ?? 0);
-  protected readonly concluidas = computed(() => this.resumo()?.completedCount ?? 0);
-  protected readonly transacoesRecentes = computed(() => this.transacoes().slice(0, this.limite()));
   protected readonly metasResumo = computed(() =>
     this.metas()
       .map((meta) => ({ nome: meta.name, progresso: meta.progress }))
       .slice(0, 3)
   );
+  protected readonly transacoesRecentes = computed(() => this.transacoes().slice(0, 5));
 
-  protected readonly gastosPorCategoria = computed(() => {
-    const mapa = new Map<string, number>();
-    for (const t of this.transacoes()) {
-      if (t.tipo !== 'saida') continue;
-      mapa.set(t.categoria, (mapa.get(t.categoria) ?? 0) + t.valor);
+  /** Geometria do gráfico de projeção (SVG viewBox 0..100 x 0..40). */
+  protected readonly grafico = computed(() => {
+    const dias = this.fluxo()?.days ?? [];
+    if (!dias.length) {
+      return null;
     }
-    const total = Array.from(mapa.values()).reduce((a, b) => a + b, 0) || 1;
-    return Array.from(mapa.entries())
-      .map(([categoria, totalCategoria]) => ({
-        categoria,
-        total: totalCategoria,
-        porcentagem: Math.round((totalCategoria / total) * 100)
-      }))
-      .sort((a, b) => b.total - a.total)
-      .slice(0, 3);
-  });
+    const saldos = dias.map((d) => d.balance);
+    const max = Math.max(...saldos, 0);
+    const min = Math.min(...saldos, 0);
+    const range = max - min || 1;
+    const n = dias.length;
+    const x = (i: number) => (n === 1 ? 0 : (i / (n - 1)) * 100);
+    const y = (v: number) => 38 - ((v - min) / range) * 34;
 
-  protected readonly donutBackground = computed(() => {
-    const categorias = this.gastosPorCategoria();
-    if (!categorias.length) {
-      return '#e2e8f0';
-    }
+    const pontos = dias.map((d, i) => `${x(i).toFixed(2)},${y(d.balance).toFixed(2)}`);
+    const area = `M0,40 L${pontos.join(' L ')} L100,40 Z`;
+    const linha = pontos.join(' ');
+    const zeroY = min < 0 ? y(0) : null;
 
-    const cores = ['#1e40af', '#475569', '#94a3b8'];
-    let inicio = 0;
-    const partes: string[] = [];
+    const marcadores = dias
+      .map((d, i) => ({ d, i }))
+      .filter(({ d }) => d.events.length)
+      .map(({ d, i }) => ({
+        cx: x(i),
+        cy: y(d.balance),
+        positivo: d.inflow - d.outflow >= 0,
+        titulo: d.events.map((e) => `${e.label}: ${e.amount}`).join(' | ')
+      }));
 
-    categorias.forEach((item, idx) => {
-      const fim = inicio + item.porcentagem;
-      partes.push(`${cores[idx]} ${inicio}% ${fim}%`);
-      inicio = fim;
-    });
+    const menor = this.fluxo()?.minBalance;
+    const idxMenor = menor ? dias.findIndex((d) => d.date === menor.date) : -1;
+    const pontoMenor = idxMenor >= 0 ? { cx: x(idxMenor), cy: y(dias[idxMenor].balance) } : null;
 
-    if (inicio < 100) {
-      partes.push(`#e2e8f0 ${inicio}% 100%`);
-    }
-
-    return `conic-gradient(${partes.join(',')})`;
-  });
-
-  protected readonly serie6m = computed<MonthlyPoint[]>(() =>
-    (this.resumo()?.monthlySeries ?? []).map((item: MonthlyReportItem) => ({
-      mes: item.month,
-      receita: item.income,
-      despesa: item.expense
-    }))
-  );
-
-  protected readonly maiorValor6m = computed(() => {
-    const valores = this.serie6m().flatMap((p) => [p.receita, p.despesa]);
-    return Math.max(...valores, 1);
-  });
-  protected readonly hoverIndex6m = signal<number | null>(null);
-  protected readonly hovered6m = computed(() => {
-    const idx = this.hoverIndex6m();
-    if (idx === null) return null;
-    const pontos = this.serie6m();
-    if (idx < 0 || idx >= pontos.length) return null;
-    return { idx, ponto: pontos[idx] };
-  });
-  protected readonly hoverX6m = computed(() => {
-    const data = this.hovered6m();
-    if (!data) return 0;
-    return data.idx * 16 + 10;
+    return { area, linha, zeroY, marcadores, pontoMenor };
   });
 
   ngOnInit(): void {
     this.carregarDados();
   }
 
-  protected carregarMais(): void {
-    this.limite.update((valor) => Math.min(valor + 2, this.transacoes().length));
-  }
-
   protected recarregar(): void {
     this.carregarDados();
+  }
+
+  protected trocarHorizonte(dias: number): void {
+    if (dias === this.horizonte()) {
+      return;
+    }
+    this.horizonte.set(dias);
+    this.atualizandoGrafico.set(true);
+    this.reportsService.cashFlow(dias).subscribe({
+      next: (fluxo) => {
+        this.fluxo.set(fluxo);
+        this.atualizandoGrafico.set(false);
+      },
+      error: (error: { error?: { message?: string } }) => {
+        this.atualizandoGrafico.set(false);
+        this.erro.set(error.error?.message ?? 'Nao foi possivel atualizar a projecao.');
+      }
+    });
   }
 
   private carregarDados(): void {
@@ -179,12 +144,12 @@ export class DashboardOverviewPageComponent implements OnInit {
     this.erro.set('');
 
     forkJoin({
-      resumo: this.reportsService.dashboardSummary(),
+      fluxo: this.reportsService.cashFlow(this.horizonte()),
       metas: this.goalsService.list(),
       transacoes: this.transactionsService.list()
     }).subscribe({
-      next: ({ resumo, metas, transacoes }) => {
-        this.resumo.set(resumo);
+      next: ({ fluxo, metas, transacoes }) => {
+        this.fluxo.set(fluxo);
         this.metas.set(metas);
         this.transacoes.set(transacoes.map((item) => this.mapTransaction(item)));
         this.carregando.set(false);
@@ -203,8 +168,7 @@ export class DashboardOverviewPageComponent implements OnInit {
       categoria: item.category,
       data: item.transactionDate,
       valor: item.amount,
-      tipo: item.transactionType === 'ENTRADA' ? 'entrada' : 'saida',
-      status: item.status === 'CONCLUIDA' ? 'concluida' : 'pendente'
+      tipo: item.transactionType === 'ENTRADA' ? 'entrada' : 'saida'
     };
   }
 }

@@ -125,6 +125,60 @@ export interface InvoiceResponse {
   transactions: TransactionResponse[];
 }
 
+export interface RecurrenceResponse {
+  id: string;
+  accountId: string | null;
+  description: string;
+  category: string;
+  transactionType: TransactionType;
+  amount: number;
+  dayOfMonth: number;
+  active: boolean;
+}
+
+export interface RecurrenceRequest {
+  accountId: string | null;
+  description: string;
+  category: string;
+  transactionType: TransactionType;
+  amount: number;
+  dayOfMonth: number;
+  active: boolean;
+}
+
+export interface FlowEvent {
+  type: 'RECEITA' | 'DESPESA' | 'FATURA';
+  label: string;
+  amount: number;
+}
+
+export interface DailyPoint {
+  date: string;
+  inflow: number;
+  outflow: number;
+  balance: number;
+  events: FlowEvent[];
+}
+
+export interface CardProvision {
+  cardId: string;
+  name: string;
+  creditLimit: number;
+  usedLimit: number;
+  availableLimit: number;
+  nextDueDate: string | null;
+  nextInvoiceTotal: number;
+}
+
+export interface CashFlowResponse {
+  startBalance: number;
+  startDate: string;
+  endDate: string;
+  days: DailyPoint[];
+  minBalance: { date: string; balance: number };
+  cards: CardProvision[];
+}
+
 export interface UserProfileResponse {
   userId: string;
   fullName: string;

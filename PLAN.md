@@ -256,6 +256,19 @@ Validado: build Docker limpo (backend + frontend) e smoke test de API ponta a po
 
 Fora do escopo (Fase 1b do plano): materializar fatura e ação "marcar como paga".
 
+### Task 19 — CONCLUÍDA
+Dashboard refatorado com projeção de saldo dia-a-dia (fluxo de caixa futuro).
+
+Entregue:
+- **Backend**: novo domínio `recurrence` (migration `V4__recurrences.sql`) com CRUD `GET/POST/PUT/DELETE /api/recurrences` — lançamentos fixos (salário/aluguel) com tipo, valor, dia do mês, conta e categoria. Novo `CashFlowService` + `GET /api/reports/cash-flow?days=90`: série diária a partir do Σ saldo das contas, somando recorrências e transações futuras não-cartão, e subtraindo faturas de cartão **no vencimento** (reusa `CardCycle` e `sumCardSince`); retorna `minBalance` (menor saldo previsto) e provisão por cartão (limite usado/disponível + próxima fatura). `CardCycle` tornado público para reuso.
+- **Frontend**: tela `/recurrences` (CRUD, padrão accounts-page) + item na sidebar. Dashboard reescrito: cards de saldo hoje / menor saldo previsto (alerta) / entradas e saídas previstas; gráfico SVG de projeção dia-a-dia (área+linha, marca o menor saldo e linha de zero) com toggle 30/60/90; provisão de cartões; agenda de próximos eventos; metas e transações condensadas. `RecurrencesService`, `ReportsService.cashFlow`.
+
+Decisão de design: projeção ancora no saldo atual das contas e conta só eventos futuros; compras no cartão entram como saída no vencimento da fatura (semântica de caixa), não na data da compra.
+
+Validado: build Docker limpo (backend + frontend); smoke test de API ponta a ponta (startBalance = Σ contas; salário no dia 5, aluguel no 10, fatura no vencimento 28; menor saldo previsto correto; provisão de cartões; CRUD de recorrências create/update/delete).
+
+Fora do escopo (futuro): projeção por conta selecionável; recorrência semanal/quinzenal; recalcular `account.balance` a partir das transações.
+
 ## Dependências entre tasks
 - Tasks 1 a 4 desbloqueiam 5 e 6
 - Tasks 5 a 8 desbloqueiam 10 a 12

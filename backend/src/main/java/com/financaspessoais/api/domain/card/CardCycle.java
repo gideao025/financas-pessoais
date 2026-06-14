@@ -10,7 +10,7 @@ import java.time.YearMonth;
  * fecha no mês {@code ym} cobre as compras do dia seguinte ao fechamento anterior até o dia de
  * fechamento de {@code ym} (inclusive), e vence no próximo {@code dueDay} a partir do fechamento.
  */
-final class CardCycle {
+public final class CardCycle {
 
   private CardCycle() {}
 
@@ -20,23 +20,23 @@ final class CardCycle {
   }
 
   /** Mês em que fecha a fatura de uma compra feita em {@code date}. */
-  static YearMonth invoiceMonthFor(LocalDate date, int closingDay) {
+  public static YearMonth invoiceMonthFor(LocalDate date, int closingDay) {
     YearMonth ym = YearMonth.from(date);
     return date.isAfter(dayOf(ym, closingDay)) ? ym.plusMonths(1) : ym;
   }
 
   /** Data de fechamento da fatura que fecha em {@code ym}. */
-  static LocalDate closeDate(YearMonth ym, int closingDay) {
+  public static LocalDate closeDate(YearMonth ym, int closingDay) {
     return dayOf(ym, closingDay);
   }
 
   /** Primeiro dia coberto pela fatura que fecha em {@code ym} (dia seguinte ao fechamento anterior). */
-  static LocalDate periodStart(YearMonth ym, int closingDay) {
+  public static LocalDate periodStart(YearMonth ym, int closingDay) {
     return dayOf(ym.minusMonths(1), closingDay).plusDays(1);
   }
 
   /** Vencimento: próximo {@code dueDay} a partir do fechamento (mesmo mês se cair depois, senão o seguinte). */
-  static LocalDate dueDate(YearMonth ym, int closingDay, int dueDay) {
+  public static LocalDate dueDate(YearMonth ym, int closingDay, int dueDay) {
     LocalDate close = closeDate(ym, closingDay);
     LocalDate candidate = dayOf(ym, dueDay);
     return candidate.isAfter(close) ? candidate : dayOf(ym.plusMonths(1), dueDay);

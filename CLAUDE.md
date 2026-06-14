@@ -88,7 +88,9 @@ npm start   # http://localhost:4200
 - `GET /api/cards/{id}/invoice/current`, `GET /api/cards/{id}/invoice?month=YYYY-MM` (fatura computada por ciclo)
 - `GET/POST /api/transactions`, `DELETE /api/transactions/{id}` (apaga o grupo de parcelas inteiro)
 - `GET/POST /api/goals`, `PUT /api/goals/{id}`, `POST /api/goals/{id}/complete`
+- `GET/POST /api/recurrences`, `PUT/DELETE /api/recurrences/{id}` (lançamentos fixos: salário/aluguel)
 - `GET /api/reports/dashboard-summary`
+- `GET /api/reports/cash-flow?days=90` (projeção de saldo dia-a-dia)
 - `GET/PATCH /api/settings`
 - `GET /actuator/health`
 
@@ -96,6 +98,7 @@ npm start   # http://localhost:4200
 - `V1__init_schema.sql` — users, refresh_tokens, accounts, cards, transactions, user_settings
 - `V2__goals.sql` — goals
 - `V3__card_cycle_installments.sql` — `closing_day` em cards; `installment_*` em transactions (parcelamento + ciclo de fatura)
+- `V4__recurrences.sql` — recurrences (lançamentos recorrentes para projeção de fluxo de caixa)
 
 `ddl-auto: validate` — nunca alterar schema fora de migrations Flyway.
 
@@ -110,9 +113,10 @@ npm start   # http://localhost:4200
 **Rotas** (todas sob `ShellLayoutComponent` + `authGuard`, exceto `/auth`):
 ```
 /auth         → AuthPageComponent        (login + registro, público)
-/dashboard    → DashboardOverviewPage
+/dashboard    → DashboardOverviewPage    (projeção de saldo dia-a-dia / fluxo de caixa)
 /accounts     → AccountsPage             (gestão de contas bancárias)
 /transactions → TransactionsPage
+/recurrences  → RecurrencesPage          (lançamentos fixos: salário/aluguel)
 /reports      → ReportsPage
 /goals        → GoalsPage
 /cards        → CreditCardsPage
@@ -121,7 +125,7 @@ npm start   # http://localhost:4200
 
 **Camada de serviços HTTP** (`core/services/`):
 - `auth.service.ts` — login, registro, refresh token, logout
-- `accounts.service.ts` (list/create/update), `transactions.service.ts`, `goals.service.ts`, `cards.service.ts`, `reports.service.ts`, `settings.service.ts`
+- `accounts.service.ts` (list/create/update), `transactions.service.ts`, `goals.service.ts`, `cards.service.ts` (list/create/update/invoice), `recurrences.service.ts`, `reports.service.ts` (dashboardSummary/cashFlow), `settings.service.ts`
 
 **Interceptor e guard** (`core/auth/`):
 - `auth.interceptor.ts` — injeta Bearer token em todas as requisições
@@ -155,7 +159,8 @@ Configuração em `WebConfig.java`. Se adicionar nova origem, atualizar aqui.
 | Banco / Flyway | OK no Docker |
 | Backend (auth, accounts, transactions, goals, cards, reports, settings) | Implementado |
 | Frontend — auth page | Integrado |
-| Frontend — dashboard | Integrado |
+| Frontend — dashboard | Refatorado: projeção de saldo dia-a-dia (Task 19) |
+| Frontend — recurrences (lançamentos fixos) | Integrado (Task 19) |
 | Frontend — accounts (gestão de contas) | Integrado (Task 17) |
 | Frontend — transactions | Integrado |
 | Frontend — goals | Integrado |
