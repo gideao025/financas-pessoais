@@ -125,9 +125,9 @@ npm start   # http://localhost:4200
 - `auth.interceptor.ts` — injeta Bearer token em todas as requisições
 - `auth.guard.ts` — redireciona para `/auth` se não autenticado
 
-**Navegação:** a sidebar real é inline no `layouts/shell-layout/shell-layout.component.html`. O `components/sidebar/` é código morto (não importado) — não editar.
+**Navegação:** a sidebar real é inline no `layouts/shell-layout/shell-layout.component.html`. (O antigo `components/sidebar/`, código morto, foi removido na Task 16.)
 
-**Mocks:** `app/mocks/finance.mock.ts` — código morto, nenhuma página importa.
+**Mocks:** `app/mocks/finance.mock.ts` foi removido na Task 16 — nenhuma página o importava. Não há mais mocks no app.
 
 **Layout templates** em `layout_templates/stitch_finance_dashboard_overview/` — referência visual para cada tela (HTML + screenshot PNG).
 
@@ -163,9 +163,9 @@ Configuração em `WebConfig.java`. Se adicionar nova origem, atualizar aqui.
 | CORS docker (porta 9090) | Configurado |
 | Sem mvnw | Usar `mvn` direto |
 
-Teste ponta a ponta executado e aprovado (API + UI). Nenhuma tela do app importa mais `finance.mock.ts`. Todas as telas da POC consomem a API real.
+Teste ponta a ponta executado e aprovado (API + UI). O app não tem mais mocks: `finance.mock.ts` e `components/sidebar/` foram removidos na Task 16. Todas as telas da POC consomem a API real. POC fechada — backlog pós-POC em `PLAN.md` (Task 15).
 
 ## Problemas conhecidos
 
 - Backend não possui `mvnw` — depende de Maven instalado no host para rodar fora do Docker
-- `frontend/src/app/mocks/finance.mock.ts` ainda existe no repo, mas é código morto (nenhuma página importa)
+- Sem testes automatizados relevantes (validação foi manual); CRUDs assimétricos por recurso — ver backlog em `PLAN.md` (Task 15)

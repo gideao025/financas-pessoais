@@ -18,11 +18,11 @@ POC concluída — fluxo ponta a ponta validado (API + UI) via teste manual.
 - **Fase 1 (bootstrap)**: concluída — `docker compose up --build` sobe postgres + backend + frontend.
 - **Fase 2 (backend)**: concluída — migrations Flyway aplicadas, `/actuator/health` OK, todos os endpoints da POC testados.
 - **Fase 3 (integração frontend)**: concluída — auth, dashboard, transações, metas, cartões, relatórios e settings consomem a API real. Nenhuma tela importa mais `finance.mock.ts`.
-- **Fase 4 (fechar POC)**: teste ponta a ponta executado e aprovado (Task 14). Falta consolidar backlog (Task 15) e checklist final (Task 16).
+- **Fase 4 (fechar POC)**: concluída — teste ponta a ponta aprovado (Task 14), backlog pós-POC consolidado (Task 15) e checklist final de entrega documentado (Task 16). Código morto removido (`finance.mock.ts` e `components/sidebar/`).
 
 Bug corrigido na validação: `POST /api/accounts` agora cria conta sempre ativa.
 
-Pendências mapeadas: ver Fase 5.
+Pendências mapeadas: ver Task 15 (backlog) e Fase 5 (evolução).
 
 ## Fase 1: Corrigir bootstrap local
 
@@ -141,22 +141,77 @@ Roteiro:
 Critérios:
 - fluxo completo sem uso de mocks no caminho principal
 
-### Task 15
+### Task 15 — CONCLUÍDA
 Definir backlog do que fica fora da POC.
-Exemplos:
-- cartões completos
-- relatórios avançados
-- configurações persistidas no frontend
-- refresh token automatizado mais robusto
-- testes automatizados adicionais
 
-### Task 16
+Itens fora do escopo da POC, agrupados por tema. Esta é a fonte de verdade do que
+**não** está pronto — qualquer um pode virar uma task da Fase 5.
+
+**Robustez / infra**
+- Adicionar Maven Wrapper (`mvnw`) ao backend — hoje depende de Maven instalado no host
+- Testes automatizados de backend: integração de auth e, crítico, scoping por usuário
+  (garantir que o usuário A nunca enxergue dados do usuário B)
+- Testes de frontend além do `app.spec.ts` boilerplate
+- Refresh token automático mais robusto (renovação transparente ao expirar o access token)
+- Pipeline de CI (build + testes em PR)
+
+**CRUDs incompletos no backend** (assimetrias atuais por recurso)
+- Transações: existe criar/listar/deletar, falta **editar** (`PUT /api/transactions/{id}`)
+- Contas: existe criar/listar/editar, falta **deletar** (`DELETE /api/accounts/{id}`)
+- Cartões: existe criar/listar/toggle-block, faltam **editar** e **deletar**
+
+**Produto**
+- Categorias de transação (cadastro próprio + atribuição na transação)
+- Filtros e seleção de período no dashboard e relatórios
+- Relatórios avançados (gráficos, comparativos por mês/categoria)
+- Configurações do usuário além de profile (moeda, tema, notificações)
+- Metas: histórico de aportes / progresso ao longo do tempo
+
+**Qualidade de código**
+- `frontend/src/app/components/top-nav` — verificar se realmente é usado (auditar código morto residual)
+- Internacionalização (hoje strings pt-BR hardcoded)
+
+### Task 16 — CONCLUÍDA
 Documentar checklist final de entrega.
-Critérios:
-- comandos para subir
-- portas
-- credenciais/exemplos
-- limitações conhecidas da POC
+
+**Como subir (stack completa via Docker — recomendado)**
+```bash
+docker compose up --build
+```
+| Serviço | URL / porta |
+|---|---|
+| Frontend | http://localhost:9090 |
+| Backend | http://localhost:9091 |
+| Postgres | localhost:5433 |
+
+**Como subir (dev local, sem Docker completo)**
+```bash
+cd backend && docker compose up -d   # só postgres na 5432
+cd backend && mvn spring-boot:run     # backend em :8080 (requer Maven no host)
+cd frontend && npm install && npm start   # frontend em :4200
+```
+
+**Resolução de API base no frontend** (`core/api.config.ts`):
+porta 9090 → backend `:9091`; qualquer outra porta → backend `:8080`.
+
+**Credenciais / exemplo de uso**
+- Não há usuário seed — registrar via UI (`/auth`) ou:
+```bash
+curl -X POST http://localhost:9091/api/auth/register \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"Demo","email":"demo@exemplo.com","password":"senha123"}'
+```
+- `JWT_SECRET` default é de desenvolvimento — trocar em produção (ver CLAUDE.md).
+
+**Roteiro de validação ponta a ponta** (Task 14, aprovado):
+registrar → logar → criar conta → criar transação → ver dashboard → criar meta.
+
+**Limitações conhecidas da POC**
+- Backend sem `mvnw`: execução local fora do Docker exige Maven instalado
+- Sem testes automatizados relevantes (validação foi manual)
+- CRUDs assimétricos por recurso (ver Task 15)
+- Sem seed de dados; primeiro acesso exige registro
+- `JWT_SECRET`, usuário e senha do Postgres usam defaults de desenvolvimento
 
 ## Fase 5: Evolução pós-POC
 
