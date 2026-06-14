@@ -25,13 +25,15 @@ public record CardRequest(
     @Positive(message = "Limite deve ser positivo")
     BigDecimal creditLimit,
 
-    @NotNull(message = "Limite usado é obrigatório")
-    BigDecimal usedLimit,
-
     @NotNull(message = "Dia de vencimento é obrigatório")
     @Min(value = 1)
     @Max(value = 31)
     Integer dueDay,
+
+    @NotNull(message = "Dia de fechamento é obrigatório")
+    @Min(value = 1)
+    @Max(value = 31)
+    Integer closingDay,
 
     boolean blocked
 ) {}

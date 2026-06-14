@@ -13,7 +13,9 @@ public record TransactionResponse(
     TransactionType transactionType,
     TransactionStatus status,
     BigDecimal amount,
-    LocalDate transactionDate
+    LocalDate transactionDate,
+    Integer installmentNumber,
+    Integer installmentTotal
 ) {
   public static TransactionResponse from(TransactionEntity entity) {
     return new TransactionResponse(
@@ -25,6 +27,8 @@ public record TransactionResponse(
         entity.getTransactionType(),
         entity.getStatus(),
         entity.getAmount(),
-        entity.getTransactionDate());
+        entity.getTransactionDate(),
+        entity.getInstallmentNumber(),
+        entity.getInstallmentTotal());
   }
 }

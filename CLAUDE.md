@@ -83,10 +83,11 @@ npm start   # http://localhost:4200
 - `POST /api/auth/register`
 - `POST /api/auth/login`
 - `POST /api/auth/refresh`
-- `GET/POST /api/accounts`
-- `GET/POST /api/cards`
-- `GET/POST /api/transactions`
-- `GET/POST /api/goals`
+- `GET/POST /api/accounts`, `PUT /api/accounts/{id}`
+- `GET/POST /api/cards`, `PUT /api/cards/{id}`, `POST /api/cards/{id}/toggle-block`
+- `GET /api/cards/{id}/invoice/current`, `GET /api/cards/{id}/invoice?month=YYYY-MM` (fatura computada por ciclo)
+- `GET/POST /api/transactions`, `DELETE /api/transactions/{id}` (apaga o grupo de parcelas inteiro)
+- `GET/POST /api/goals`, `PUT /api/goals/{id}`, `POST /api/goals/{id}/complete`
 - `GET /api/reports/dashboard-summary`
 - `GET/PATCH /api/settings`
 - `GET /actuator/health`
@@ -94,6 +95,7 @@ npm start   # http://localhost:4200
 **Migrações Flyway:**
 - `V1__init_schema.sql` — users, refresh_tokens, accounts, cards, transactions, user_settings
 - `V2__goals.sql` — goals
+- `V3__card_cycle_installments.sql` — `closing_day` em cards; `installment_*` em transactions (parcelamento + ciclo de fatura)
 
 `ddl-auto: validate` — nunca alterar schema fora de migrations Flyway.
 
@@ -157,7 +159,7 @@ Configuração em `WebConfig.java`. Se adicionar nova origem, atualizar aqui.
 | Frontend — accounts (gestão de contas) | Integrado (Task 17) |
 | Frontend — transactions | Integrado |
 | Frontend — goals | Integrado |
-| Frontend — cards | Integrado |
+| Frontend — cards | Integrado + motor de fatura/parcelas (Task 18) |
 | Frontend — reports | Integrado |
 | Frontend — settings | Integrado |
 | CORS docker (porta 9090) | Configurado |

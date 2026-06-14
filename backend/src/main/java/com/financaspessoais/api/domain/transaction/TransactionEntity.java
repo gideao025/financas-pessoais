@@ -66,6 +66,15 @@ public class TransactionEntity {
   @Column(name = "transaction_date", nullable = false)
   private LocalDate transactionDate;
 
+  @Column(name = "installment_group_id")
+  private UUID installmentGroupId;
+
+  @Column(name = "installment_number")
+  private Integer installmentNumber;
+
+  @Column(name = "installment_total")
+  private Integer installmentTotal;
+
   @Column(name = "created_at", nullable = false)
   private LocalDateTime createdAt;
 

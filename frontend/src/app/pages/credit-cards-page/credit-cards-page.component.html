@@ -2,9 +2,9 @@
   <div class="flex flex-wrap items-center justify-between gap-3">
     <div>
       <h2 class="text-3xl font-black tracking-tight">Gerenciador de Cartões de Crédito</h2>
-      <p class="text-sm text-[#64748b]">Gerencie saldos, limites e vencimentos dos seus cartões ativos.</p>
+      <p class="text-sm text-[#64748b]">Gerencie limites, fechamento, vencimento e fatura dos seus cartões.</p>
     </div>
-    <button class="rounded-xl bg-primary px-4 py-2 text-sm font-bold text-white" (click)="painelAberto.set(true)">Novo Cartão</button>
+    <button class="rounded-xl bg-primary px-4 py-2 text-sm font-bold text-white" (click)="novoCartao()">Novo Cartão</button>
   </div>
 
   <p *ngIf="erro()" class="rounded-lg bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 dark:bg-red-900/20 dark:text-red-400">{{ erro() }}</p>
@@ -17,7 +17,7 @@
   </div>
 
   <article *ngIf="painelAberto()" class="rounded-xl border border-[#e5e7eb] bg-white p-5 dark:border-[#2a3441] dark:bg-[#1a242f]">
-    <h3 class="mb-4 text-lg font-bold">Novo Cartão</h3>
+    <h3 class="mb-4 text-lg font-bold">{{ editandoId() ? 'Editar Cartão' : 'Novo Cartão' }}</h3>
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
       <label class="flex flex-col gap-1 text-xs font-bold">
         Nome do cartão
@@ -38,21 +38,22 @@
         <input class="h-10 rounded-lg border border-[#dbe0e6] px-3 text-sm font-normal dark:border-[#2a3441] dark:bg-[#24313f]" placeholder="0000" maxlength="4" [value]="formFinal()" (input)="formFinal.set($any($event.target).value)" />
       </label>
       <label class="flex flex-col gap-1 text-xs font-bold">
-        Dia de vencimento
-        <input type="number" min="1" max="31" class="h-10 rounded-lg border border-[#dbe0e6] px-3 text-sm font-normal dark:border-[#2a3441] dark:bg-[#24313f]" [value]="formVencimento()" (input)="formVencimento.set($any($event.target).value)" />
-      </label>
-      <label class="flex flex-col gap-1 text-xs font-bold">
         Limite total (R$)
         <input class="h-10 rounded-lg border border-[#dbe0e6] px-3 text-sm font-normal dark:border-[#2a3441] dark:bg-[#24313f]" placeholder="0,00" [value]="formLimite()" (input)="formLimite.set($any($event.target).value)" />
       </label>
       <label class="flex flex-col gap-1 text-xs font-bold">
-        Limite usado (R$)
-        <input class="h-10 rounded-lg border border-[#dbe0e6] px-3 text-sm font-normal dark:border-[#2a3441] dark:bg-[#24313f]" placeholder="0,00" [value]="formUsado()" (input)="formUsado.set($any($event.target).value)" />
+        Dia de fechamento
+        <input type="number" min="1" max="31" class="h-10 rounded-lg border border-[#dbe0e6] px-3 text-sm font-normal dark:border-[#2a3441] dark:bg-[#24313f]" [value]="formFechamento()" (input)="formFechamento.set($any($event.target).value)" />
+      </label>
+      <label class="flex flex-col gap-1 text-xs font-bold">
+        Dia de vencimento
+        <input type="number" min="1" max="31" class="h-10 rounded-lg border border-[#dbe0e6] px-3 text-sm font-normal dark:border-[#2a3441] dark:bg-[#24313f]" [value]="formVencimento()" (input)="formVencimento.set($any($event.target).value)" />
       </label>
     </div>
+    <p class="mt-3 text-xs text-[#64748b]">O limite usado é calculado automaticamente a partir das compras lançadas no cartão.</p>
     <div class="mt-4 flex gap-2">
       <button class="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white" (click)="salvarCartao()">Salvar</button>
-      <button class="rounded-lg border border-[#dbe0e6] px-4 py-2 text-sm font-bold dark:border-[#2a3441]" (click)="painelAberto.set(false); erro.set('')">Cancelar</button>
+      <button class="rounded-lg border border-[#dbe0e6] px-4 py-2 text-sm font-bold dark:border-[#2a3441]" (click)="fecharPainel()">Cancelar</button>
     </div>
   </article>
 
@@ -74,11 +75,49 @@
 
       <div class="rounded-xl border border-[#e5e7eb] bg-white p-5 dark:border-[#2a3441] dark:bg-[#1a242f]">
         <p class="text-xs font-bold uppercase tracking-wider text-[#64748b]">Saldo Disponível</p>
-        <p class="text-lg font-bold text-primary">{{ (card.creditLimit - card.usedLimit) | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }} / {{ card.creditLimit | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</p>
-        <div class="mt-3 h-2 rounded-full bg-[#eef2f6] dark:bg-[#24313f]"><div class="h-2 rounded-full bg-primary" [style.width.%]="(card.usedLimit / card.creditLimit) * 100"></div></div>
-        <div class="mt-4 flex items-center justify-between text-sm">
-          <span>Vencimento dia {{ card.dueDay }}</span>
+        <p class="text-lg font-bold text-primary">{{ card.availableLimit | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }} / {{ card.creditLimit | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</p>
+        <div class="mt-3 h-2 rounded-full bg-[#eef2f6] dark:bg-[#24313f]"><div class="h-2 rounded-full bg-primary" [style.width.%]="card.creditLimit ? (card.usedLimit / card.creditLimit) * 100 : 0"></div></div>
+        <div class="mt-4 flex items-center justify-between text-sm text-[#64748b]">
+          <span>Fecha dia {{ card.closingDay }}</span>
+          <span>Vence dia {{ card.dueDay }}</span>
+        </div>
+        <div class="mt-4 flex flex-wrap items-center gap-2">
+          <button class="rounded-lg bg-primary px-3 py-1.5 text-xs font-bold text-white" (click)="verFatura(card)">{{ faturaCartaoId() === card.id ? 'Ocultar fatura' : 'Ver fatura' }}</button>
+          <button class="rounded-lg border border-[#dbe0e6] px-3 py-1.5 text-xs font-bold dark:border-[#2a3441]" (click)="editarCartao(card)">Editar</button>
           <button class="rounded-lg border border-primary px-3 py-1.5 text-xs font-bold text-primary" (click)="alternarBloqueio(card.id)">{{ card.blocked ? 'Desbloquear' : 'Bloquear' }}</button>
+        </div>
+      </div>
+
+      <div *ngIf="faturaCartaoId() === card.id" class="rounded-xl border border-[#e5e7eb] bg-white p-5 dark:border-[#2a3441] dark:bg-[#1a242f]">
+        <div *ngIf="faturaCarregando()" class="py-6 text-center text-sm text-[#64748b]">Carregando fatura...</div>
+
+        <div *ngIf="!faturaCarregando() && fatura() as f">
+          <div class="flex items-center justify-between">
+            <button class="rounded-lg p-1 hover:bg-[#eef2f6] dark:hover:bg-[#24313f]" (click)="navegarFatura(-1)">
+              <span class="material-symbols-outlined text-lg">chevron_left</span>
+            </button>
+            <div class="text-center">
+              <p class="text-sm font-bold">Fatura {{ f.periodEnd | date: 'MMM/yyyy' : '' : 'pt-BR' }}</p>
+              <p class="text-xs text-[#64748b]">{{ f.periodStart | date: 'dd/MM' : '' : 'pt-BR' }} – {{ f.periodEnd | date: 'dd/MM' : '' : 'pt-BR' }} · vence {{ f.dueDate | date: 'dd/MM/yyyy' : '' : 'pt-BR' }}</p>
+            </div>
+            <button class="rounded-lg p-1 hover:bg-[#eef2f6] dark:hover:bg-[#24313f]" (click)="navegarFatura(1)">
+              <span class="material-symbols-outlined text-lg">chevron_right</span>
+            </button>
+          </div>
+
+          <div class="my-3 flex items-baseline justify-between border-y border-[#eef2f6] py-2 dark:border-[#24313f]">
+            <span class="text-xs font-bold uppercase tracking-wider text-[#64748b]">Total da fatura</span>
+            <span class="text-xl font-black text-red-500">{{ f.total | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</span>
+          </div>
+
+          <p *ngIf="!f.transactions.length" class="py-4 text-center text-sm text-[#64748b]">Sem lançamentos nesta fatura.</p>
+
+          <ul *ngIf="f.transactions.length" class="divide-y divide-[#eef2f6] dark:divide-[#24313f]">
+            <li *ngFor="let t of f.transactions" class="flex items-center justify-between gap-2 py-2 text-sm">
+              <span class="truncate">{{ t.description }}</span>
+              <span class="shrink-0 font-bold">{{ t.amount | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</span>
+            </li>
+          </ul>
         </div>
       </div>
     </article>

@@ -56,10 +56,12 @@ export interface TransactionResponse {
   status: TransactionStatus;
   amount: number;
   transactionDate: string;
+  installmentNumber: number | null;
+  installmentTotal: number | null;
 }
 
 export interface TransactionRequest {
-  accountId: string;
+  accountId: string | null;
   cardId: string | null;
   description: string;
   category: string;
@@ -67,6 +69,7 @@ export interface TransactionRequest {
   status: TransactionStatus;
   amount: number;
   transactionDate: string;
+  installmentTotal: number | null;
 }
 
 export interface GoalResponse {
@@ -95,7 +98,9 @@ export interface CardResponse {
   lastFour: string;
   creditLimit: number;
   usedLimit: number;
+  availableLimit: number;
   dueDay: number;
+  closingDay: number;
   blocked: boolean;
 }
 
@@ -105,9 +110,19 @@ export interface CardRequest {
   brand: string;
   lastFour: string;
   creditLimit: number;
-  usedLimit: number;
   dueDay: number;
+  closingDay: number;
   blocked: boolean;
+}
+
+export interface InvoiceResponse {
+  cardId: string;
+  month: string;
+  periodStart: string;
+  periodEnd: string;
+  dueDate: string;
+  total: number;
+  transactions: TransactionResponse[];
 }
 
 export interface UserProfileResponse {

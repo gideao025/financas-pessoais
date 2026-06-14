@@ -1,5 +1,7 @@
 package com.financaspessoais.api.domain.transaction;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -28,5 +30,9 @@ public record TransactionRequest(
     BigDecimal amount,
 
     @NotNull(message = "Data da transação é obrigatória")
-    LocalDate transactionDate
+    LocalDate transactionDate,
+
+    @Min(value = 1, message = "Número de parcelas inválido")
+    @Max(value = 36, message = "Máximo de 36 parcelas")
+    Integer installmentTotal
 ) {}

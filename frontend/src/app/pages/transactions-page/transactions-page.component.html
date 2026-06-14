@@ -60,6 +60,10 @@
         <option value="todas">Conta: Todas</option>
         <option *ngFor="let conta of contas()" [value]="conta.name">{{ conta.name }}</option>
       </select>
+      <select *ngIf="cartoes().length" class="h-9 rounded-lg bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" [value]="cartaoSelecionado()" (change)="cartaoSelecionado.set(($any($event.target)).value); pageIndex.set(1)">
+        <option value="todos">Cartão: Todos</option>
+        <option *ngFor="let cartao of cartoes()" [value]="cartao.id">{{ cartao.name }}</option>
+      </select>
       <select class="h-9 rounded-lg bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" [value]="tipoSelecionado()" (change)="tipoSelecionado.set(($any($event.target)).value); pageIndex.set(1)">
         <option value="todos">Tipo: Todos</option>
         <option value="entrada">Tipo: Entrada</option>
@@ -89,6 +93,7 @@
             <th class="px-5 py-4">Descrição</th>
             <th class="px-5 py-4">Categoria</th>
             <th class="px-5 py-4">Conta</th>
+            <th class="px-5 py-4">Cartão</th>
             <th class="px-5 py-4 text-right">Valor</th>
           </tr>
         </thead>
@@ -98,6 +103,11 @@
             <td class="px-5 py-4 text-sm font-semibold">{{ item.descricao }}</td>
             <td class="px-5 py-4"><span class="rounded-full bg-[#eef2f5] px-2.5 py-0.5 text-xs dark:bg-[#24313f]">{{ item.categoria }}</span></td>
             <td class="px-5 py-4 text-sm text-[#64748b]">{{ item.conta }}</td>
+            <td class="px-5 py-4 text-sm text-[#64748b]">
+              <span *ngIf="item.cartaoId">{{ item.cartao }}</span>
+              <span *ngIf="item.parcela" class="ml-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary">{{ item.parcela }}</span>
+              <span *ngIf="!item.cartaoId">—</span>
+            </td>
             <td class="px-5 py-4 text-right text-sm font-bold" [ngClass]="item.tipo === 'entrada' ? 'text-green-600' : 'text-red-500'">{{ item.tipo === 'entrada' ? '+' : '-' }}{{ item.valor | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</td>
           </tr>
         </tbody>
@@ -160,6 +170,18 @@
           <select class="h-10 w-full rounded-lg border-none bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" [value]="formContaId()" (change)="formContaId.set(($any($event.target)).value)">
             <option *ngFor="let conta of contas()" [value]="conta.id">{{ conta.name }}</option>
           </select>
+        </label>
+        <label *ngIf="cartoes().length" class="space-y-1">
+          <span class="text-xs font-bold">Cartão (opcional)</span>
+          <select class="h-10 w-full rounded-lg border-none bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" [value]="formCartaoId()" (change)="formCartaoId.set(($any($event.target)).value)">
+            <option value="">Sem cartão</option>
+            <option *ngFor="let cartao of cartoes()" [value]="cartao.id">{{ cartao.name }}</option>
+          </select>
+        </label>
+        <label *ngIf="formCartaoId() && formTipo() === 'saida'" class="space-y-1">
+          <span class="text-xs font-bold">Parcelas</span>
+          <input class="h-10 w-full rounded-lg border-none bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" type="number" min="1" max="36" [value]="formParcelas()" (input)="formParcelas.set(($any($event.target)).value)" />
+          <span class="text-xs text-[#64748b]">O valor informado é o total da compra; será dividido nas parcelas.</span>
         </label>
         <div class="pt-2">
           <button class="w-full rounded-xl bg-primary py-2.5 text-sm font-bold text-white hover:bg-primary/90" (click)="salvarTransacao()">Salvar Transação</button>

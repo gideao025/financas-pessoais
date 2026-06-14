@@ -5,11 +5,13 @@ import { forkJoin } from 'rxjs';
 import type {
   AccountResponse,
   AccountType,
+  CardResponse,
   TransactionResponse,
   TransactionStatus,
   TransactionType
 } from '../../core/models/api.models';
 import { AccountsService } from '../../core/services/accounts.service';
+import { CardsService } from '../../core/services/cards.service';
 import { TransactionsService } from '../../core/services/transactions.service';
 
 interface UiTransaction {
@@ -18,6 +20,9 @@ interface UiTransaction {
   categoria: string;
   conta: string;
   contaId: string | null;
+  cartao: string;
+  cartaoId: string | null;
+  parcela: string;
   data: string;
   valor: number;
   tipo: 'entrada' | 'saida';
@@ -33,6 +38,7 @@ interface UiTransaction {
 export class TransactionsPageComponent implements OnInit {
   private readonly accountsService = inject(AccountsService);
   private readonly transactionsService = inject(TransactionsService);
+  private readonly cardsService = inject(CardsService);
   private readonly categoriasPadrao = ['Moradia', 'Alimentação', 'Transporte', 'Lazer', 'Renda'];
 
   protected readonly carregando = signal(true);
@@ -40,12 +46,14 @@ export class TransactionsPageComponent implements OnInit {
   protected readonly mensagem = signal('');
   protected readonly transacoes = signal<UiTransaction[]>([]);
   protected readonly contas = signal<AccountResponse[]>([]);
+  protected readonly cartoes = signal<CardResponse[]>([]);
   protected readonly busca = signal('');
   protected readonly tipoSelecionado = signal<'todos' | 'entrada' | 'saida'>('todos');
   protected readonly statusSelecionado = signal<'todos' | 'concluida' | 'pendente'>('todos');
   protected readonly periodoSelecionado = signal<'esteMes' | 'todos'>('todos');
   protected readonly categoriaSelecionada = signal<'todas' | string>('todas');
   protected readonly contaSelecionada = signal<'todas' | string>('todas');
+  protected readonly cartaoSelecionado = signal<'todos' | string>('todos');
   protected readonly pageSize = signal(5);
   protected readonly pageIndex = signal(1);
   protected readonly painelAberto = signal(false);
@@ -57,6 +65,8 @@ export class TransactionsPageComponent implements OnInit {
   protected readonly formDescricao = signal('');
   protected readonly formCategoria = signal('Alimentação');
   protected readonly formContaId = signal('');
+  protected readonly formCartaoId = signal('');
+  protected readonly formParcelas = signal('1');
 
   protected readonly contaNome = signal('');
   protected readonly contaInstituicao = signal('');
@@ -81,7 +91,9 @@ export class TransactionsPageComponent implements OnInit {
       const bateCategoria =
         this.categoriaSelecionada() === 'todas' || item.categoria === this.categoriaSelecionada();
       const bateConta = this.contaSelecionada() === 'todas' || item.conta === this.contaSelecionada();
-      return bateBusca && bateTipo && bateStatus && batePeriodo && bateCategoria && bateConta;
+      const bateCartao =
+        this.cartaoSelecionado() === 'todos' || item.cartaoId === this.cartaoSelecionado();
+      return bateBusca && bateTipo && bateStatus && batePeriodo && bateCategoria && bateConta && bateCartao;
     })
   );
 
@@ -118,11 +130,13 @@ export class TransactionsPageComponent implements OnInit {
 
     forkJoin({
       contas: this.accountsService.list(),
+      cartoes: this.cardsService.list(),
       transacoes: this.transactionsService.list()
     }).subscribe({
-      next: ({ contas, transacoes }) => {
+      next: ({ contas, cartoes, transacoes }) => {
         this.contas.set(contas);
-        this.transacoes.set(transacoes.map((item) => this.mapTransaction(item, contas)));
+        this.cartoes.set(cartoes);
+        this.transacoes.set(transacoes.map((item) => this.mapTransaction(item, contas, cartoes)));
         this.formContaId.set(contas[0]?.id ?? '');
         this.carregando.set(false);
       },
@@ -162,28 +176,37 @@ export class TransactionsPageComponent implements OnInit {
 
     const transactionType: TransactionType = this.formTipo() === 'entrada' ? 'ENTRADA' : 'SAIDA';
     const status: TransactionStatus = this.formStatus() === 'concluida' ? 'CONCLUIDA' : 'PENDENTE';
+    const cardId = this.formCartaoId() || null;
+    // parcelamento só faz sentido para despesa no cartão
+    const parcelas = cardId && this.formTipo() === 'saida' ? Math.max(1, Number(this.formParcelas()) || 1) : 1;
 
     this.transactionsService
       .create({
         accountId: this.formContaId(),
-        cardId: null,
+        cardId,
         description: this.formDescricao().trim(),
         category: this.formCategoria().trim(),
         transactionType,
         status,
         amount,
-        transactionDate: this.formData()
+        transactionDate: this.formData(),
+        installmentTotal: parcelas
       })
       .subscribe({
-        next: (response) => {
-          const contas = this.contas();
-          this.transacoes.update((itens) => [this.mapTransaction(response, contas), ...itens]);
+        next: () => {
           this.painelAberto.set(false);
           this.formValor.set('');
           this.formDescricao.set('');
           this.formStatus.set('concluida');
+          this.formCartaoId.set('');
+          this.formParcelas.set('1');
           this.pageIndex.set(1);
-          this.mensagem.set('Transacao salva com sucesso.');
+          this.mensagem.set(
+            parcelas > 1 ? `Compra parcelada em ${parcelas}x salva com sucesso.` : 'Transacao salva com sucesso.'
+          );
+          setTimeout(() => this.mensagem.set(''), 2500);
+          // recarrega para trazer todas as parcelas geradas no backend
+          this.carregarDados();
         },
         error: (error: { error?: { message?: string } }) => {
           this.erro.set(error.error?.message ?? 'Nao foi possivel salvar a transacao.');
@@ -228,8 +251,13 @@ export class TransactionsPageComponent implements OnInit {
     this.mensagem.set('');
   }
 
-  private mapTransaction(item: TransactionResponse, contas: AccountResponse[]): UiTransaction {
+  private mapTransaction(
+    item: TransactionResponse,
+    contas: AccountResponse[],
+    cartoes: CardResponse[]
+  ): UiTransaction {
     const conta = contas.find((current) => current.id === item.accountId);
+    const cartao = cartoes.find((current) => current.id === item.cardId);
 
     return {
       id: item.id,
@@ -237,6 +265,11 @@ export class TransactionsPageComponent implements OnInit {
       categoria: item.category,
       conta: conta?.name ?? 'Conta removida',
       contaId: item.accountId,
+      cartao: cartao?.name ?? '—',
+      cartaoId: item.cardId,
+      parcela: item.installmentNumber && item.installmentTotal
+        ? `${item.installmentNumber}/${item.installmentTotal}`
+        : '',
       data: item.transactionDate,
       valor: item.amount,
       tipo: item.transactionType === 'ENTRADA' ? 'entrada' : 'saida',

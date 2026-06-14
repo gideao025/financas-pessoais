@@ -11,10 +11,14 @@ public record CardResponse(
     String lastFour,
     BigDecimal creditLimit,
     BigDecimal usedLimit,
+    BigDecimal availableLimit,
     Integer dueDay,
+    Integer closingDay,
     boolean blocked
 ) {
-  public static CardResponse from(CardEntity entity) {
+  /** {@code usedLimit} é calculado (fatura aberta + parcelas futuras), não persistido. */
+  public static CardResponse from(CardEntity entity, BigDecimal usedLimit) {
+    BigDecimal available = entity.getCreditLimit().subtract(usedLimit);
     return new CardResponse(
         entity.getId(),
         entity.getAccount() != null ? entity.getAccount().getId() : null,
@@ -22,8 +26,10 @@ public record CardResponse(
         entity.getBrand(),
         entity.getLastFour(),
         entity.getCreditLimit(),
-        entity.getUsedLimit(),
+        usedLimit,
+        available,
         entity.getDueDay(),
+        entity.getClosingDay(),
         entity.isBlocked());
   }
 }

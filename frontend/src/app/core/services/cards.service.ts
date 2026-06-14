@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { resolveApiBaseUrl } from '../api.config';
-import type { CardRequest, CardResponse } from '../models/api.models';
+import type { CardRequest, CardResponse, InvoiceResponse } from '../models/api.models';
 
 @Injectable({ providedIn: 'root' })
 export class CardsService {
@@ -18,7 +18,19 @@ export class CardsService {
     return this.http.post<CardResponse>(`${this.apiBaseUrl}/cards`, payload);
   }
 
+  update(id: string, payload: CardRequest): Observable<CardResponse> {
+    return this.http.put<CardResponse>(`${this.apiBaseUrl}/cards/${id}`, payload);
+  }
+
   toggleBlock(id: string): Observable<CardResponse> {
     return this.http.post<CardResponse>(`${this.apiBaseUrl}/cards/${id}/toggle-block`, {});
+  }
+
+  currentInvoice(id: string): Observable<InvoiceResponse> {
+    return this.http.get<InvoiceResponse>(`${this.apiBaseUrl}/cards/${id}/invoice/current`);
+  }
+
+  invoice(id: string, month: string): Observable<InvoiceResponse> {
+    return this.http.get<InvoiceResponse>(`${this.apiBaseUrl}/cards/${id}/invoice`, { params: { month } });
   }
 }

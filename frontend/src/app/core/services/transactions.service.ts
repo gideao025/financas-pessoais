@@ -17,4 +17,8 @@ export class TransactionsService {
   create(payload: TransactionRequest): Observable<TransactionResponse> {
     return this.http.post<TransactionResponse>(`${this.apiBaseUrl}/transactions`, payload);
   }
+
+  delete(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiBaseUrl}/transactions/${id}`);
+  }
 }

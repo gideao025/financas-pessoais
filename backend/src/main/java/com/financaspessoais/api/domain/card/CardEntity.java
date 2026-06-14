@@ -56,6 +56,9 @@ public class CardEntity {
   @Column(name = "due_day", nullable = false)
   private Integer dueDay;
 
+  @Column(name = "closing_day", nullable = false)
+  private Integer closingDay;
+
   @Column(nullable = false)
   private boolean blocked;
 

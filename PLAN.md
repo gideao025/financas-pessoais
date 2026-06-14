@@ -158,7 +158,7 @@ Itens fora do escopo da POC, agrupados por tema. Esta é a fonte de verdade do q
 **CRUDs incompletos no backend** (assimetrias atuais por recurso)
 - Transações: existe criar/listar/deletar, falta **editar** (`PUT /api/transactions/{id}`)
 - Contas: existe criar/listar/editar, falta **deletar** (`DELETE /api/accounts/{id}`)
-- Cartões: existe criar/listar/toggle-block, faltam **editar** e **deletar**
+- Cartões: criar/listar/editar/toggle-block + fatura/parcelas (Task 18); falta **deletar**
 
 **Produto**
 - Categorias de transação (cadastro próprio + atribuição na transação)
@@ -244,6 +244,17 @@ Critérios de pronto:
 
 Referência:
 - seguir convenções da skill `frontend` (`.claude/skills/frontend/SKILL.md`)
+
+### Task 18 — CONCLUÍDA
+Motor de controle de cartão de crédito (Fase 1 do plano de evolução `~/.claude/plans/me-de-dicas-do-lazy-whisper.md`).
+
+Entregue:
+- **Backend**: migration `V3__card_cycle_installments.sql` (`closing_day` em cards; `installment_group_id/number/total` em transactions). `CardCycle` (matemática de ciclo), `CardInvoiceService` + `InvoiceResponse` com `GET /api/cards/{id}/invoice/current` e `?month=YYYY-MM` (fatura computada, não materializada). `PUT /api/cards/{id}` (editar, padrão Goal). `CardResponse` expõe `usedLimit`/`availableLimit` **calculados** (fatura aberta + parcelas futuras); request não exige mais `usedLimit`. Transação aceita `installmentTotal` e expande em N linhas ligadas por grupo; `DELETE` remove o grupo inteiro; parcelar exige cartão.
+- **Frontend**: lançamento expõe seletor de cartão + campo de parcelas (some o `cardId: null` hardcoded); lista de transações ganha coluna de cartão/parcela e filtro por cartão; tela de cartões ganha edição, dia de fechamento, limite calculado e painel de fatura inline com navegação de mês. `CardsService.update/currentInvoice/invoice`, `TransactionsService.delete`.
+
+Validado: build Docker limpo (backend + frontend) e smoke test de API ponta a ponta (criação/edição de cartão, parcela 3x distribuída em ciclos consecutivos, fatura atual e do mês seguinte, limite calculado, delete por grupo, rejeição de parcela sem cartão).
+
+Fora do escopo (Fase 1b do plano): materializar fatura e ação "marcar como paga".
 
 ## Dependências entre tasks
 - Tasks 1 a 4 desbloqueiam 5 e 6
