@@ -1,9 +1,6 @@
 export function resolveApiBaseUrl(): string {
-  if (typeof window === 'undefined') {
-    return 'http://localhost:8080/api';
-  }
-
-  return window.location.port === '9090'
-    ? 'http://localhost:9091/api'
-    : 'http://localhost:8080/api';
+  // Caminho relativo: o nginx do frontend faz proxy de /api para o backend.
+  // Funciona em qualquer origem (localhost, IP da LAN ou domínio atrás de proxy reverso),
+  // sem CORS e sem depender de porta/host fixos.
+  return '/api';
 }
