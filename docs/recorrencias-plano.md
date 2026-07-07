@@ -43,11 +43,12 @@ O que já resolve "quais já paguei / quais faltam".
   já existe a transação materializada. (Ponto de correção mais delicado desta fase.)
 - **Front**: badge de origem (recorrente) e status na lista; botão "pagar".
 
-### Fase 2 — Pagamento parcial  ·  **M**
-- **Migration**: `paid_amount numeric(14,2)` na transação; novo status `PARCIAL`.
-- **Backend**: registrar `paid_amount < amount` → status `PARCIAL`; o **efeito no saldo passa a
-  usar `paid_amount`**, não o valor cheio (ajuste na lógica de saldo atual, que hoje usa o total).
-- **Front**: input de valor pago + exibição "pago X de Y".
+### Fase 2 — Pagamento parcial  ·  **M**  ·  ✅ **CONCLUÍDA**
+- **Migration V7**: `paid_amount numeric(14,2)` (backfill = `amount` para `CONCLUIDA`); status `PARCIAL`.
+- **Backend**: `POST /api/transactions/{id}/pay` aceita `{amount}` opcional (ausente = quita o
+  restante); status vira `PARCIAL` enquanto faltar, `CONCLUIDA` ao quitar. O **efeito no saldo passou
+  a usar `paid_amount`** (modelo unificado: cada pagamento debita só a parcela paga).
+- **Front**: badge "parcial · pago X de Y" + input inline de pagamento (total ou parcial).
 
 ### Fase 3 — Atraso e rollover  ·  **M–G (depende de regra de negócio)**
 Parte mais aberta; exige **decisões de produto** antes de estimar com precisão.
