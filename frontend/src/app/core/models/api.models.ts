@@ -56,6 +56,8 @@ export interface TransactionResponse {
   status: TransactionStatus;
   amount: number;
   transactionDate: string;
+  recurrenceId: string | null;
+  dueDate: string | null;
   installmentNumber: number | null;
   installmentTotal: number | null;
 }

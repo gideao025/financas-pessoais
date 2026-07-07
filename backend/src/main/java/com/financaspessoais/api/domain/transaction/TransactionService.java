@@ -180,6 +180,28 @@ public class TransactionService {
     return saved;
   }
 
+  /** Marca uma transação pendente como paga (na data de hoje) e reflete no saldo da conta. */
+  @Transactional
+  public TransactionResponse pay(UUID id) {
+    UUID userId = securityContextService.getUserId();
+    TransactionEntity entity = transactionRepository.findByIdAndUserId(id, userId)
+        .orElseThrow(() -> new BusinessException("Transação não encontrada", HttpStatus.NOT_FOUND));
+
+    if (entity.getStatus() == TransactionStatus.CONCLUIDA) {
+      return TransactionResponse.from(entity);
+    }
+
+    entity.setStatus(TransactionStatus.CONCLUIDA);
+    entity.setTransactionDate(LocalDate.now());
+    entity.setUpdatedAt(LocalDateTime.now());
+
+    TransactionResponse saved = TransactionResponse.from(transactionRepository.save(entity));
+    Map<UUID, BigDecimal> deltas = new HashMap<>();
+    accumulate(deltas, entity, BigDecimal.ONE);
+    applyBalanceDeltas(userId, deltas);
+    return saved;
+  }
+
   @Transactional
   public void delete(UUID id) {
     UUID userId = securityContextService.getUserId();

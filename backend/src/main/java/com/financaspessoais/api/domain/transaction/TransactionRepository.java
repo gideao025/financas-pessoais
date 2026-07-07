@@ -17,6 +17,12 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
   // parcelas de uma mesma compra parcelada
   List<TransactionEntity> findByInstallmentGroupIdAndUserId(UUID installmentGroupId, UUID userId);
 
+  // materialização de recorrências: evita duplicar a conta fixa no mesmo mês
+  boolean existsByUserIdAndRecurrenceIdAndCompetence(UUID userId, UUID recurrenceId, String competence);
+
+  // transações originadas de recorrências (para não contar em dobro no cash-flow)
+  List<TransactionEntity> findByUserIdAndRecurrenceIdIsNotNull(UUID userId);
+
   // transações de um cartão dentro de um período (fatura)
   List<TransactionEntity> findByUserIdAndCardIdAndTransactionDateBetweenOrderByTransactionDateDesc(
       UUID userId, UUID cardId, LocalDate from, LocalDate to);

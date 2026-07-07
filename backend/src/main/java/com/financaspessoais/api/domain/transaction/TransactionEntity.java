@@ -66,6 +66,15 @@ public class TransactionEntity {
   @Column(name = "transaction_date", nullable = false)
   private LocalDate transactionDate;
 
+  @Column(name = "recurrence_id")
+  private UUID recurrenceId;
+
+  @Column(name = "due_date")
+  private LocalDate dueDate;
+
+  @Column(name = "competence")
+  private String competence;
+
   @Column(name = "installment_group_id")
   private UUID installmentGroupId;
 

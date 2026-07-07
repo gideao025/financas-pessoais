@@ -27,6 +27,8 @@ interface UiTransaction {
   valor: number;
   tipo: 'entrada' | 'saida';
   status: 'concluida' | 'pendente';
+  recorrente: boolean;
+  vencimento: string | null;
 }
 
 @Component({
@@ -123,7 +125,43 @@ export class TransactionsPageComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    this.carregarDados();
+    // gera (sob demanda) as contas fixas do mês corrente e então carrega a lista
+    this.transactionsService.generateRecurrences().subscribe({
+      next: () => this.carregarDados(),
+      error: () => this.carregarDados()
+    });
+  }
+
+  /** Gera as contas fixas do mês manualmente (idempotente). */
+  protected gerarContas(): void {
+    this.transactionsService.generateRecurrences().subscribe({
+      next: (criadas) => {
+        this.mensagem.set(
+          criadas.length
+            ? `${criadas.length} conta(s) fixa(s) gerada(s) para este mês.`
+            : 'Nenhuma conta fixa nova para gerar.'
+        );
+        setTimeout(() => this.mensagem.set(''), 2500);
+        this.carregarDados();
+      },
+      error: (error: { error?: { message?: string } }) => {
+        this.erro.set(error.error?.message ?? 'Nao foi possivel gerar as contas do mes.');
+      }
+    });
+  }
+
+  /** Marca uma conta/transação pendente como paga. */
+  protected pagar(item: UiTransaction): void {
+    this.transactionsService.pay(item.id).subscribe({
+      next: () => {
+        this.mensagem.set('Pagamento registrado.');
+        setTimeout(() => this.mensagem.set(''), 2500);
+        this.carregarDados();
+      },
+      error: (error: { error?: { message?: string } }) => {
+        this.erro.set(error.error?.message ?? 'Nao foi possivel registrar o pagamento.');
+      }
+    });
   }
 
   /** Troca o período e recarrega do servidor (filtro de datas server-side). */
@@ -368,7 +406,9 @@ export class TransactionsPageComponent implements OnInit {
       data: item.transactionDate,
       valor: item.amount,
       tipo: item.transactionType === 'ENTRADA' ? 'entrada' : 'saida',
-      status: item.status === 'CONCLUIDA' ? 'concluida' : 'pendente'
+      status: item.status === 'CONCLUIDA' ? 'concluida' : 'pendente',
+      recorrente: !!item.recurrenceId,
+      vencimento: item.dueDate
     };
   }
 }

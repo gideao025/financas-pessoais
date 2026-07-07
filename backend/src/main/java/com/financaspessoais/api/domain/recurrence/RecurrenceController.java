@@ -1,5 +1,6 @@
 package com.financaspessoais.api.domain.recurrence;
 
+import com.financaspessoais.api.domain.transaction.TransactionResponse;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -42,5 +44,11 @@ public class RecurrenceController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void delete(@PathVariable UUID id) {
     recurrenceService.delete(id);
+  }
+
+  /** Gera (sob demanda) as contas fixas do mês como transações PENDENTE. Idempotente. */
+  @PostMapping("/generate")
+  public List<TransactionResponse> generate(@RequestParam(required = false) String month) {
+    return recurrenceService.generateForMonth(month);
   }
 }

@@ -14,6 +14,8 @@ public record TransactionResponse(
     TransactionStatus status,
     BigDecimal amount,
     LocalDate transactionDate,
+    UUID recurrenceId,
+    LocalDate dueDate,
     Integer installmentNumber,
     Integer installmentTotal
 ) {
@@ -28,6 +30,8 @@ public record TransactionResponse(
         entity.getStatus(),
         entity.getAmount(),
         entity.getTransactionDate(),
+        entity.getRecurrenceId(),
+        entity.getDueDate(),
         entity.getInstallmentNumber(),
         entity.getInstallmentTotal());
   }

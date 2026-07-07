@@ -4,9 +4,14 @@
       <h2 class="text-[22px] font-bold tracking-tight">Transações</h2>
       <p class="text-[13px] text-dim">Histórico completo de movimentações com filtros.</p>
     </div>
-    <button class="flex items-center gap-1.5 rounded-xl bg-gradient-to-br from-accent2 to-accentstrong px-4 py-2 text-[13px] font-bold text-[#0f0f13] hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60" [disabled]="!contas().length" (click)="abrirNova()">
-      <span class="material-symbols-outlined text-[18px]">add</span> Nova transação
-    </button>
+    <div class="flex items-center gap-2">
+      <button class="flex items-center gap-1.5 rounded-xl border border-bd bg-card px-3.5 py-2 text-[13px] font-semibold text-tx2 hover:border-accent/40" (click)="gerarContas()">
+        <span class="material-symbols-outlined text-[18px]">event_repeat</span> Gerar contas do mês
+      </button>
+      <button class="flex items-center gap-1.5 rounded-xl bg-gradient-to-br from-accent2 to-accentstrong px-4 py-2 text-[13px] font-bold text-[#0f0f13] hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60" [disabled]="!contas().length" (click)="abrirNova()">
+        <span class="material-symbols-outlined text-[18px]">add</span> Nova transação
+      </button>
+    </div>
   </div>
 
   <p *ngIf="mensagem()" class="rounded-xl border border-pos/30 bg-pos/[0.12] px-4 py-2 text-sm font-semibold text-pos">{{ mensagem() }}</p>
@@ -89,10 +94,19 @@
             <tr *ngFor="let item of pagina()" class="border-t border-bd2">
               <td class="px-[18px] py-[11px]">
                 <div class="flex items-center gap-2.5">
-                  <div class="flex h-[30px] w-[30px] items-center justify-center rounded-[9px]" [ngClass]="item.tipo === 'entrada' ? 'bg-pos/[0.14]' : 'bg-chip'">
-                    <span class="material-symbols-outlined text-[17px]" [ngClass]="item.tipo === 'entrada' ? 'text-pos' : 'text-accentsoft'">{{ item.tipo === 'entrada' ? 'south_west' : 'north_east' }}</span>
+                  <div class="flex h-[30px] w-[30px] items-center justify-center rounded-[9px]" [ngClass]="item.recorrente ? 'bg-accent/[0.14]' : item.tipo === 'entrada' ? 'bg-pos/[0.14]' : 'bg-chip'">
+                    <span class="material-symbols-outlined text-[17px]" [ngClass]="item.recorrente ? 'text-accent' : item.tipo === 'entrada' ? 'text-pos' : 'text-accentsoft'">{{ item.recorrente ? 'event_repeat' : item.tipo === 'entrada' ? 'south_west' : 'north_east' }}</span>
                   </div>
-                  <span class="font-semibold">{{ item.descricao }}</span>
+                  <div class="flex flex-col gap-0.5">
+                    <div class="flex items-center gap-1.5">
+                      <span class="font-semibold">{{ item.descricao }}</span>
+                      <span *ngIf="item.recorrente" class="rounded-full bg-accent/[0.14] px-1.5 py-0.5 text-[9.5px] font-semibold text-accent">fixa</span>
+                    </div>
+                    <span
+                      class="w-fit rounded-full px-1.5 py-0.5 text-[9.5px] font-semibold"
+                      [ngClass]="item.status === 'concluida' ? 'bg-pos/[0.14] text-pos' : 'bg-neg/[0.14] text-neg'"
+                    >{{ item.status === 'concluida' ? 'paga' : (item.vencimento ? 'pendente · vence ' + (item.vencimento | date: 'dd/MM' : '' : 'pt-BR') : 'pendente') }}</span>
+                  </div>
                 </div>
               </td>
               <td class="px-3 py-[11px]"><span class="rounded-full bg-chip px-2.5 py-1 text-[11px] text-tx2">{{ item.categoria }}</span></td>
@@ -105,7 +119,10 @@
               </td>
               <td class="num px-3 py-[11px] text-right font-semibold" [ngClass]="item.tipo === 'entrada' ? 'text-pos' : 'text-tx2'">{{ item.tipo === 'entrada' ? '+' : '−' }}{{ item.valor | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</td>
               <td class="px-[18px] py-[11px] text-right">
-                <div *ngIf="excluindoId() !== item.id" class="flex justify-end gap-1">
+                <div *ngIf="excluindoId() !== item.id" class="flex items-center justify-end gap-1">
+                  <button *ngIf="item.status === 'pendente'" class="flex h-7 items-center gap-1 rounded-lg bg-pos/[0.14] px-2 text-[11px] font-semibold text-pos hover:bg-pos/20" title="Marcar como paga" (click)="pagar(item)">
+                    <span class="material-symbols-outlined text-[15px]">check</span> Pagar
+                  </button>
                   <button *ngIf="!item.parcela" class="flex h-7 w-7 items-center justify-center rounded-lg text-dim hover:bg-accent/[0.14] hover:text-accent" title="Editar" (click)="editar(item)">
                     <span class="material-symbols-outlined text-[18px]">edit</span>
                   </button>

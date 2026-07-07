@@ -21,8 +21,10 @@ import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -92,12 +94,25 @@ public class CashFlowService {
         });
   }
 
-  /** Recorrências ativas expandidas no dia do mês, dentro do horizonte. */
+  /**
+   * Recorrências ativas expandidas no dia do mês, dentro do horizonte. Meses já materializados
+   * (transação gerada a partir da recorrência) são pulados para não contar em dobro — nesses casos
+   * a transação já entra pela projeção de transações futuras ou já foi realizada no saldo.
+   */
   private void collectRecurrences(UUID userId, LocalDate today, LocalDate end,
       Map<LocalDate, List<FlowEvent>> eventsByDay) {
     List<RecurrenceEntity> recs = recurrenceRepository.findByUserIdAndActiveTrue(userId);
+
+    Set<String> materializadas = transactionRepository.findByUserIdAndRecurrenceIdIsNotNull(userId).stream()
+        .filter(t -> t.getCompetence() != null)
+        .map(t -> t.getRecurrenceId() + "|" + t.getCompetence())
+        .collect(Collectors.toSet());
+
     for (YearMonth ym = YearMonth.from(today); !ym.isAfter(YearMonth.from(end)); ym = ym.plusMonths(1)) {
       for (RecurrenceEntity r : recs) {
+        if (materializadas.contains(r.getId() + "|" + ym.toString())) {
+          continue;
+        }
         LocalDate date = ym.atDay(Math.min(r.getDayOfMonth(), ym.lengthOfMonth()));
         if (date.isAfter(today) && !date.isAfter(end)) {
           boolean entrada = r.getTransactionType() == TransactionType.ENTRADA;

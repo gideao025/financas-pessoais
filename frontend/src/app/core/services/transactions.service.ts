@@ -30,6 +30,20 @@ export class TransactionsService {
     return this.http.put<TransactionResponse>(`${this.apiBaseUrl}/transactions/${id}`, payload);
   }
 
+  /** Marca uma transação pendente como paga (data de hoje, reflete no saldo). */
+  pay(id: string): Observable<TransactionResponse> {
+    return this.http.post<TransactionResponse>(`${this.apiBaseUrl}/transactions/${id}/pay`, {});
+  }
+
+  /** Gera (sob demanda) as contas fixas do mês a partir das recorrências. */
+  generateRecurrences(month?: string): Observable<TransactionResponse[]> {
+    return this.http.post<TransactionResponse[]>(
+      `${this.apiBaseUrl}/recurrences/generate`,
+      {},
+      { params: month ? { month } : {} }
+    );
+  }
+
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiBaseUrl}/transactions/${id}`);
   }

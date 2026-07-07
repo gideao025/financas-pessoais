@@ -43,6 +43,11 @@ public class TransactionController {
     return transactionService.update(id, request);
   }
 
+  @PostMapping("/{id}/pay")
+  public TransactionResponse pay(@PathVariable UUID id) {
+    return transactionService.pay(id);
+  }
+
   @DeleteMapping("/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void delete(@PathVariable UUID id) {
