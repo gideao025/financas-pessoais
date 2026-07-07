@@ -44,8 +44,9 @@ public class TransactionController {
   }
 
   @PostMapping("/{id}/pay")
-  public TransactionResponse pay(@PathVariable UUID id) {
-    return transactionService.pay(id);
+  public TransactionResponse pay(
+      @PathVariable UUID id, @Valid @RequestBody(required = false) PaymentRequest request) {
+    return transactionService.pay(id, request != null ? request.amount() : null);
   }
 
   @DeleteMapping("/{id}")

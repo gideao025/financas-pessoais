@@ -44,7 +44,7 @@ export interface AccountRequest {
 }
 
 export type TransactionType = 'ENTRADA' | 'SAIDA';
-export type TransactionStatus = 'CONCLUIDA' | 'PENDENTE';
+export type TransactionStatus = 'CONCLUIDA' | 'PENDENTE' | 'PARCIAL';
 
 export interface TransactionResponse {
   id: string;
@@ -55,6 +55,7 @@ export interface TransactionResponse {
   transactionType: TransactionType;
   status: TransactionStatus;
   amount: number;
+  paidAmount: number;
   transactionDate: string;
   recurrenceId: string | null;
   dueDate: string | null;

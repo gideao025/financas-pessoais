@@ -118,6 +118,7 @@ public class RecurrenceService {
           .transactionType(r.getTransactionType())
           .status(TransactionStatus.PENDENTE)
           .amount(r.getAmount())
+          .paidAmount(java.math.BigDecimal.ZERO)
           .transactionDate(due)
           .dueDate(due)
           .competence(competence)

@@ -104,8 +104,14 @@
                     </div>
                     <span
                       class="w-fit rounded-full px-1.5 py-0.5 text-[9.5px] font-semibold"
-                      [ngClass]="item.status === 'concluida' ? 'bg-pos/[0.14] text-pos' : 'bg-neg/[0.14] text-neg'"
-                    >{{ item.status === 'concluida' ? 'paga' : (item.vencimento ? 'pendente · vence ' + (item.vencimento | date: 'dd/MM' : '' : 'pt-BR') : 'pendente') }}</span>
+                      [ngClass]="item.status === 'concluida' ? 'bg-pos/[0.14] text-pos' : item.status === 'parcial' ? 'bg-accent/[0.14] text-accent' : 'bg-neg/[0.14] text-neg'"
+                    >{{
+                      item.status === 'concluida'
+                        ? 'paga'
+                        : item.status === 'parcial'
+                          ? ('parcial · pago ' + (item.pago | currency: 'BRL' : 'symbol' : '1.0-0' : 'pt-BR') + ' de ' + (item.valor | currency: 'BRL' : 'symbol' : '1.0-0' : 'pt-BR'))
+                          : (item.vencimento ? 'pendente · vence ' + (item.vencimento | date: 'dd/MM' : '' : 'pt-BR') : 'pendente')
+                    }}</span>
                   </div>
                 </div>
               </td>
@@ -119,9 +125,9 @@
               </td>
               <td class="num px-3 py-[11px] text-right font-semibold" [ngClass]="item.tipo === 'entrada' ? 'text-pos' : 'text-tx2'">{{ item.tipo === 'entrada' ? '+' : '−' }}{{ item.valor | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</td>
               <td class="px-[18px] py-[11px] text-right">
-                <div *ngIf="excluindoId() !== item.id" class="flex items-center justify-end gap-1">
-                  <button *ngIf="item.status === 'pendente'" class="flex h-7 items-center gap-1 rounded-lg bg-pos/[0.14] px-2 text-[11px] font-semibold text-pos hover:bg-pos/20" title="Marcar como paga" (click)="pagar(item)">
-                    <span class="material-symbols-outlined text-[15px]">check</span> Pagar
+                <div *ngIf="excluindoId() !== item.id && pagandoId() !== item.id" class="flex items-center justify-end gap-1">
+                  <button *ngIf="item.status !== 'concluida'" class="flex h-7 items-center gap-1 rounded-lg bg-pos/[0.14] px-2 text-[11px] font-semibold text-pos hover:bg-pos/20" title="Registrar pagamento" (click)="iniciarPagamento(item)">
+                    <span class="material-symbols-outlined text-[15px]">payments</span> Pagar
                   </button>
                   <button *ngIf="!item.parcela" class="flex h-7 w-7 items-center justify-center rounded-lg text-dim hover:bg-accent/[0.14] hover:text-accent" title="Editar" (click)="editar(item)">
                     <span class="material-symbols-outlined text-[18px]">edit</span>
@@ -129,6 +135,14 @@
                   <button class="flex h-7 w-7 items-center justify-center rounded-lg text-dim hover:bg-neg/[0.12] hover:text-neg" title="Excluir" (click)="pedirExclusao(item.id)">
                     <span class="material-symbols-outlined text-[18px]">delete</span>
                   </button>
+                </div>
+                <div *ngIf="pagandoId() === item.id" class="flex items-center justify-end gap-1.5">
+                  <div class="flex h-7 items-center rounded-lg border border-bd bg-card2 px-2">
+                    <span class="text-[10.5px] text-dim">R$</span>
+                    <input class="num w-16 border-0 bg-transparent px-1 text-right text-[11px] text-tx outline-none" [value]="valorPagamento()" (input)="valorPagamento.set($any($event.target).value)" (keyup.enter)="confirmarPagamento(item)" />
+                  </div>
+                  <button class="rounded-lg bg-pos/[0.14] px-2 py-1 text-[10.5px] font-semibold text-pos hover:bg-pos/20" (click)="confirmarPagamento(item)">OK</button>
+                  <button class="rounded-lg border border-bd px-2 py-1 text-[10.5px] font-semibold text-tx2 hover:border-accent/40" (click)="cancelarPagamento()">✕</button>
                 </div>
                 <div *ngIf="excluindoId() === item.id" class="flex items-center justify-end gap-1.5">
                   <span class="text-[10.5px] text-dim">Excluir?</span>

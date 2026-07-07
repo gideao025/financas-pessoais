@@ -63,6 +63,9 @@ public class TransactionEntity {
   @Column(nullable = false)
   private BigDecimal amount;
 
+  @Column(name = "paid_amount", nullable = false)
+  private BigDecimal paidAmount;
+
   @Column(name = "transaction_date", nullable = false)
   private LocalDate transactionDate;
 

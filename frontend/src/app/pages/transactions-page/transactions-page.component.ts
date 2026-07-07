@@ -25,8 +25,10 @@ interface UiTransaction {
   parcela: string;
   data: string;
   valor: number;
+  pago: number;
+  restante: number;
   tipo: 'entrada' | 'saida';
-  status: 'concluida' | 'pendente';
+  status: 'concluida' | 'pendente' | 'parcial';
   recorrente: boolean;
   vencimento: string | null;
 }
@@ -61,6 +63,8 @@ export class TransactionsPageComponent implements OnInit {
   protected readonly painelAberto = signal(false);
   protected readonly excluindoId = signal<string | null>(null);
   protected readonly editandoId = signal<string | null>(null);
+  protected readonly pagandoId = signal<string | null>(null);
+  protected readonly valorPagamento = signal('');
 
   protected readonly formValor = signal('');
   protected readonly formTipo = signal<'entrada' | 'saida'>('saida');
@@ -150,11 +154,29 @@ export class TransactionsPageComponent implements OnInit {
     });
   }
 
-  /** Marca uma conta/transação pendente como paga. */
-  protected pagar(item: UiTransaction): void {
-    this.transactionsService.pay(item.id).subscribe({
+  /** Abre o input de pagamento (pré-preenchido com o valor restante). */
+  protected iniciarPagamento(item: UiTransaction): void {
+    this.pagandoId.set(item.id);
+    this.valorPagamento.set(String(item.restante.toFixed(2)));
+  }
+
+  protected cancelarPagamento(): void {
+    this.pagandoId.set(null);
+    this.valorPagamento.set('');
+  }
+
+  /** Registra o pagamento (parcial se menor que o restante, total caso contrário). */
+  protected confirmarPagamento(item: UiTransaction): void {
+    const valor = Number(this.valorPagamento().replace(',', '.'));
+    if (!valor || valor <= 0) {
+      this.erro.set('Informe um valor de pagamento válido.');
+      return;
+    }
+    const parcial = valor < item.restante;
+    this.transactionsService.pay(item.id, valor).subscribe({
       next: () => {
-        this.mensagem.set('Pagamento registrado.');
+        this.cancelarPagamento();
+        this.mensagem.set(parcial ? 'Pagamento parcial registrado.' : 'Pagamento registrado.');
         setTimeout(() => this.mensagem.set(''), 2500);
         this.carregarDados();
       },
@@ -246,7 +268,7 @@ export class TransactionsPageComponent implements OnInit {
     this.editandoId.set(item.id);
     this.formValor.set(String(item.valor));
     this.formTipo.set(item.tipo);
-    this.formStatus.set(item.status);
+    this.formStatus.set(item.status === 'concluida' ? 'concluida' : 'pendente');
     this.formData.set(item.data);
     this.formDescricao.set(item.descricao);
     this.formCategoria.set(item.categoria);
@@ -405,8 +427,11 @@ export class TransactionsPageComponent implements OnInit {
         : '',
       data: item.transactionDate,
       valor: item.amount,
+      pago: item.paidAmount ?? 0,
+      restante: Math.max(0, item.amount - (item.paidAmount ?? 0)),
       tipo: item.transactionType === 'ENTRADA' ? 'entrada' : 'saida',
-      status: item.status === 'CONCLUIDA' ? 'concluida' : 'pendente',
+      status:
+        item.status === 'CONCLUIDA' ? 'concluida' : item.status === 'PARCIAL' ? 'parcial' : 'pendente',
       recorrente: !!item.recurrenceId,
       vencimento: item.dueDate
     };

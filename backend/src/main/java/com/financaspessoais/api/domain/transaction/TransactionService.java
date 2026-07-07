@@ -82,6 +82,7 @@ public class TransactionService {
         .transactionType(request.transactionType())
         .status(request.status())
         .amount(request.amount())
+        .paidAmount(request.status() == TransactionStatus.CONCLUIDA ? request.amount() : BigDecimal.ZERO)
         .transactionDate(request.transactionDate())
         .createdAt(now)
         .updatedAt(now)
@@ -121,6 +122,7 @@ public class TransactionService {
           .transactionType(request.transactionType())
           .status(request.status())
           .amount(amount)
+          .paidAmount(request.status() == TransactionStatus.CONCLUIDA ? amount : BigDecimal.ZERO)
           .transactionDate(request.transactionDate().plusMonths(i))
           .installmentGroupId(groupId)
           .installmentNumber(i + 1)
@@ -170,6 +172,8 @@ public class TransactionService {
     entity.setTransactionType(request.transactionType());
     entity.setStatus(request.status());
     entity.setAmount(request.amount());
+    // editar redefine o pago conforme o status (parcial só é mantido via pagamento)
+    entity.setPaidAmount(request.status() == TransactionStatus.CONCLUIDA ? request.amount() : BigDecimal.ZERO);
     entity.setTransactionDate(request.transactionDate());
     entity.setUpdatedAt(LocalDateTime.now());
 
@@ -180,23 +184,37 @@ public class TransactionService {
     return saved;
   }
 
-  /** Marca uma transação pendente como paga (na data de hoje) e reflete no saldo da conta. */
+  /**
+   * Registra um pagamento (total ou parcial) e reflete no saldo. {@code valor} nulo quita o
+   * restante. Atualiza o pago acumulado e o status (PARCIAL enquanto faltar, CONCLUIDA ao quitar),
+   * marcando a data do último pagamento como hoje.
+   */
   @Transactional
-  public TransactionResponse pay(UUID id) {
+  public TransactionResponse pay(UUID id, BigDecimal valor) {
     UUID userId = securityContextService.getUserId();
     TransactionEntity entity = transactionRepository.findByIdAndUserId(id, userId)
         .orElseThrow(() -> new BusinessException("Transação não encontrada", HttpStatus.NOT_FOUND));
 
-    if (entity.getStatus() == TransactionStatus.CONCLUIDA) {
-      return TransactionResponse.from(entity);
+    BigDecimal jaPago = entity.getPaidAmount() != null ? entity.getPaidAmount() : BigDecimal.ZERO;
+    BigDecimal restante = entity.getAmount().subtract(jaPago);
+    if (restante.signum() <= 0) {
+      return TransactionResponse.from(entity); // já quitada
     }
+    BigDecimal pagamento = (valor == null || valor.compareTo(restante) >= 0) ? restante : valor;
 
-    entity.setStatus(TransactionStatus.CONCLUIDA);
+    // reverte o efeito do pago anterior, atualiza, e aplica o novo — delta líquido = o pagamento
+    Map<UUID, BigDecimal> deltas = new HashMap<>();
+    accumulate(deltas, entity, BigDecimal.ONE.negate());
+
+    BigDecimal novoPago = jaPago.add(pagamento);
+    entity.setPaidAmount(novoPago);
+    entity.setStatus(novoPago.compareTo(entity.getAmount()) >= 0
+        ? TransactionStatus.CONCLUIDA
+        : TransactionStatus.PARCIAL);
     entity.setTransactionDate(LocalDate.now());
     entity.setUpdatedAt(LocalDateTime.now());
 
     TransactionResponse saved = TransactionResponse.from(transactionRepository.save(entity));
-    Map<UUID, BigDecimal> deltas = new HashMap<>();
     accumulate(deltas, entity, BigDecimal.ONE);
     applyBalanceDeltas(userId, deltas);
     return saved;
@@ -224,20 +242,21 @@ public class TransactionService {
   }
 
   /**
-   * Impacto de uma transação no saldo da conta: só transações já realizadas (CONCLUIDA), ligadas a uma
-   * conta, fora de cartão e com data até hoje entram no saldo. As de cartão entram via fatura; as futuras
-   * e pendentes são apenas projeção. {@code sign} = +1 para aplicar, -1 para reverter.
+   * Impacto de uma transação no saldo da conta = o valor efetivamente PAGO (cobre pagamento total e
+   * parcial). Só conta quando ligada a uma conta, fora de cartão e com data até hoje; cartão entra via
+   * fatura e datas futuras são apenas projeção. {@code sign} = +1 para aplicar, -1 para reverter.
    */
   private void accumulate(Map<UUID, BigDecimal> deltas, TransactionEntity t, BigDecimal sign) {
     if (t.getAccount() == null
         || t.getCard() != null
-        || t.getStatus() != TransactionStatus.CONCLUIDA
         || t.getTransactionDate().isAfter(LocalDate.now())) {
       return;
     }
-    BigDecimal signed = t.getTransactionType() == TransactionType.ENTRADA
-        ? t.getAmount()
-        : t.getAmount().negate();
+    BigDecimal pago = t.getPaidAmount() != null ? t.getPaidAmount() : BigDecimal.ZERO;
+    if (pago.signum() == 0) {
+      return;
+    }
+    BigDecimal signed = t.getTransactionType() == TransactionType.ENTRADA ? pago : pago.negate();
     deltas.merge(t.getAccount().getId(), signed.multiply(sign), BigDecimal::add);
   }
 
