@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -35,6 +36,11 @@ public class TransactionController {
   @ResponseStatus(HttpStatus.CREATED)
   public TransactionResponse create(@Valid @RequestBody TransactionRequest request) {
     return transactionService.create(request);
+  }
+
+  @PutMapping("/{id}")
+  public TransactionResponse update(@PathVariable UUID id, @Valid @RequestBody TransactionRequest request) {
+    return transactionService.update(id, request);
   }
 
   @DeleteMapping("/{id}")

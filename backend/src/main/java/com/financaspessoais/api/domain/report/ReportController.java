@@ -1,5 +1,6 @@
 package com.financaspessoais.api.domain.report;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,5 +23,10 @@ public class ReportController {
   @GetMapping("/cash-flow")
   public CashFlowResponse cashFlow(@RequestParam(defaultValue = "90") int days) {
     return cashFlowService.cashFlow(days);
+  }
+
+  @GetMapping("/by-category")
+  public List<CategoryReportItem> byCategory(@RequestParam(required = false) String month) {
+    return reportService.expensesByCategory(month);
   }
 }

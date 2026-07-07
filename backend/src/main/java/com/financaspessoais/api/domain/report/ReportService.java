@@ -57,6 +57,42 @@ public class ReportService {
     return new DashboardSummaryResponse(income, expense, income.subtract(expense), pending, completed, series);
   }
 
+  /** Soma das saídas por categoria no mês informado (YYYY-MM); usa o mês corrente se nulo/vazio. */
+  public List<CategoryReportItem> expensesByCategory(String month) {
+    UUID userId = securityContextService.getUserId();
+
+    LocalDate base = parseMonth(month);
+    LocalDate from = base.withDayOfMonth(1);
+    LocalDate to = base.withDayOfMonth(base.lengthOfMonth());
+
+    List<TransactionEntity> saidas = transactionRepository
+        .findByUserIdAndTransactionDateBetweenOrderByTransactionDateDesc(userId, from, to)
+        .stream()
+        .filter(t -> t.getTransactionType() == TransactionType.SAIDA)
+        .toList();
+
+    return saidas.stream()
+        .collect(Collectors.groupingBy(
+            t -> t.getCategory() == null || t.getCategory().isBlank() ? "Sem categoria" : t.getCategory(),
+            Collectors.reducing(BigDecimal.ZERO, TransactionEntity::getAmount, BigDecimal::add)))
+        .entrySet().stream()
+        .map(e -> new CategoryReportItem(e.getKey(), e.getValue()))
+        .sorted(Comparator.comparing(CategoryReportItem::total).reversed())
+        .toList();
+  }
+
+  private LocalDate parseMonth(String month) {
+    if (month == null || month.isBlank()) {
+      return LocalDate.now();
+    }
+    try {
+      String[] parts = month.split("-");
+      return LocalDate.of(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), 1);
+    } catch (RuntimeException ex) {
+      return LocalDate.now();
+    }
+  }
+
   private BigDecimal sumByType(List<TransactionEntity> transactions, TransactionType type) {
     return transactions.stream()
         .filter(t -> t.getTransactionType() == type)

@@ -2,6 +2,57 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ===== Design tokens (dark-only, fiel ao protótipo) ===== */
+:root {
+  --bg: #0c0c0f;
+  --sidebar: #0f0f13;
+  --card: #16171c;
+  --card2: #1c1d23;
+  --chip: #26262e;
+  --bd: rgba(255, 255, 255, 0.06);
+  --bd2: rgba(255, 255, 255, 0.05);
+  --tx: #eceef2;
+  --tx2: #c4c4cc;
+  --mut: #8b8b95;
+  --dim: #6c6c76;
+  --faint: #46464e;
+  --accent: #a78bfa;
+  --accent2: #b79dff;
+  --accentsoft: #c9b6ff;
+  --accentstrong: #8b5cf6;
+  --pos: #4ade80;
+  --neg: #fb7185;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--tx);
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(140, 140, 150, 0.28);
+  border-radius: 8px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+/* Números financeiros com fonte mono tabular */
+.num {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-feature-settings: 'tnum' 1;
+  letter-spacing: -0.02em;
+}
+
 .material-symbols-outlined {
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  line-height: 1;
 }

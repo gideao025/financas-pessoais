@@ -1,149 +1,159 @@
-<section class="mx-auto flex w-full max-w-6xl flex-col gap-6">
-  <div class="flex flex-wrap items-center justify-between gap-3">
-    <div>
-      <h2 class="text-3xl font-black tracking-tight">Projeção de Saldo</h2>
-      <p class="text-sm text-[#64748b]">Seu saldo dia a dia daqui pra frente — salários, contas fixas e faturas de cartão.</p>
-    </div>
-    <div class="flex items-center gap-2">
-      <div class="flex overflow-hidden rounded-lg border border-[#dbe0e6] text-xs font-bold dark:border-[#2a3441]">
-        <button *ngFor="let h of [30, 60, 90]" class="px-3 py-2" [ngClass]="horizonte() === h ? 'bg-primary text-white' : 'text-[#64748b]'" (click)="trocarHorizonte(h)">{{ h }}d</button>
-      </div>
-      <button class="rounded-lg border border-[#dbe0e6] px-3 py-2 text-xs font-bold dark:border-[#2a3441]" (click)="recarregar()">Atualizar</button>
-    </div>
-  </div>
-
-  <p *ngIf="erro()" class="rounded-lg bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 dark:bg-red-900/20 dark:text-red-400">{{ erro() }}</p>
-
-  <div *ngIf="carregando()" class="py-16 text-center text-sm text-[#64748b]">Carregando projeção...</div>
+<section class="mx-auto flex w-full max-w-[1200px] flex-col gap-[18px] px-[30px] py-[22px]">
+  <p *ngIf="erro()" class="rounded-xl border border-neg/30 bg-neg/[0.12] px-4 py-2 text-sm font-semibold text-neg">{{ erro() }}</p>
+  <div *ngIf="carregando()" class="py-16 text-center text-sm text-dim">Carregando projeção...</div>
 
   <ng-container *ngIf="!carregando() && fluxo() as f">
-    <!-- cards de topo -->
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      <article class="rounded-xl border border-[#e5e7eb] bg-white p-5 dark:border-[#2a3441] dark:bg-[#1a242f]">
-        <p class="text-xs font-bold uppercase tracking-wider text-[#64748b]">Saldo hoje</p>
-        <p class="mt-1 text-3xl font-black">{{ saldoHoje() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</p>
-        <p class="text-xs text-[#64748b]">soma das contas</p>
-      </article>
-      <article class="rounded-xl border p-5" [ngClass]="(menorSaldo()?.balance ?? 0) < 0 ? 'border-red-300 bg-red-50 dark:border-red-900/40 dark:bg-red-900/10' : 'border-[#e5e7eb] bg-white dark:border-[#2a3441] dark:bg-[#1a242f]'">
-        <p class="text-xs font-bold uppercase tracking-wider text-[#64748b]">Menor saldo previsto</p>
-        <p class="mt-1 text-3xl font-black" [ngClass]="(menorSaldo()?.balance ?? 0) < 0 ? 'text-red-600' : ''">{{ menorSaldo()?.balance | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</p>
-        <p class="text-xs text-[#64748b]">em {{ menorSaldo()?.date | date: 'dd/MM/yyyy' : '' : 'pt-BR' }}<span *ngIf="(menorSaldo()?.balance ?? 0) < 0" class="font-bold text-red-600"> · atenção</span></p>
-      </article>
-      <article class="rounded-xl border border-[#e5e7eb] bg-white p-5 dark:border-[#2a3441] dark:bg-[#1a242f]">
-        <p class="text-xs font-bold uppercase tracking-wider text-[#64748b]">Entradas previstas</p>
-        <p class="mt-1 text-3xl font-black text-green-600">{{ entradasPrevistas() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</p>
-        <p class="text-xs text-[#64748b]">próximos {{ horizonte() }} dias</p>
-      </article>
-      <article class="rounded-xl border border-[#e5e7eb] bg-white p-5 dark:border-[#2a3441] dark:bg-[#1a242f]">
-        <p class="text-xs font-bold uppercase tracking-wider text-[#64748b]">Saídas previstas</p>
-        <p class="mt-1 text-3xl font-black text-red-500">{{ saidasPrevistas() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</p>
-        <p class="text-xs text-[#64748b]">próximos {{ horizonte() }} dias</p>
-      </article>
+    <!-- KPIs -->
+    <div class="grid grid-cols-1 gap-3.5 sm:grid-cols-2 xl:grid-cols-4">
+      <div class="rounded-[16px] border border-bd bg-card p-[17px] shadow-card">
+        <div class="mb-3 flex h-[34px] w-[34px] items-center justify-center rounded-[11px] bg-accent/[0.14]">
+          <span class="material-symbols-outlined text-[19px] text-accent2">account_balance_wallet</span>
+        </div>
+        <div class="mb-1 text-[11.5px] text-mut">Saldo hoje</div>
+        <div class="num text-[23px] font-semibold">R$ {{ parteReais(saldoHoje()) }}<span class="text-[15px] text-dim">,{{ parteCentavos(saldoHoje()) }}</span></div>
+        <div class="mt-1.5 text-[11px] text-dim">soma das contas</div>
+      </div>
+
+      <div class="relative overflow-hidden rounded-[16px] p-[17px] shadow-card" [ngClass]="(menorSaldo()?.balance ?? 0) < 0 ? 'border border-neg bg-card' : 'border border-bd bg-card'">
+        <div *ngIf="(menorSaldo()?.balance ?? 0) < 0" class="pointer-events-none absolute inset-0" style="background:linear-gradient(160deg, rgba(251,113,133,.14), transparent 60%)"></div>
+        <div class="relative mb-3 flex h-[34px] w-[34px] items-center justify-center rounded-[11px] bg-neg/[0.14]">
+          <span class="material-symbols-outlined text-[19px] text-neg">{{ (menorSaldo()?.balance ?? 0) < 0 ? 'warning' : 'shield' }}</span>
+        </div>
+        <div class="relative mb-1 text-[11.5px]" [ngClass]="(menorSaldo()?.balance ?? 0) < 0 ? 'text-neg' : 'text-mut'">Menor saldo previsto</div>
+        <div class="num relative text-[23px] font-semibold" [ngClass]="(menorSaldo()?.balance ?? 0) < 0 ? 'text-neg' : ''">{{ (menorSaldo()?.balance ?? 0) < 0 ? '−' : '' }}R$ {{ parteReais(menorSaldo()?.balance ?? 0) }}<span class="text-[15px] opacity-70">,{{ parteCentavos(menorSaldo()?.balance ?? 0) }}</span></div>
+        <div class="relative mt-1.5 inline-flex items-center gap-1 text-[11px] font-semibold" [ngClass]="(menorSaldo()?.balance ?? 0) < 0 ? 'text-neg' : 'text-dim'">
+          <span class="material-symbols-outlined text-[14px]">event</span>{{ (menorSaldo()?.balance ?? 0) < 0 ? 'fica no vermelho em ' : 'em ' }}{{ menorSaldo()?.date | date: 'dd/MM' : '' : 'pt-BR' }}
+        </div>
+      </div>
+
+      <div class="rounded-[16px] border border-bd bg-card p-[17px] shadow-card">
+        <div class="mb-3 flex h-[34px] w-[34px] items-center justify-center rounded-[11px] bg-pos/[0.14]">
+          <span class="material-symbols-outlined text-[19px] text-pos">south_west</span>
+        </div>
+        <div class="mb-1 text-[11.5px] text-mut">Entradas previstas</div>
+        <div class="num text-[23px] font-semibold text-pos">+R$ {{ parteReais(entradasPrevistas()) }}</div>
+        <div class="mt-1.5 text-[11px] text-dim">próximos {{ horizonte() }} dias</div>
+      </div>
+
+      <div class="rounded-[16px] border border-bd bg-card p-[17px] shadow-card">
+        <div class="mb-3 flex h-[34px] w-[34px] items-center justify-center rounded-[11px] bg-chip">
+          <span class="material-symbols-outlined text-[19px] text-tx2">north_east</span>
+        </div>
+        <div class="mb-1 text-[11.5px] text-mut">Saídas previstas</div>
+        <div class="num text-[23px] font-semibold">−R$ {{ parteReais(saidasPrevistas()) }}</div>
+        <div class="mt-1.5 text-[11px] text-dim">contas fixas + faturas</div>
+      </div>
     </div>
 
-    <!-- gráfico herói -->
-    <article class="rounded-xl border border-[#e5e7eb] bg-white p-5 dark:border-[#2a3441] dark:bg-[#1a242f]">
-      <div class="mb-3 flex items-center justify-between">
-        <h3 class="text-lg font-bold">Saldo projetado · {{ horizonte() }} dias</h3>
-        <span class="text-sm font-bold" [ngClass]="saldoFinal() >= saldoHoje() ? 'text-green-600' : 'text-red-500'">
-          fim do período: {{ saldoFinal() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
-        </span>
-      </div>
-
-      <div class="relative h-64 w-full" [ngClass]="{ 'opacity-50': atualizandoGrafico() }">
-        <svg *ngIf="grafico() as g" viewBox="0 0 100 40" preserveAspectRatio="none" class="h-full w-full">
-          <defs>
-            <linearGradient id="fluxoArea" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#2563eb" stop-opacity="0.35" />
-              <stop offset="100%" stop-color="#2563eb" stop-opacity="0" />
-            </linearGradient>
-          </defs>
-          <line *ngIf="g.zeroY !== null" x1="0" [attr.y1]="g.zeroY" x2="100" [attr.y2]="g.zeroY" stroke="#ef4444" stroke-width="0.3" stroke-dasharray="1,1" />
-          <path [attr.d]="g.area" fill="url(#fluxoArea)" />
-          <polyline [attr.points]="g.linha" fill="none" stroke="#2563eb" stroke-width="0.6" stroke-linejoin="round" />
-          <circle *ngFor="let m of g.marcadores" [attr.cx]="m.cx" [attr.cy]="m.cy" r="0.7" [attr.fill]="m.positivo ? '#16a34a' : '#ef4444'">
-            <title>{{ m.titulo }}</title>
-          </circle>
-          <circle *ngIf="g.pontoMenor as pm" [attr.cx]="pm.cx" [attr.cy]="pm.cy" r="1.1" fill="none" stroke="#ef4444" stroke-width="0.5" />
-        </svg>
-      </div>
-      <div class="mt-2 flex justify-between text-xs text-[#64748b]">
-        <span>{{ f.startDate | date: 'dd/MM' : '' : 'pt-BR' }}</span>
-        <span>{{ f.endDate | date: 'dd/MM' : '' : 'pt-BR' }}</span>
-      </div>
-      <p class="mt-3 text-xs text-[#64748b]">Parte do saldo atual das contas e considera apenas eventos futuros. Compras no cartão entram como saída no vencimento da fatura — mantenha os saldos das contas atualizados.</p>
-    </article>
-
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-      <!-- provisão de cartões -->
-      <article class="rounded-xl border border-[#e5e7eb] bg-white p-5 dark:border-[#2a3441] dark:bg-[#1a242f]">
-        <h3 class="mb-4 text-lg font-bold">Provisão de cartões</h3>
-        <p *ngIf="!cartoes().length" class="text-sm text-[#64748b]">Nenhum cartão cadastrado.</p>
-        <div class="space-y-4">
-          <div *ngFor="let c of cartoes()">
-            <div class="flex items-center justify-between text-sm">
-              <span class="font-bold">{{ c.name }}</span>
-              <span class="text-[#64748b]">{{ c.availableLimit | currency: 'BRL' : 'symbol' : '1.0-0' : 'pt-BR' }} disp.</span>
-            </div>
-            <div class="mt-1 h-2 rounded-full bg-[#eef2f6] dark:bg-[#24313f]">
-              <div class="h-2 rounded-full bg-primary" [style.width.%]="c.creditLimit ? (c.usedLimit / c.creditLimit) * 100 : 0"></div>
-            </div>
-            <div class="mt-1 flex items-center justify-between text-xs text-[#64748b]">
-              <span>usado {{ c.usedLimit | currency: 'BRL' : 'symbol' : '1.0-0' : 'pt-BR' }} de {{ c.creditLimit | currency: 'BRL' : 'symbol' : '1.0-0' : 'pt-BR' }}</span>
-              <span *ngIf="c.nextDueDate">próx. fatura {{ c.nextInvoiceTotal | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }} · {{ c.nextDueDate | date: 'dd/MM' : '' : 'pt-BR' }}</span>
-            </div>
+    <!-- chart + eventos -->
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_300px]">
+      <article class="rounded-[18px] border border-bd bg-card p-5 pb-3 shadow-cardlg">
+        <div class="mb-1 flex items-start gap-3">
+          <div>
+            <div class="text-[15px] font-bold tracking-tight">Projeção de saldo</div>
+            <div class="text-xs text-dim">Como seu saldo evolui nos próximos {{ horizonte() }} dias</div>
           </div>
+          <div class="ml-auto flex rounded-[10px] border border-bd bg-card2 p-[3px] text-[11.5px] font-semibold" [ngClass]="{ 'opacity-50': atualizandoGrafico() }">
+            <button *ngFor="let h of [30, 60, 90]" class="rounded-[7px] px-[11px] py-[5px]" [ngClass]="horizonte() === h ? 'bg-accentstrong text-white' : 'text-mut'" (click)="trocarHorizonte(h)">{{ h }}d</button>
+          </div>
+        </div>
+
+        <div [ngClass]="{ 'opacity-50': atualizandoGrafico() }">
+          <svg *ngIf="grafico() as g" [attr.viewBox]="'0 0 ' + g.W + ' ' + g.H" class="block h-[300px] w-full">
+            <defs>
+              <linearGradient id="areaA" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#b79dff" stop-opacity="0.30" />
+                <stop offset="0.72" stop-color="#b79dff" stop-opacity="0.03" />
+                <stop offset="1" stop-color="#b79dff" stop-opacity="0" />
+              </linearGradient>
+              <linearGradient id="lineA" x1="0" y1="0" x2="1" y2="0">
+                <stop *ngFor="let s of g.stops" [attr.offset]="s.offset" [attr.stop-color]="s.color" />
+              </linearGradient>
+            </defs>
+            <g [attr.transform]="'translate(' + g.padL + ',' + g.padT + ')'">
+              <rect *ngIf="g.zeroY !== null" x="0" [attr.y]="g.zeroY" [attr.width]="g.plotW" [attr.height]="g.plotH - g.zeroY" fill="rgba(251,113,133,.06)" />
+              <text *ngFor="let yl of g.yLabels" x="-8" [attr.y]="yl.y + 3" text-anchor="end" font-family="JetBrains Mono" font-size="9.5" [attr.fill]="yl.zero ? 'rgba(251,113,133,.75)' : '#46464e'">{{ yl.text }}</text>
+              <line *ngIf="g.zeroY !== null" x1="0" [attr.y1]="g.zeroY" [attr.x2]="g.plotW" [attr.y2]="g.zeroY" stroke="rgba(251,113,133,.45)" stroke-width="1.2" stroke-dasharray="2 4" />
+              <path [attr.d]="g.area" fill="url(#areaA)" />
+              <path [attr.d]="g.linha" fill="none" stroke="url(#lineA)" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round" />
+              <circle [attr.cx]="g.hoje.x" [attr.cy]="g.hoje.y" r="8" fill="rgba(167,139,250,.14)" />
+              <circle [attr.cx]="g.hoje.x" [attr.cy]="g.hoje.y" r="4" fill="#16171c" stroke="#c9b6ff" stroke-width="2.4" />
+              <g [attr.transform]="'translate(' + g.hoje.x + ',' + g.hoje.y + ')'">
+                <rect x="9" y="-9" width="110" height="19" rx="6" fill="rgba(167,139,250,.14)" />
+                <text x="16" y="4" font-family="Hanken Grotesk" font-size="10.5" font-weight="600" fill="#c9b6ff">{{ g.hoje.label }}</text>
+              </g>
+              <ng-container *ngIf="g.menor as mn">
+                <line [attr.x1]="mn.x" y1="0" [attr.x2]="mn.x" [attr.y2]="mn.y" stroke="rgba(251,113,133,.28)" stroke-width="1" stroke-dasharray="3 3" />
+                <circle [attr.cx]="mn.x" [attr.cy]="mn.y" r="9" fill="rgba(251,113,133,.16)" />
+                <circle [attr.cx]="mn.x" [attr.cy]="mn.y" r="4.5" fill="#fb7185" stroke="#16171c" stroke-width="2" />
+                <g [attr.transform]="'translate(' + mn.labelX + ',' + mn.y + ')'">
+                  <rect x="-62" y="-47" width="124" height="31" rx="9" fill="#fb7185" />
+                  <text x="0" y="-34" text-anchor="middle" font-family="Hanken Grotesk" font-size="8.5" font-weight="700" fill="rgba(20,8,10,.6)" letter-spacing=".09em">MENOR SALDO</text>
+                  <text x="0" y="-21" text-anchor="middle" font-family="JetBrains Mono" font-size="11.5" font-weight="700" fill="#160a0c">{{ mn.texto }}</text>
+                </g>
+              </ng-container>
+              <text *ngFor="let xt of g.xTicks" [attr.x]="xt.x" [attr.y]="g.plotH + 22" [attr.text-anchor]="xt.anchor" font-family="JetBrains Mono" font-size="9.5" fill="#6c6c76">{{ xt.text }}</text>
+            </g>
+          </svg>
         </div>
       </article>
 
       <!-- próximos eventos -->
-      <article class="rounded-xl border border-[#e5e7eb] bg-white p-5 dark:border-[#2a3441] dark:bg-[#1a242f]">
-        <h3 class="mb-4 text-lg font-bold">Próximos eventos</h3>
-        <p *ngIf="!proximosEventos().length" class="text-sm text-[#64748b]">Nada previsto no horizonte. Cadastre recorrências para ver salários e contas fixas.</p>
-        <ul class="divide-y divide-[#eef2f6] dark:divide-[#2a3441]">
-          <li *ngFor="let e of proximosEventos()" class="flex items-center justify-between gap-3 py-2.5 text-sm">
-            <div class="flex items-center gap-3">
-              <span class="material-symbols-outlined text-lg" [ngClass]="e.tipo === 'RECEITA' ? 'text-green-600' : 'text-red-500'">{{ e.tipo === 'RECEITA' ? 'south_west' : (e.tipo === 'FATURA' ? 'credit_card' : 'north_east') }}</span>
-              <div>
-                <p class="font-semibold">{{ e.label }}</p>
-                <p class="text-xs text-[#64748b]">{{ e.data | date: 'dd MMM' : '' : 'pt-BR' }}</p>
-              </div>
+      <article class="flex flex-col rounded-[18px] border border-bd bg-card p-[18px] shadow-cardlg">
+        <div class="mb-3.5 text-[13.5px] font-bold">Próximos eventos</div>
+        <p *ngIf="!proximosEventos().length" class="text-sm text-dim">Nada previsto. Cadastre recorrências para ver salários e contas fixas.</p>
+        <div class="flex flex-1 flex-col gap-[13px]">
+          <div *ngFor="let e of proximosEventos()" class="flex items-center gap-[11px]">
+            <div class="flex h-8 w-8 flex-none items-center justify-center rounded-[10px]" [ngClass]="e.tipo === 'RECEITA' ? 'bg-pos/[0.14]' : e.tipo === 'FATURA' ? 'bg-neg/[0.14]' : 'bg-chip'">
+              <span class="material-symbols-outlined text-[18px]" [ngClass]="e.tipo === 'RECEITA' ? 'text-pos' : e.tipo === 'FATURA' ? 'text-neg' : 'text-accentsoft'">
+                {{ e.tipo === 'RECEITA' ? 'payments' : e.tipo === 'FATURA' ? 'credit_card' : 'north_east' }}
+              </span>
             </div>
-            <span class="font-bold" [ngClass]="e.valor >= 0 ? 'text-green-600' : 'text-red-500'">{{ e.valor >= 0 ? '+' : '' }}{{ e.valor | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</span>
-          </li>
-        </ul>
+            <div class="leading-tight">
+              <div class="text-[12.5px] font-semibold">{{ e.label }}</div>
+              <div class="text-[11px] text-dim">{{ e.data | date: 'dd/MM' : '' : 'pt-BR' }}<span *ngIf="e.tipo === 'RECEITA'"> · recorrente</span></div>
+            </div>
+            <span class="num ml-auto text-[13px] font-semibold" [ngClass]="e.valor >= 0 ? 'text-pos' : 'text-tx2'">
+              {{ e.valor >= 0 ? '+' : '−' }}{{ (e.valor < 0 ? -e.valor : e.valor) | number: '1.0-0' : 'pt-BR' }}
+            </span>
+          </div>
+        </div>
       </article>
     </div>
 
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-      <!-- metas -->
-      <article class="rounded-xl border border-[#e5e7eb] bg-white p-5 dark:border-[#2a3441] dark:bg-[#1a242f]">
-        <h3 class="mb-4 text-lg font-bold">Metas</h3>
-        <p *ngIf="!metasResumo().length" class="text-sm text-[#64748b]">Nenhuma meta cadastrada.</p>
-        <div class="space-y-3">
-          <div *ngFor="let m of metasResumo()">
-            <div class="flex items-center justify-between text-sm">
-              <span class="font-semibold">{{ m.nome }}</span>
-              <span class="text-[#64748b]">{{ m.progresso }}%</span>
+    <!-- cartões + metas -->
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <article class="rounded-[18px] border border-bd bg-card px-5 py-[18px] shadow-card">
+        <h3 class="mb-4 text-[13.5px] font-bold">Provisão de cartões</h3>
+        <p *ngIf="!cartoes().length" class="text-sm text-dim">Nenhum cartão cadastrado.</p>
+        <div class="space-y-4">
+          <div *ngFor="let c of cartoes()">
+            <div class="mb-[7px] flex items-center justify-between text-[12px]">
+              <span class="font-semibold text-tx2">{{ c.name }}<span *ngIf="c.creditLimit && c.usedLimit / c.creditLimit > 0.85" class="text-[10px] font-semibold text-neg"> · {{ (c.usedLimit / c.creditLimit) * 100 | number: '1.0-0' }}%</span></span>
+              <span class="num text-mut">{{ c.usedLimit | currency: 'BRL' : 'symbol' : '1.0-0' : 'pt-BR' }} / {{ c.creditLimit | number: '1.0-0' : 'pt-BR' }}</span>
             </div>
-            <div class="mt-1 h-2 rounded-full bg-[#eef2f6] dark:bg-[#24313f]"><div class="h-2 rounded-full bg-primary" [style.width.%]="m.progresso"></div></div>
+            <div class="h-[7px] overflow-hidden rounded-[5px] bg-chip">
+              <div class="h-full rounded-[5px]" [ngClass]="c.creditLimit && c.usedLimit / c.creditLimit > 0.85 ? 'bg-neg' : 'bg-accent2'" [style.width.%]="c.creditLimit ? (c.usedLimit / c.creditLimit) * 100 : 0"></div>
+            </div>
           </div>
         </div>
       </article>
 
-      <!-- transações recentes -->
-      <article class="rounded-xl border border-[#e5e7eb] bg-white p-5 dark:border-[#2a3441] dark:bg-[#1a242f]">
-        <h3 class="mb-4 text-lg font-bold">Transações recentes</h3>
-        <p *ngIf="!transacoesRecentes().length" class="text-sm text-[#64748b]">Nenhuma transação.</p>
-        <ul class="divide-y divide-[#eef2f6] dark:divide-[#2a3441]">
-          <li *ngFor="let t of transacoesRecentes()" class="flex items-center justify-between gap-3 py-2.5 text-sm">
-            <div>
-              <p class="font-semibold">{{ t.descricao }}</p>
-              <p class="text-xs text-[#64748b]">{{ t.categoria }} · {{ t.data | date: 'dd MMM' : '' : 'pt-BR' }}</p>
+      <article class="rounded-[18px] border border-bd bg-card px-5 py-[18px] shadow-card">
+        <h3 class="mb-4 text-[13.5px] font-bold">Metas de economia</h3>
+        <p *ngIf="!metasResumo().length" class="text-sm text-dim">Nenhuma meta cadastrada.</p>
+        <div class="space-y-4">
+          <div *ngFor="let m of metasResumo()">
+            <div class="mb-[7px] flex items-center justify-between text-[12px]">
+              <span class="font-semibold text-tx2">{{ m.nome }}</span>
+              <span class="num font-semibold text-accent">{{ m.progresso }}%</span>
             </div>
-            <span class="font-bold" [ngClass]="t.tipo === 'entrada' ? 'text-green-600' : 'text-red-500'">{{ t.tipo === 'entrada' ? '+' : '-' }}{{ t.valor | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</span>
-          </li>
-        </ul>
+            <div class="h-[7px] overflow-hidden rounded-[5px] bg-chip">
+              <div class="h-full rounded-[5px] bg-gradient-to-r from-accentstrong to-accent2" [style.width.%]="m.progresso"></div>
+            </div>
+            <div class="num mt-[5px] text-[10.5px] text-dim">{{ m.atual | currency: 'BRL' : 'symbol' : '1.0-0' : 'pt-BR' }} de {{ m.alvo | currency: 'BRL' : 'symbol' : '1.0-0' : 'pt-BR' }}</div>
+          </div>
+        </div>
       </article>
     </div>
   </ng-container>

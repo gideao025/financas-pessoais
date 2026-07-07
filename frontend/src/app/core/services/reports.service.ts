@@ -3,7 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { resolveApiBaseUrl } from '../api.config';
-import type { CashFlowResponse, DashboardSummaryResponse } from '../models/api.models';
+import type {
+  CashFlowResponse,
+  CategoryReportItem,
+  DashboardSummaryResponse
+} from '../models/api.models';
 
 @Injectable({ providedIn: 'root' })
 export class ReportsService {
@@ -17,6 +21,13 @@ export class ReportsService {
   cashFlow(days: number): Observable<CashFlowResponse> {
     return this.http.get<CashFlowResponse>(`${this.apiBaseUrl}/reports/cash-flow`, {
       params: { days: String(days) }
+    });
+  }
+
+  /** Gastos por categoria no mês (YYYY-MM); omitido = mês corrente. */
+  byCategory(month?: string): Observable<CategoryReportItem[]> {
+    return this.http.get<CategoryReportItem[]>(`${this.apiBaseUrl}/reports/by-category`, {
+      params: month ? { month } : {}
     });
   }
 }

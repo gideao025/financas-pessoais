@@ -1,196 +1,206 @@
-<section class="mx-auto flex w-full max-w-6xl flex-col gap-6">
+<section class="mx-auto flex w-full max-w-[1200px] flex-col gap-4 px-[30px] py-[22px]">
   <div class="flex flex-wrap items-center justify-between gap-3">
     <div>
-      <h2 class="text-3xl font-black tracking-tight">Transações e Registros</h2>
-      <p class="text-sm text-[#64748b]">Histórico completo de movimentações com filtros.</p>
+      <h2 class="text-[22px] font-bold tracking-tight">Transações</h2>
+      <p class="text-[13px] text-dim">Histórico completo de movimentações com filtros.</p>
     </div>
-    <div class="flex items-center gap-2">
-      <button class="rounded-xl bg-primary px-4 py-2 text-sm font-bold text-white hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60" [disabled]="!contas().length" (click)="painelAberto.set(true); limparMensagens()">Adicionar Nova Transação</button>
-    </div>
+    <button class="flex items-center gap-1.5 rounded-xl bg-gradient-to-br from-accent2 to-accentstrong px-4 py-2 text-[13px] font-bold text-[#0f0f13] hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60" [disabled]="!contas().length" (click)="abrirNova()">
+      <span class="material-symbols-outlined text-[18px]">add</span> Nova transação
+    </button>
   </div>
 
-  <p *ngIf="mensagem()" class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-    {{ mensagem() }}
-  </p>
+  <p *ngIf="mensagem()" class="rounded-xl border border-pos/30 bg-pos/[0.12] px-4 py-2 text-sm font-semibold text-pos">{{ mensagem() }}</p>
+  <p *ngIf="erro()" class="rounded-xl border border-neg/30 bg-neg/[0.12] px-4 py-2 text-sm font-semibold text-neg">{{ erro() }}</p>
 
-  <p *ngIf="erro()" class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-    {{ erro() }}
-  </p>
-
-  <article *ngIf="!carregando() && !contas().length" class="rounded-2xl border border-[#dbe0e6] bg-white p-5 dark:border-[#2a3441] dark:bg-[#1a242f]">
+  <!-- primeira conta -->
+  <div *ngIf="!carregando() && !contas().length" class="rounded-[16px] border border-bd bg-card p-5 shadow-card">
     <div class="mb-4">
-      <h3 class="text-xl font-bold">Crie sua primeira conta</h3>
-      <p class="mt-1 text-sm text-[#64748b]">Antes de lançar transações, a POC precisa de pelo menos uma conta financeira.</p>
+      <h3 class="text-[15px] font-bold">Crie sua primeira conta</h3>
+      <p class="mt-1 text-[13px] text-dim">Antes de lançar transações, você precisa de pelo menos uma conta financeira.</p>
     </div>
-
     <div class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
-      <input class="h-11 rounded-xl bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" placeholder="Nome da conta" [value]="contaNome()" (input)="contaNome.set(($any($event.target)).value)" />
-      <input class="h-11 rounded-xl bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" placeholder="Instituição" [value]="contaInstituicao()" (input)="contaInstituicao.set(($any($event.target)).value)" />
-      <input class="h-11 rounded-xl bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" placeholder="Saldo inicial" [value]="contaSaldo()" (input)="contaSaldo.set(($any($event.target)).value)" />
-      <select class="h-11 rounded-xl bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" [value]="contaTipo()" (change)="contaTipo.set(($any($event.target)).value)">
+      <input class="h-11 rounded-[11px] border border-bd bg-card2 px-3.5 text-sm text-tx outline-none focus:border-accent/40" placeholder="Nome da conta" [value]="contaNome()" (input)="contaNome.set(($any($event.target)).value)" />
+      <input class="h-11 rounded-[11px] border border-bd bg-card2 px-3.5 text-sm text-tx outline-none focus:border-accent/40" placeholder="Instituição" [value]="contaInstituicao()" (input)="contaInstituicao.set(($any($event.target)).value)" />
+      <input class="num h-11 rounded-[11px] border border-bd bg-card2 px-3.5 text-sm text-tx outline-none focus:border-accent/40" placeholder="Saldo inicial" [value]="contaSaldo()" (input)="contaSaldo.set(($any($event.target)).value)" />
+      <select class="h-11 rounded-[11px] border border-bd bg-card2 px-3.5 text-sm text-tx outline-none focus:border-accent/40" [value]="contaTipo()" (change)="contaTipo.set(($any($event.target)).value)">
         <option value="CHECKING">Conta corrente</option>
         <option value="SAVINGS">Poupança</option>
         <option value="WALLET">Carteira</option>
         <option value="INVESTMENT">Investimento</option>
       </select>
     </div>
-
-    <button class="mt-4 rounded-xl bg-primary px-4 py-2 text-sm font-bold text-white hover:bg-primary/90" (click)="criarConta()">Criar conta</button>
-  </article>
-
-  <div *ngIf="carregando()" class="rounded-2xl border border-[#dbe0e6] bg-white px-4 py-3 text-sm text-[#64748b] dark:border-[#2a3441] dark:bg-[#1a242f] dark:text-slate-300">
-    Carregando transacoes...
+    <button class="mt-4 rounded-xl bg-gradient-to-br from-accent2 to-accentstrong px-4 py-2 text-sm font-bold text-[#0f0f13] hover:opacity-90" (click)="criarConta()">Criar conta</button>
   </div>
 
-  <div class="rounded-2xl border border-[#dbe0e6] bg-white p-4 dark:border-[#2a3441] dark:bg-[#1a242f]">
-    <div class="flex flex-wrap items-center gap-2">
-      <label class="relative min-w-[220px] flex-1">
-        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#64748b] text-lg">search</span>
-        <input class="w-full rounded-lg border-none bg-[#f0f2f4] py-2 pl-10 pr-3 text-sm focus:ring-2 focus:ring-primary dark:bg-[#24313f]" placeholder="Pesquisar transações..." [value]="busca()" (input)="busca.set(($any($event.target)).value); pageIndex.set(1)" />
-      </label>
-      <select class="h-9 rounded-lg bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" [value]="periodoSelecionado()" (change)="periodoSelecionado.set(($any($event.target)).value); pageIndex.set(1)">
-        <option value="esteMes">Período: Este Mês</option>
-        <option value="todos">Período: Todos</option>
-      </select>
-      <select class="h-9 rounded-lg bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" [value]="categoriaSelecionada()" (change)="categoriaSelecionada.set(($any($event.target)).value); pageIndex.set(1)">
-        <option value="todas">Categoria: Todas</option>
-        <option *ngFor="let c of categoriasDisponiveis()" [value]="c">{{ c }}</option>
-      </select>
-      <select class="h-9 rounded-lg bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" [value]="contaSelecionada()" (change)="contaSelecionada.set(($any($event.target)).value); pageIndex.set(1)">
-        <option value="todas">Conta: Todas</option>
-        <option *ngFor="let conta of contas()" [value]="conta.name">{{ conta.name }}</option>
-      </select>
-      <select *ngIf="cartoes().length" class="h-9 rounded-lg bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" [value]="cartaoSelecionado()" (change)="cartaoSelecionado.set(($any($event.target)).value); pageIndex.set(1)">
-        <option value="todos">Cartão: Todos</option>
-        <option *ngFor="let cartao of cartoes()" [value]="cartao.id">{{ cartao.name }}</option>
-      </select>
-      <select class="h-9 rounded-lg bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" [value]="tipoSelecionado()" (change)="tipoSelecionado.set(($any($event.target)).value); pageIndex.set(1)">
-        <option value="todos">Tipo: Todos</option>
-        <option value="entrada">Tipo: Entrada</option>
-        <option value="saida">Tipo: Saída</option>
-      </select>
-      <select class="h-9 rounded-lg bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" [value]="statusSelecionado()" (change)="statusSelecionado.set(($any($event.target)).value); pageIndex.set(1)">
-        <option value="todos">Status: Todos</option>
-        <option value="concluida">Status: Concluída</option>
-        <option value="pendente">Status: Pendente</option>
-      </select>
-      <div class="ml-auto flex items-center gap-2">
-        <select class="h-9 rounded-lg bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" [value]="pageSize()" (change)="atualizarPageSize($event)">
-          <option [value]="5">Exibir: 5</option>
-          <option [value]="10">Exibir: 10</option>
-          <option [value]="20">Exibir: 20</option>
-        </select>
-      </div>
+  <div *ngIf="carregando()" class="py-16 text-center text-sm text-dim">Carregando transações...</div>
+
+  <!-- toolbar de filtros -->
+  <div *ngIf="contas().length" class="flex flex-wrap items-center gap-2.5">
+    <div class="flex rounded-[11px] border border-bd bg-card p-[3px] text-[12.5px] font-semibold">
+      <span class="cursor-pointer rounded-lg px-3.5 py-1.5" [ngClass]="tipoSelecionado() === 'todos' ? 'bg-accentstrong text-white' : 'text-mut'" (click)="tipoSelecionado.set('todos'); pageIndex.set(1)">Todas</span>
+      <span class="cursor-pointer rounded-lg px-3.5 py-1.5" [ngClass]="tipoSelecionado() === 'entrada' ? 'bg-accentstrong text-white' : 'text-mut'" (click)="tipoSelecionado.set('entrada'); pageIndex.set(1)">Entradas</span>
+      <span class="cursor-pointer rounded-lg px-3.5 py-1.5" [ngClass]="tipoSelecionado() === 'saida' ? 'bg-accentstrong text-white' : 'text-mut'" (click)="tipoSelecionado.set('saida'); pageIndex.set(1)">Saídas</span>
     </div>
+
+    <label class="relative min-w-[200px] flex-1">
+      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-dim">search</span>
+      <input class="h-[38px] w-full rounded-[11px] border border-bd bg-card py-2 pl-10 pr-3 text-[12.5px] text-tx outline-none focus:border-accent/40" placeholder="Pesquisar transações..." [value]="busca()" (input)="busca.set(($any($event.target)).value); pageIndex.set(1)" />
+    </label>
+
+    <select class="h-[38px] rounded-[11px] border border-bd bg-card px-3 text-[12.5px] font-semibold text-tx2 outline-none focus:border-accent/40" [value]="categoriaSelecionada()" (change)="categoriaSelecionada.set(($any($event.target)).value); pageIndex.set(1)">
+      <option value="todas">Categoria: todas</option>
+      <option *ngFor="let c of categoriasDisponiveis()" [value]="c">{{ c }}</option>
+    </select>
+    <select class="h-[38px] rounded-[11px] border border-bd bg-card px-3 text-[12.5px] font-semibold text-tx2 outline-none focus:border-accent/40" [value]="contaSelecionada()" (change)="contaSelecionada.set(($any($event.target)).value); pageIndex.set(1)">
+      <option value="todas">Conta: todas</option>
+      <option *ngFor="let conta of contas()" [value]="conta.name">{{ conta.name }}</option>
+    </select>
+    <select *ngIf="cartoes().length" class="h-[38px] rounded-[11px] border border-bd bg-card px-3 text-[12.5px] font-semibold text-tx2 outline-none focus:border-accent/40" [value]="cartaoSelecionado()" (change)="cartaoSelecionado.set(($any($event.target)).value); pageIndex.set(1)">
+      <option value="todos">Cartão: todos</option>
+      <option *ngFor="let cartao of cartoes()" [value]="cartao.id">{{ cartao.name }}</option>
+    </select>
+    <select class="h-[38px] rounded-[11px] border border-bd bg-card px-3 text-[12.5px] font-semibold text-tx2 outline-none focus:border-accent/40" [value]="periodoSelecionado()" (change)="trocarPeriodo(($any($event.target)).value)">
+      <option value="esteMes">Período: este mês</option>
+      <option value="todos">Período: todos</option>
+    </select>
+    <select class="ml-auto h-[38px] rounded-[11px] border border-bd bg-card px-3 text-[12.5px] font-semibold text-tx2 outline-none focus:border-accent/40" [value]="pageSize()" (change)="atualizarPageSize($event)">
+      <option [value]="5">Exibir: 5</option>
+      <option [value]="10">Exibir: 10</option>
+      <option [value]="20">Exibir: 20</option>
+    </select>
   </div>
 
-  <div *ngIf="contas().length" class="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
-    <article class="overflow-hidden rounded-2xl border border-[#dbe0e6] bg-white dark:border-[#2a3441] dark:bg-[#1a242f]">
-      <table class="w-full min-w-[760px] text-left">
-        <thead class="bg-[#fcfcfd] dark:bg-[#24313f]">
-          <tr class="border-b border-[#dbe0e6] text-xs uppercase tracking-wider text-[#64748b] dark:border-[#2a3441]">
-            <th class="px-5 py-4">Data</th>
-            <th class="px-5 py-4">Descrição</th>
-            <th class="px-5 py-4">Categoria</th>
-            <th class="px-5 py-4">Conta</th>
-            <th class="px-5 py-4">Cartão</th>
-            <th class="px-5 py-4 text-right">Valor</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-[#dbe0e6] dark:divide-[#2a3441]">
-          <tr *ngFor="let item of pagina()" class="hover:bg-[#f8fafc] dark:hover:bg-[#24313f]">
-            <td class="px-5 py-4 text-sm">{{ item.data | date: 'dd MMM, yyyy' : '' : 'pt-BR' }}</td>
-            <td class="px-5 py-4 text-sm font-semibold">{{ item.descricao }}</td>
-            <td class="px-5 py-4"><span class="rounded-full bg-[#eef2f5] px-2.5 py-0.5 text-xs dark:bg-[#24313f]">{{ item.categoria }}</span></td>
-            <td class="px-5 py-4 text-sm text-[#64748b]">{{ item.conta }}</td>
-            <td class="px-5 py-4 text-sm text-[#64748b]">
-              <span *ngIf="item.cartaoId">{{ item.cartao }}</span>
-              <span *ngIf="item.parcela" class="ml-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary">{{ item.parcela }}</span>
-              <span *ngIf="!item.cartaoId">—</span>
-            </td>
-            <td class="px-5 py-4 text-right text-sm font-bold" [ngClass]="item.tipo === 'entrada' ? 'text-green-600' : 'text-red-500'">{{ item.tipo === 'entrada' ? '+' : '-' }}{{ item.valor | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</td>
-          </tr>
-        </tbody>
-      </table>
-      <div class="flex items-center justify-between border-t border-[#dbe0e6] px-5 py-4 dark:border-[#2a3441]">
-        <p class="text-sm text-[#64748b]">Exibindo {{ inicioExibido() }} a {{ fimExibido() }} de {{ totalFiltradas() }} transações</p>
+  <div *ngIf="contas().length" class="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_360px]">
+    <div class="overflow-hidden rounded-[16px] border border-bd bg-card shadow-card">
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[720px] text-left text-[12.5px]">
+          <thead>
+            <tr class="text-[10.5px] uppercase tracking-wider text-dim">
+              <th class="px-[18px] py-3 font-semibold">Descrição</th>
+              <th class="px-3 py-3 font-semibold">Categoria</th>
+              <th class="px-3 py-3 font-semibold">Data</th>
+              <th class="px-3 py-3 font-semibold">Conta</th>
+              <th class="px-3 py-3 font-semibold">Cartão</th>
+              <th class="px-3 py-3 text-right font-semibold">Valor</th>
+              <th class="px-[18px] py-3 text-right font-semibold"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of pagina()" class="border-t border-bd2">
+              <td class="px-[18px] py-[11px]">
+                <div class="flex items-center gap-2.5">
+                  <div class="flex h-[30px] w-[30px] items-center justify-center rounded-[9px]" [ngClass]="item.tipo === 'entrada' ? 'bg-pos/[0.14]' : 'bg-chip'">
+                    <span class="material-symbols-outlined text-[17px]" [ngClass]="item.tipo === 'entrada' ? 'text-pos' : 'text-accentsoft'">{{ item.tipo === 'entrada' ? 'south_west' : 'north_east' }}</span>
+                  </div>
+                  <span class="font-semibold">{{ item.descricao }}</span>
+                </div>
+              </td>
+              <td class="px-3 py-[11px]"><span class="rounded-full bg-chip px-2.5 py-1 text-[11px] text-tx2">{{ item.categoria }}</span></td>
+              <td class="num px-3 py-[11px] text-mut">{{ item.data | date: 'dd/MM/yy' : '' : 'pt-BR' }}</td>
+              <td class="px-3 py-[11px] text-mut">{{ item.conta }}</td>
+              <td class="px-3 py-[11px] text-dim">
+                <span *ngIf="item.cartaoId">{{ item.cartao }}</span>
+                <span *ngIf="item.parcela" class="num ml-1 rounded-full bg-accent/[0.14] px-2 py-0.5 text-[10.5px] font-semibold text-accent">{{ item.parcela }}</span>
+                <span *ngIf="!item.cartaoId">—</span>
+              </td>
+              <td class="num px-3 py-[11px] text-right font-semibold" [ngClass]="item.tipo === 'entrada' ? 'text-pos' : 'text-tx2'">{{ item.tipo === 'entrada' ? '+' : '−' }}{{ item.valor | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</td>
+              <td class="px-[18px] py-[11px] text-right">
+                <div *ngIf="excluindoId() !== item.id" class="flex justify-end gap-1">
+                  <button *ngIf="!item.parcela" class="flex h-7 w-7 items-center justify-center rounded-lg text-dim hover:bg-accent/[0.14] hover:text-accent" title="Editar" (click)="editar(item)">
+                    <span class="material-symbols-outlined text-[18px]">edit</span>
+                  </button>
+                  <button class="flex h-7 w-7 items-center justify-center rounded-lg text-dim hover:bg-neg/[0.12] hover:text-neg" title="Excluir" (click)="pedirExclusao(item.id)">
+                    <span class="material-symbols-outlined text-[18px]">delete</span>
+                  </button>
+                </div>
+                <div *ngIf="excluindoId() === item.id" class="flex items-center justify-end gap-1.5">
+                  <span class="text-[10.5px] text-dim">Excluir?</span>
+                  <button class="rounded-lg bg-neg/[0.14] px-2 py-1 text-[10.5px] font-semibold text-neg hover:bg-neg/20" (click)="confirmarExclusao(item)">Sim</button>
+                  <button class="rounded-lg border border-bd px-2 py-1 text-[10.5px] font-semibold text-tx2 hover:border-accent/40" (click)="cancelarExclusao()">Não</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="flex items-center justify-between border-t border-bd2 px-5 py-3.5">
+        <p class="text-[12px] text-dim">Exibindo {{ inicioExibido() }} a {{ fimExibido() }} de {{ totalFiltradas() }} transações</p>
         <div class="flex items-center gap-1">
-          <button class="flex size-9 items-center justify-center rounded-lg hover:bg-[#eef2f6] dark:hover:bg-[#24313f]" (click)="antPagina()">
+          <button class="flex h-8 w-8 items-center justify-center rounded-lg text-mut hover:bg-card2" (click)="antPagina()">
             <span class="material-symbols-outlined text-lg">chevron_left</span>
           </button>
-          <button *ngFor="let page of pageButtons()" class="flex size-9 items-center justify-center rounded-lg text-xs font-bold" [ngClass]="pageIndex() === page ? 'bg-primary text-white' : 'hover:bg-[#eef2f6] dark:hover:bg-[#24313f]'" (click)="setPage(page)">{{ page }}</button>
-          <span *ngIf="totalPages() > pageButtons().length" class="flex size-9 items-center justify-center text-[#64748b]">...</span>
-          <button *ngIf="totalPages() > pageButtons().length" class="flex size-9 items-center justify-center rounded-lg hover:bg-[#eef2f6] dark:hover:bg-[#24313f]" (click)="setPage(totalPages())">{{ totalPages() }}</button>
-          <button class="flex size-9 items-center justify-center rounded-lg hover:bg-[#eef2f6] dark:hover:bg-[#24313f]" (click)="proxPagina()">
+          <button *ngFor="let page of pageButtons()" class="flex h-8 w-8 items-center justify-center rounded-lg text-xs font-bold" [ngClass]="pageIndex() === page ? 'bg-accentstrong text-white' : 'text-mut hover:bg-card2'" (click)="setPage(page)">{{ page }}</button>
+          <span *ngIf="totalPages() > pageButtons().length" class="flex h-8 w-8 items-center justify-center text-dim">...</span>
+          <button *ngIf="totalPages() > pageButtons().length" class="flex h-8 w-8 items-center justify-center rounded-lg text-mut hover:bg-card2" (click)="setPage(totalPages())">{{ totalPages() }}</button>
+          <button class="flex h-8 w-8 items-center justify-center rounded-lg text-mut hover:bg-card2" (click)="proxPagina()">
             <span class="material-symbols-outlined text-lg">chevron_right</span>
           </button>
         </div>
       </div>
-    </article>
 
-    <aside *ngIf="painelAberto()" class="hidden w-[360px] flex-col rounded-2xl border border-[#dbe0e6] bg-white dark:border-[#2a3441] dark:bg-[#1a242f] lg:flex">
-      <div class="flex items-center justify-between border-b border-[#dbe0e6] px-4 py-3 dark:border-[#2a3441]">
-        <h3 class="text-lg font-bold">Adicionar Transação</h3>
-        <button class="rounded-lg p-1 hover:bg-[#eef2f6] dark:hover:bg-[#24313f]" (click)="painelAberto.set(false)">
+      <div *ngIf="!carregando() && !totalFiltradas()" class="border-t border-bd2 px-5 py-10 text-center text-sm text-dim">
+        Nenhuma transação encontrada com os filtros atuais.
+      </div>
+    </div>
+
+    <!-- painel novo lançamento -->
+    <aside *ngIf="painelAberto()" class="flex w-full flex-col rounded-[16px] border border-bd bg-card shadow-card lg:w-[360px]">
+      <div class="flex items-center justify-between border-b border-bd2 px-4 py-3.5">
+        <h3 class="text-[15px] font-bold">{{ editandoId() ? 'Editar transação' : 'Adicionar transação' }}</h3>
+        <button class="rounded-lg p-1 text-mut hover:bg-card2" (click)="fecharPainel()">
           <span class="material-symbols-outlined">close</span>
         </button>
       </div>
-      <div class="space-y-4 p-4">
-        <label class="space-y-1">
-          <span class="text-xs font-bold">Valor</span>
-          <input class="h-10 w-full rounded-lg border-none bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" placeholder="0,00" [value]="formValor()" (input)="formValor.set(($any($event.target)).value)" />
+      <div class="space-y-3.5 p-4">
+        <label class="block space-y-1.5">
+          <span class="text-xs font-semibold text-tx2">Valor</span>
+          <input class="num h-11 w-full rounded-[11px] border border-bd bg-card2 px-3.5 text-sm text-tx outline-none focus:border-accent/40" placeholder="0,00" [value]="formValor()" (input)="formValor.set(($any($event.target)).value)" />
         </label>
         <div class="flex gap-2">
-          <button class="flex-1 rounded-lg border px-3 py-2 text-xs font-bold" [ngClass]="formTipo() === 'saida' ? 'border-primary text-primary' : 'text-[#64748b]'" (click)="formTipo.set('saida')">Despesas</button>
-          <button class="flex-1 rounded-lg border px-3 py-2 text-xs font-bold" [ngClass]="formTipo() === 'entrada' ? 'border-primary text-primary' : 'text-[#64748b]'" (click)="formTipo.set('entrada')">Receitas</button>
+          <button class="flex-1 rounded-[11px] border px-3 py-2 text-xs font-bold" [ngClass]="formTipo() === 'saida' ? 'border-accent text-accent' : 'border-bd text-mut'" (click)="formTipo.set('saida')">Saída</button>
+          <button class="flex-1 rounded-[11px] border px-3 py-2 text-xs font-bold" [ngClass]="formTipo() === 'entrada' ? 'border-pos text-pos' : 'border-bd text-mut'" (click)="formTipo.set('entrada')">Entrada</button>
         </div>
-        <label class="space-y-1">
-          <span class="text-xs font-bold">Status</span>
-          <select class="h-10 w-full rounded-lg border-none bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" [value]="formStatus()" (change)="formStatus.set(($any($event.target)).value)">
+        <label class="block space-y-1.5">
+          <span class="text-xs font-semibold text-tx2">Status</span>
+          <select class="h-11 w-full rounded-[11px] border border-bd bg-card2 px-3.5 text-sm text-tx outline-none focus:border-accent/40" [value]="formStatus()" (change)="formStatus.set(($any($event.target)).value)">
             <option value="concluida">Concluída</option>
             <option value="pendente">Pendente</option>
           </select>
         </label>
-        <label class="space-y-1">
-          <span class="text-xs font-bold">Data</span>
-          <input class="h-10 w-full rounded-lg border-none bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" type="date" [value]="formData()" (input)="formData.set(($any($event.target)).value)" />
+        <label class="block space-y-1.5">
+          <span class="text-xs font-semibold text-tx2">Data</span>
+          <input class="h-11 w-full rounded-[11px] border border-bd bg-card2 px-3.5 text-sm text-tx outline-none focus:border-accent/40 [color-scheme:dark]" type="date" [value]="formData()" (input)="formData.set(($any($event.target)).value)" />
         </label>
-        <label class="space-y-1">
-          <span class="text-xs font-bold">Descrição</span>
-          <input class="h-10 w-full rounded-lg border-none bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" placeholder="Onde voce gastou?" [value]="formDescricao()" (input)="formDescricao.set(($any($event.target)).value)" />
+        <label class="block space-y-1.5">
+          <span class="text-xs font-semibold text-tx2">Descrição</span>
+          <input class="h-11 w-full rounded-[11px] border border-bd bg-card2 px-3.5 text-sm text-tx outline-none focus:border-accent/40" placeholder="Onde você gastou?" [value]="formDescricao()" (input)="formDescricao.set(($any($event.target)).value)" />
         </label>
-        <label class="space-y-1">
-          <span class="text-xs font-bold">Categoria</span>
-          <select class="h-10 w-full rounded-lg border-none bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" [value]="formCategoria()" (change)="formCategoria.set(($any($event.target)).value)">
+        <label class="block space-y-1.5">
+          <span class="text-xs font-semibold text-tx2">Categoria</span>
+          <select class="h-11 w-full rounded-[11px] border border-bd bg-card2 px-3.5 text-sm text-tx outline-none focus:border-accent/40" [value]="formCategoria()" (change)="formCategoria.set(($any($event.target)).value)">
             <option *ngFor="let c of categoriasDisponiveis()" [value]="c">{{ c }}</option>
           </select>
         </label>
-        <label class="space-y-1">
-          <span class="text-xs font-bold">Conta</span>
-          <select class="h-10 w-full rounded-lg border-none bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" [value]="formContaId()" (change)="formContaId.set(($any($event.target)).value)">
+        <label class="block space-y-1.5">
+          <span class="text-xs font-semibold text-tx2">Conta</span>
+          <select class="h-11 w-full rounded-[11px] border border-bd bg-card2 px-3.5 text-sm text-tx outline-none focus:border-accent/40" [value]="formContaId()" (change)="formContaId.set(($any($event.target)).value)">
             <option *ngFor="let conta of contas()" [value]="conta.id">{{ conta.name }}</option>
           </select>
         </label>
-        <label *ngIf="cartoes().length" class="space-y-1">
-          <span class="text-xs font-bold">Cartão (opcional)</span>
-          <select class="h-10 w-full rounded-lg border-none bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" [value]="formCartaoId()" (change)="formCartaoId.set(($any($event.target)).value)">
+        <label *ngIf="cartoes().length" class="block space-y-1.5">
+          <span class="text-xs font-semibold text-tx2">Cartão (opcional)</span>
+          <select class="h-11 w-full rounded-[11px] border border-bd bg-card2 px-3.5 text-sm text-tx outline-none focus:border-accent/40" [value]="formCartaoId()" (change)="formCartaoId.set(($any($event.target)).value)">
             <option value="">Sem cartão</option>
             <option *ngFor="let cartao of cartoes()" [value]="cartao.id">{{ cartao.name }}</option>
           </select>
         </label>
-        <label *ngIf="formCartaoId() && formTipo() === 'saida'" class="space-y-1">
-          <span class="text-xs font-bold">Parcelas</span>
-          <input class="h-10 w-full rounded-lg border-none bg-[#f0f2f4] px-3 text-sm dark:bg-[#24313f]" type="number" min="1" max="36" [value]="formParcelas()" (input)="formParcelas.set(($any($event.target)).value)" />
-          <span class="text-xs text-[#64748b]">O valor informado é o total da compra; será dividido nas parcelas.</span>
+        <label *ngIf="formCartaoId() && formTipo() === 'saida' && !editandoId()" class="block space-y-1.5">
+          <span class="text-xs font-semibold text-tx2">Parcelas</span>
+          <input class="num h-11 w-full rounded-[11px] border border-bd bg-card2 px-3.5 text-sm text-tx outline-none focus:border-accent/40" type="number" min="1" max="36" [value]="formParcelas()" (input)="formParcelas.set(($any($event.target)).value)" />
+          <span class="text-[11px] text-dim">O valor informado é o total da compra; será dividido nas parcelas.</span>
         </label>
-        <div class="pt-2">
-          <button class="w-full rounded-xl bg-primary py-2.5 text-sm font-bold text-white hover:bg-primary/90" (click)="salvarTransacao()">Salvar Transação</button>
-        </div>
+        <button class="mt-1 w-full rounded-xl bg-gradient-to-br from-accent2 to-accentstrong py-2.5 text-sm font-bold text-[#0f0f13] hover:opacity-90" (click)="salvarTransacao()">Salvar transação</button>
       </div>
     </aside>
   </div>
-
-  <article *ngIf="!carregando() && contas().length && !totalFiltradas()" class="rounded-2xl border border-dashed border-[#cbd5e1] bg-white px-5 py-8 text-center text-sm text-[#64748b] dark:border-[#334155] dark:bg-[#1a242f] dark:text-slate-300">
-    Nenhuma transacao encontrada com os filtros atuais.
-  </article>
 </section>

@@ -1,7 +1,11 @@
 import { CurrencyPipe, NgClass, NgFor, NgIf, PercentPipe } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 
-import type { DashboardSummaryResponse, MonthlyReportItem } from '../../core/models/api.models';
+import type {
+  CategoryReportItem,
+  DashboardSummaryResponse,
+  MonthlyReportItem
+} from '../../core/models/api.models';
 import { ReportsService } from '../../core/services/reports.service';
 
 interface MonthlyPoint {
@@ -23,6 +27,11 @@ export class ReportsPageComponent implements OnInit {
   protected readonly erro = signal('');
   protected readonly periodo = signal<'3m' | '6m' | '12m'>('6m');
   protected readonly resumo = signal<DashboardSummaryResponse | null>(null);
+  protected readonly categorias = signal<CategoryReportItem[]>([]);
+
+  protected readonly maiorCategoria = computed(() =>
+    Math.max(...this.categorias().map((c) => c.total), 1)
+  );
 
   protected readonly todaSerie = computed<MonthlyPoint[]>(() =>
     (this.resumo()?.monthlySeries ?? []).map((item: MonthlyReportItem) => ({
@@ -39,6 +48,10 @@ export class ReportsPageComponent implements OnInit {
   });
 
   protected readonly patrimonio = computed(() => this.resumo()?.balance ?? 0);
+  protected readonly totalEntradas = computed(() => this.resumo()?.totalIncome ?? 0);
+  protected readonly totalSaidas = computed(() => this.resumo()?.totalExpense ?? 0);
+  protected readonly pendentes = computed(() => this.resumo()?.pendingCount ?? 0);
+  protected readonly concluidas = computed(() => this.resumo()?.completedCount ?? 0);
 
   protected readonly variacaoMensal = computed(() => {
     const serie = this.todaSerie();
@@ -118,6 +131,11 @@ export class ReportsPageComponent implements OnInit {
         this.carregando.set(false);
         this.erro.set(error.error?.message ?? 'Nao foi possivel carregar os relatorios.');
       }
+    });
+
+    this.reportsService.byCategory().subscribe({
+      next: (categorias) => this.categorias.set(categorias),
+      error: () => this.categorias.set([])
     });
   }
 }

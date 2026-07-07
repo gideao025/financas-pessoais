@@ -57,6 +57,8 @@ export class TransactionsPageComponent implements OnInit {
   protected readonly pageSize = signal(5);
   protected readonly pageIndex = signal(1);
   protected readonly painelAberto = signal(false);
+  protected readonly excluindoId = signal<string | null>(null);
+  protected readonly editandoId = signal<string | null>(null);
 
   protected readonly formValor = signal('');
   protected readonly formTipo = signal<'entrada' | 'saida'>('saida');
@@ -124,6 +126,28 @@ export class TransactionsPageComponent implements OnInit {
     this.carregarDados();
   }
 
+  /** Troca o período e recarrega do servidor (filtro de datas server-side). */
+  protected trocarPeriodo(valor: 'esteMes' | 'todos'): void {
+    this.periodoSelecionado.set(valor);
+    this.pageIndex.set(1);
+    this.carregarDados();
+  }
+
+  /** Intervalo enviado ao backend conforme o período selecionado. */
+  private intervaloServidor(): { from?: string; to?: string } | undefined {
+    if (this.periodoSelecionado() !== 'esteMes') {
+      return undefined;
+    }
+    const agora = new Date();
+    const inicio = new Date(agora.getFullYear(), agora.getMonth(), 1);
+    const fim = new Date(agora.getFullYear(), agora.getMonth() + 1, 0);
+    return { from: this.iso(inicio), to: this.iso(fim) };
+  }
+
+  private iso(data: Date): string {
+    return `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, '0')}-${String(data.getDate()).padStart(2, '0')}`;
+  }
+
   protected carregarDados(): void {
     this.carregando.set(true);
     this.erro.set('');
@@ -131,7 +155,7 @@ export class TransactionsPageComponent implements OnInit {
     forkJoin({
       contas: this.accountsService.list(),
       cartoes: this.cardsService.list(),
-      transacoes: this.transactionsService.list()
+      transacoes: this.transactionsService.list(this.intervaloServidor())
     }).subscribe({
       next: ({ contas, cartoes, transacoes }) => {
         this.contas.set(contas);
@@ -165,6 +189,41 @@ export class TransactionsPageComponent implements OnInit {
     this.pageIndex.set(1);
   }
 
+  /** Abre o painel para um novo lançamento (limpa o estado de edição). */
+  protected abrirNova(): void {
+    this.editandoId.set(null);
+    this.formValor.set('');
+    this.formTipo.set('saida');
+    this.formStatus.set('concluida');
+    this.formData.set(new Date().toISOString().slice(0, 10));
+    this.formDescricao.set('');
+    this.formCartaoId.set('');
+    this.formParcelas.set('1');
+    this.limparMensagens();
+    this.painelAberto.set(true);
+  }
+
+  /** Abre o painel preenchido para editar um lançamento (parcelas não são editáveis). */
+  protected editar(item: UiTransaction): void {
+    this.editandoId.set(item.id);
+    this.formValor.set(String(item.valor));
+    this.formTipo.set(item.tipo);
+    this.formStatus.set(item.status);
+    this.formData.set(item.data);
+    this.formDescricao.set(item.descricao);
+    this.formCategoria.set(item.categoria);
+    this.formContaId.set(item.contaId ?? '');
+    this.formCartaoId.set(item.cartaoId ?? '');
+    this.formParcelas.set('1');
+    this.limparMensagens();
+    this.painelAberto.set(true);
+  }
+
+  protected fecharPainel(): void {
+    this.painelAberto.set(false);
+    this.editandoId.set(null);
+  }
+
   protected salvarTransacao(): void {
     const amount = Number(this.formValor().replace(',', '.'));
     if (!this.formDescricao().trim() || !amount || !this.formCategoria().trim() || !this.formContaId()) {
@@ -177,41 +236,50 @@ export class TransactionsPageComponent implements OnInit {
     const transactionType: TransactionType = this.formTipo() === 'entrada' ? 'ENTRADA' : 'SAIDA';
     const status: TransactionStatus = this.formStatus() === 'concluida' ? 'CONCLUIDA' : 'PENDENTE';
     const cardId = this.formCartaoId() || null;
-    // parcelamento só faz sentido para despesa no cartão
-    const parcelas = cardId && this.formTipo() === 'saida' ? Math.max(1, Number(this.formParcelas()) || 1) : 1;
+    const editId = this.editandoId();
+    // parcelamento só se aplica a novas despesas no cartão
+    const parcelas =
+      !editId && cardId && this.formTipo() === 'saida' ? Math.max(1, Number(this.formParcelas()) || 1) : 1;
 
-    this.transactionsService
-      .create({
-        accountId: this.formContaId(),
-        cardId,
-        description: this.formDescricao().trim(),
-        category: this.formCategoria().trim(),
-        transactionType,
-        status,
-        amount,
-        transactionDate: this.formData(),
-        installmentTotal: parcelas
-      })
-      .subscribe({
-        next: () => {
-          this.painelAberto.set(false);
-          this.formValor.set('');
-          this.formDescricao.set('');
-          this.formStatus.set('concluida');
-          this.formCartaoId.set('');
-          this.formParcelas.set('1');
-          this.pageIndex.set(1);
-          this.mensagem.set(
-            parcelas > 1 ? `Compra parcelada em ${parcelas}x salva com sucesso.` : 'Transacao salva com sucesso.'
-          );
-          setTimeout(() => this.mensagem.set(''), 2500);
-          // recarrega para trazer todas as parcelas geradas no backend
-          this.carregarDados();
-        },
-        error: (error: { error?: { message?: string } }) => {
-          this.erro.set(error.error?.message ?? 'Nao foi possivel salvar a transacao.');
-        }
-      });
+    const payload = {
+      accountId: this.formContaId(),
+      cardId,
+      description: this.formDescricao().trim(),
+      category: this.formCategoria().trim(),
+      transactionType,
+      status,
+      amount,
+      transactionDate: this.formData(),
+      installmentTotal: parcelas
+    };
+
+    const requisicao = editId
+      ? this.transactionsService.update(editId, payload)
+      : this.transactionsService.create(payload);
+
+    requisicao.subscribe({
+      next: () => {
+        this.fecharPainel();
+        this.formValor.set('');
+        this.formDescricao.set('');
+        this.formStatus.set('concluida');
+        this.formCartaoId.set('');
+        this.formParcelas.set('1');
+        this.pageIndex.set(1);
+        this.mensagem.set(
+          editId
+            ? 'Transacao atualizada com sucesso.'
+            : parcelas > 1
+              ? `Compra parcelada em ${parcelas}x salva com sucesso.`
+              : 'Transacao salva com sucesso.'
+        );
+        setTimeout(() => this.mensagem.set(''), 2500);
+        this.carregarDados();
+      },
+      error: (error: { error?: { message?: string } }) => {
+        this.erro.set(error.error?.message ?? 'Nao foi possivel salvar a transacao.');
+      }
+    });
   }
 
   protected criarConta(): void {
@@ -249,6 +317,33 @@ export class TransactionsPageComponent implements OnInit {
   protected limparMensagens(): void {
     this.erro.set('');
     this.mensagem.set('');
+  }
+
+  protected pedirExclusao(id: string): void {
+    this.excluindoId.set(id);
+  }
+
+  protected cancelarExclusao(): void {
+    this.excluindoId.set(null);
+  }
+
+  protected confirmarExclusao(item: UiTransaction): void {
+    this.transactionsService.delete(item.id).subscribe({
+      next: () => {
+        this.excluindoId.set(null);
+        this.mensagem.set(
+          item.parcela
+            ? 'Compra parcelada removida (todas as parcelas do grupo).'
+            : 'Transacao removida.'
+        );
+        setTimeout(() => this.mensagem.set(''), 2500);
+        this.carregarDados();
+      },
+      error: (error: { error?: { message?: string } }) => {
+        this.excluindoId.set(null);
+        this.erro.set(error.error?.message ?? 'Nao foi possivel remover a transacao.');
+      }
+    });
   }
 
   private mapTransaction(

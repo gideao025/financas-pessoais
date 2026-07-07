@@ -205,6 +205,11 @@ export interface MonthlyReportItem {
   savings: number;
 }
 
+export interface CategoryReportItem {
+  category: string;
+  total: number;
+}
+
 export interface DashboardSummaryResponse {
   totalIncome: number;
   totalExpense: number;

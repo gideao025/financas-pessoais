@@ -1,4 +1,4 @@
-import { NgClass, NgIf } from '@angular/common';
+import { NgIf } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 
@@ -6,7 +6,7 @@ import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-auth-page',
-  imports: [NgIf, NgClass],
+  imports: [NgIf],
   templateUrl: './auth-page.component.html',
   styleUrl: './auth-page.component.scss'
 })

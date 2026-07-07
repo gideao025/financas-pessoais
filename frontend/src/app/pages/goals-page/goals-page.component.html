@@ -1,168 +1,95 @@
-<section class="mx-auto flex w-full max-w-6xl flex-col gap-6">
+<section class="mx-auto flex w-full max-w-[1200px] flex-col gap-4 px-[30px] py-[22px]">
   <div class="flex flex-wrap items-center justify-between gap-3">
     <div>
-      <h2 class="text-3xl font-black tracking-tight">Metas Financeiras</h2>
-      <p class="text-sm text-[#64748b]">
-        Defina e acompanhe objetivos como reserva de emergência, casa própria e viagens.
-      </p>
+      <h2 class="text-[22px] font-bold tracking-tight">Metas de economia</h2>
+      <p class="text-[13px] text-dim">Objetivos como reserva de emergência, casa própria e viagens.</p>
     </div>
-    <button
-      class="rounded-xl bg-primary px-4 py-2 text-sm font-bold text-white hover:bg-primary/90"
-      (click)="iniciarNova()"
-    >
-      + Nova Meta
+    <button class="flex items-center gap-1.5 rounded-xl bg-gradient-to-br from-accent2 to-accentstrong px-4 py-2 text-[13px] font-bold text-[#0f0f13] hover:opacity-90" (click)="iniciarNova()">
+      <span class="material-symbols-outlined text-[18px]">add</span> Nova meta
     </button>
   </div>
 
-  <p *ngIf="mensagem()" class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-    {{ mensagem() }}
-  </p>
-
-  <div *ngIf="erro()" class="flex items-center justify-between gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+  <p *ngIf="mensagem()" class="rounded-xl border border-pos/30 bg-pos/[0.12] px-4 py-2 text-sm font-semibold text-pos">{{ mensagem() }}</p>
+  <div *ngIf="erro()" class="flex items-center justify-between gap-3 rounded-xl border border-neg/30 bg-neg/[0.12] px-4 py-2 text-sm text-neg">
     <span>{{ erro() }}</span>
-    <button class="font-bold text-red-700 hover:underline" (click)="recarregar()">Tentar novamente</button>
+    <button class="font-bold hover:underline" (click)="recarregar()">Tentar novamente</button>
   </div>
+  <div *ngIf="carregando()" class="py-16 text-center text-sm text-dim">Carregando metas...</div>
 
-  <div *ngIf="carregando()" class="rounded-2xl border border-[#e5e7eb] bg-white px-4 py-3 text-sm text-[#64748b] dark:border-[#2a3441] dark:bg-[#1a242f] dark:text-slate-300">
-    Carregando metas...
-  </div>
-
-  <div class="grid grid-cols-1 gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-    <article
-      class="rounded-xl border border-[#e5e7eb] bg-white p-5 dark:border-[#2a3441] dark:bg-[#1a242f]"
-    >
-      <div class="mb-3 flex items-center justify-between">
-        <h3 class="text-lg font-bold">Resumo das Metas</h3>
+  <div class="grid grid-cols-1 gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+    <!-- lista -->
+    <div class="rounded-[18px] border border-bd bg-card p-5 shadow-card">
+      <div class="mb-4 flex items-center justify-between">
+        <h3 class="text-[13.5px] font-bold">Resumo das metas</h3>
         <div class="text-right">
-          <p class="text-xs text-[#64748b]">Progresso agregado</p>
-          <p class="text-xl font-black text-primary">{{ progressoTotal() }}%</p>
+          <p class="text-[11px] text-dim">Progresso agregado</p>
+          <p class="num text-lg font-bold text-accent">{{ progressoTotal() }}%</p>
         </div>
       </div>
-      <div class="space-y-4">
-        <div
-          *ngFor="let meta of metas()"
-          class="rounded-lg border border-[#e5e7eb] p-4 dark:border-[#2a3441]"
-        >
-          <div class="mb-1 flex items-center justify-between gap-2">
-            <div>
-              <p class="text-sm font-bold">{{ meta.name }}</p>
-              <p class="text-xs text-[#64748b] line-clamp-2">{{ meta.description }}</p>
+      <p *ngIf="!carregando() && !metas().length" class="text-sm text-dim">Nenhuma meta cadastrada ainda. Use o formulário ao lado.</p>
+      <div class="space-y-3">
+        <div *ngFor="let meta of metas()" class="rounded-2xl border border-bd bg-card2 p-4">
+          <div class="mb-2 flex items-start justify-between gap-2">
+            <div class="flex items-center gap-2.5">
+              <div class="flex h-9 w-9 items-center justify-center rounded-[11px] bg-accent/[0.14]">
+                <span class="material-symbols-outlined text-[19px] text-accent">savings</span>
+              </div>
+              <div>
+                <p class="text-[13.5px] font-bold">{{ meta.name }}</p>
+                <p class="line-clamp-1 text-[11px] text-dim">{{ meta.description }}</p>
+              </div>
             </div>
             <div class="text-right">
-              <p class="text-xs text-[#64748b]">Alvo</p>
-              <p class="text-sm font-bold">
-                {{ meta.currentAmount | currency: 'BRL' : 'symbol' : '1.0-0' : 'pt-BR' }} /
-                {{ meta.targetAmount | currency: 'BRL' : 'symbol' : '1.0-0' : 'pt-BR' }}
+              <p class="num text-[13px] font-semibold">
+                {{ meta.currentAmount | currency: 'BRL' : 'symbol' : '1.0-0' : 'pt-BR' }}<span class="text-dim"> / {{ meta.targetAmount | currency: 'BRL' : 'symbol' : '1.0-0' : 'pt-BR' }}</span>
               </p>
-              <p class="text-[10px] text-[#64748b]">
-                Prazo: {{ meta.dueDate | date: 'dd/MM/yyyy' : '' : 'pt-BR' }}
-              </p>
+              <p class="text-[10px] text-dim">Prazo: {{ meta.dueDate | date: 'dd/MM/yyyy' : '' : 'pt-BR' }}</p>
             </div>
           </div>
-          <div class="mb-2 h-2 rounded-full bg-[#e2e8f0] dark:bg-[#24313f]">
-            <div class="h-2 rounded-full bg-primary" [style.width.%]="progresso(meta)"></div>
+          <div class="mb-2 h-2 overflow-hidden rounded-full bg-chip">
+            <div class="h-2 rounded-full bg-gradient-to-r from-accentstrong to-accent2" [style.width.%]="progresso(meta)"></div>
           </div>
-          <div class="flex items-center justify-between text-xs">
-            <span class="font-semibold text-[#64748b]"> {{ progresso(meta) }}% concluído </span>
+          <div class="flex items-center justify-between text-[11.5px]">
+            <span class="font-semibold text-mut">{{ progresso(meta) }}% concluído</span>
             <div class="flex gap-2">
-              <button
-                class="rounded-lg border border-[#e5e7eb] px-2 py-1 font-semibold text-[#64748b] hover:bg-[#f3f4f6] dark:border-[#2a3441] dark:hover:bg-[#24313f]"
-                (click)="editar(meta)"
-              >
-                Editar
-              </button>
-              <button
-                class="rounded-lg bg-primary/10 px-2 py-1 font-semibold text-primary hover:bg-primary/20"
-                (click)="concluir(meta)"
-              >
-                Marcar como concluída
-              </button>
+              <button class="rounded-lg border border-bd px-2.5 py-1 font-semibold text-tx2 hover:border-accent/40" (click)="editar(meta)">Editar</button>
+              <button class="rounded-lg bg-accent/[0.14] px-2.5 py-1 font-semibold text-accent hover:bg-accent/20" (click)="concluir(meta)">Concluir</button>
             </div>
           </div>
         </div>
       </div>
-    </article>
+    </div>
 
-    <article
-      class="rounded-xl border border-[#e5e7eb] bg-white p-5 dark:border-[#2a3441] dark:bg-[#1a242f]"
-    >
-      <h3 class="mb-4 text-lg font-bold">
-        {{ metaEditando() ? 'Editar Meta' : 'Nova Meta' }}
-      </h3>
-      <div class="space-y-4">
-        <div class="space-y-1">
-          <label class="text-xs font-bold text-[#64748b]">Nome da meta</label>
-          <input
-            class="w-full rounded-xl border border-[#e5e7eb] bg-[#f8fafc] px-3 py-2 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary dark:border-[#2a3441] dark:bg-[#111827]"
-            [value]="nome()"
-            (input)="nome.set($any($event.target).value)"
-            placeholder="Ex.: Reserva de Emergência"
-          />
+    <!-- form -->
+    <div class="rounded-[18px] border border-bd bg-card p-5 shadow-card">
+      <h3 class="mb-4 text-[13.5px] font-bold">{{ metaEditando() ? 'Editar meta' : 'Nova meta' }}</h3>
+      <div class="space-y-3.5">
+        <label class="block space-y-1.5">
+          <span class="text-xs font-semibold text-tx2">Nome da meta</span>
+          <input class="h-11 w-full rounded-[11px] border border-bd bg-card2 px-3.5 text-sm text-tx outline-none focus:border-accent/40" [value]="nome()" (input)="nome.set($any($event.target).value)" placeholder="Ex.: Reserva de emergência" />
+        </label>
+        <label class="block space-y-1.5">
+          <span class="text-xs font-semibold text-tx2">Descrição</span>
+          <textarea rows="3" class="w-full rounded-[11px] border border-bd bg-card2 px-3.5 py-2.5 text-sm text-tx outline-none focus:border-accent/40" [value]="descricao()" (input)="descricao.set($any($event.target).value)" placeholder="Detalhe o objetivo."></textarea>
+        </label>
+        <div class="grid grid-cols-2 gap-3">
+          <label class="block space-y-1.5">
+            <span class="text-xs font-semibold text-tx2">Valor alvo</span>
+            <input type="number" min="0" class="num h-11 w-full rounded-[11px] border border-bd bg-card2 px-3.5 text-sm text-tx outline-none focus:border-accent/40" [value]="alvo()" (input)="alvo.set(toNumber($any($event.target).value))" />
+          </label>
+          <label class="block space-y-1.5">
+            <span class="text-xs font-semibold text-tx2">Valor atual</span>
+            <input type="number" min="0" class="num h-11 w-full rounded-[11px] border border-bd bg-card2 px-3.5 text-sm text-tx outline-none focus:border-accent/40" [value]="atual()" (input)="atual.set(toNumber($any($event.target).value))" />
+          </label>
         </div>
-        <div class="space-y-1">
-          <label class="text-xs font-bold text-[#64748b]">Descrição</label>
-          <textarea
-            rows="3"
-            class="w-full rounded-xl border border-[#e5e7eb] bg-[#f8fafc] px-3 py-2 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary dark:border-[#2a3441] dark:bg-[#111827]"
-            [value]="descricao()"
-            (input)="descricao.set($any($event.target).value)"
-            placeholder="Detalhe o objetivo para lembrar o contexto."
-          ></textarea>
-        </div>
-        <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
-          <div class="space-y-1">
-            <label class="text-xs font-bold text-[#64748b]">Valor alvo</label>
-            <div class="relative">
-              <span
-                class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-[#64748b]"
-                >R$</span
-              >
-              <input
-                type="number"
-                min="0"
-                class="w-full rounded-xl border border-[#e5e7eb] bg-[#f8fafc] px-8 py-2 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary dark:border-[#2a3441] dark:bg-[#111827]"
-                [value]="alvo()"
-                (input)="alvo.set(toNumber($any($event.target).value))"
-              />
-            </div>
-          </div>
-          <div class="space-y-1">
-            <label class="text-xs font-bold text-[#64748b]">Valor atual</label>
-            <div class="relative">
-              <span
-                class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-[#64748b]"
-                >R$</span
-              >
-              <input
-                type="number"
-                min="0"
-                class="w-full rounded-xl border border-[#e5e7eb] bg-[#f8fafc] px-8 py-2 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary dark:border-[#2a3441] dark:bg-[#111827]"
-                [value]="atual()"
-                (input)="atual.set(toNumber($any($event.target).value))"
-              />
-            </div>
-          </div>
-        </div>
-        <div class="space-y-1">
-          <label class="text-xs font-bold text-[#64748b]">Prazo estimado</label>
-          <input
-            type="date"
-            class="w-full rounded-xl border border-[#e5e7eb] bg-[#f8fafc] px-3 py-2 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary dark:border-[#2a3441] dark:bg-[#111827]"
-            [value]="prazo()"
-            (input)="prazo.set($any($event.target).value)"
-          />
-        </div>
-        <button
-          class="mt-2 w-full rounded-xl bg-primary py-2.5 text-sm font-bold text-white hover:bg-primary/90"
-          (click)="salvar()"
-        >
+        <label class="block space-y-1.5">
+          <span class="text-xs font-semibold text-tx2">Prazo estimado</span>
+          <input type="date" class="h-11 w-full rounded-[11px] border border-bd bg-card2 px-3.5 text-sm text-tx outline-none focus:border-accent/40 [color-scheme:dark]" [value]="prazo()" (input)="prazo.set($any($event.target).value)" />
+        </label>
+        <button class="mt-1 h-11 w-full rounded-xl bg-gradient-to-br from-accent2 to-accentstrong text-sm font-bold text-[#0f0f13] hover:opacity-90" (click)="salvar()">
           {{ metaEditando() ? 'Salvar alterações' : 'Criar meta' }}
         </button>
       </div>
-    </article>
+    </div>
   </div>
-
-  <article *ngIf="!carregando() && !metas().length" class="rounded-xl border border-dashed border-[#cbd5e1] bg-white p-6 text-sm text-[#64748b] dark:border-[#334155] dark:bg-[#1a242f] dark:text-slate-300">
-    Nenhuma meta cadastrada ainda. Use o formulário para criar a primeira.
-  </article>
 </section>

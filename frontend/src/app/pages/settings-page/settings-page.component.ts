@@ -62,7 +62,8 @@ export class SettingsPageComponent implements OnInit {
       monthlySummary: this.resumoMensal(),
       lowBalanceAlert: this.alertaSaldo(),
       securityAlert: this.alertaSeguranca(),
-      theme: this.perfil()?.theme ?? 'light'
+      // App é dark-only por ora; persiste 'dark' para não deixar o valor inconsistente.
+      theme: 'dark'
     }).subscribe({
       next: (p) => {
         this.perfil.set(p);

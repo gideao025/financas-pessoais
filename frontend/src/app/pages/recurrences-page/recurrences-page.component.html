@@ -1,114 +1,118 @@
-<section class="mx-auto flex w-full max-w-6xl flex-col gap-6">
+<section class="mx-auto flex w-full max-w-[1200px] flex-col gap-4 px-[30px] py-[22px]">
   <div class="flex flex-wrap items-center justify-between gap-3">
     <div>
-      <h2 class="text-3xl font-black tracking-tight">Recorrências</h2>
-      <p class="text-sm text-[#64748b]">Salários, contas fixas e tudo que se repete todo mês — alimenta a projeção de saldo.</p>
+      <h2 class="text-[22px] font-bold tracking-tight">Lançamentos fixos</h2>
+      <p class="text-[13px] text-dim">Salários, contas fixas e tudo que se repete todo mês — alimenta a projeção de saldo.</p>
     </div>
-    <button class="rounded-xl bg-primary px-4 py-2 text-sm font-bold text-white hover:bg-primary/90" (click)="abrirNova()">+ Nova Recorrência</button>
+    <button class="flex items-center gap-1.5 rounded-xl bg-gradient-to-br from-accent2 to-accentstrong px-4 py-2 text-[13px] font-bold text-[#0f0f13] hover:opacity-90" (click)="abrirNova()">
+      <span class="material-symbols-outlined text-[18px]">add</span> Nova recorrência
+    </button>
   </div>
 
-  <p *ngIf="erro()" class="rounded-lg bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 dark:bg-red-900/20 dark:text-red-400">{{ erro() }}</p>
-  <p *ngIf="mensagem()" class="rounded-lg bg-green-50 px-4 py-2 text-sm font-semibold text-green-600 dark:bg-green-900/20 dark:text-green-400">{{ mensagem() }}</p>
+  <p *ngIf="erro()" class="rounded-xl border border-neg/30 bg-neg/[0.12] px-4 py-2 text-sm font-semibold text-neg">{{ erro() }}</p>
+  <p *ngIf="mensagem()" class="rounded-xl border border-pos/30 bg-pos/[0.12] px-4 py-2 text-sm font-semibold text-pos">{{ mensagem() }}</p>
 
   <div *ngIf="!carregando()" class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-    <article class="rounded-xl border border-[#e5e7eb] bg-white p-5 dark:border-[#2a3441] dark:bg-[#1a242f]">
-      <p class="text-sm text-[#64748b]">Receitas fixas / mês</p>
-      <p class="text-3xl font-black text-green-600">{{ totalReceitas() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</p>
-    </article>
-    <article class="rounded-xl border border-[#e5e7eb] bg-white p-5 dark:border-[#2a3441] dark:bg-[#1a242f]">
-      <p class="text-sm text-[#64748b]">Despesas fixas / mês</p>
-      <p class="text-3xl font-black text-red-500">{{ totalDespesas() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</p>
-    </article>
+    <div class="rounded-2xl border border-bd bg-card p-5 shadow-card">
+      <p class="text-[11.5px] text-mut">Receitas fixas / mês</p>
+      <p class="num mt-1 text-[26px] font-bold text-pos">{{ totalReceitas() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</p>
+    </div>
+    <div class="rounded-2xl border border-bd bg-card p-5 shadow-card">
+      <p class="text-[11.5px] text-mut">Despesas fixas / mês</p>
+      <p class="num mt-1 text-[26px] font-bold text-neg">{{ totalDespesas() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</p>
+    </div>
   </div>
 
-  <article *ngIf="painelAberto()" class="rounded-xl border border-[#e5e7eb] bg-white p-5 dark:border-[#2a3441] dark:bg-[#1a242f]">
-    <h3 class="mb-4 text-lg font-bold">{{ editandoId() ? 'Editar Recorrência' : 'Nova Recorrência' }}</h3>
+  <div *ngIf="painelAberto()" class="rounded-[18px] border border-bd bg-card p-5 shadow-card">
+    <h3 class="mb-4 text-[13.5px] font-bold">{{ editandoId() ? 'Editar recorrência' : 'Nova recorrência' }}</h3>
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-      <label class="flex flex-col gap-1 text-xs font-bold">
+      <label class="flex flex-col gap-1.5 text-xs font-semibold text-tx2">
         Descrição
-        <input class="h-10 rounded-lg border border-[#dbe0e6] px-3 text-sm font-normal dark:border-[#2a3441] dark:bg-[#24313f]" placeholder="Ex: Salário, Aluguel, Internet" [value]="formDescricao()" (input)="formDescricao.set($any($event.target).value)" />
+        <input class="h-11 rounded-[11px] border border-bd bg-card2 px-3.5 text-sm font-normal text-tx outline-none focus:border-accent/40" placeholder="Ex: Salário, Aluguel, Internet" [value]="formDescricao()" (input)="formDescricao.set($any($event.target).value)" />
       </label>
-      <label class="flex flex-col gap-1 text-xs font-bold">
+      <label class="flex flex-col gap-1.5 text-xs font-semibold text-tx2">
         Tipo
-        <select class="h-10 rounded-lg border border-[#dbe0e6] px-3 text-sm font-normal dark:border-[#2a3441] dark:bg-[#24313f]" [value]="formTipo()" (change)="formTipo.set($any($event.target).value)">
+        <select class="h-11 rounded-[11px] border border-bd bg-card2 px-3.5 text-sm font-normal text-tx outline-none focus:border-accent/40" [value]="formTipo()" (change)="formTipo.set($any($event.target).value)">
           <option value="ENTRADA">Receita (entra)</option>
           <option value="SAIDA">Despesa (sai)</option>
         </select>
       </label>
-      <label class="flex flex-col gap-1 text-xs font-bold">
+      <label class="flex flex-col gap-1.5 text-xs font-semibold text-tx2">
         Valor (R$)
-        <input class="h-10 rounded-lg border border-[#dbe0e6] px-3 text-sm font-normal dark:border-[#2a3441] dark:bg-[#24313f]" placeholder="0,00" [value]="formValor()" (input)="formValor.set($any($event.target).value)" />
+        <input class="num h-11 rounded-[11px] border border-bd bg-card2 px-3.5 text-sm font-normal text-tx outline-none focus:border-accent/40" placeholder="0,00" [value]="formValor()" (input)="formValor.set($any($event.target).value)" />
       </label>
-      <label class="flex flex-col gap-1 text-xs font-bold">
+      <label class="flex flex-col gap-1.5 text-xs font-semibold text-tx2">
         Dia do mês
-        <input type="number" min="1" max="31" class="h-10 rounded-lg border border-[#dbe0e6] px-3 text-sm font-normal dark:border-[#2a3441] dark:bg-[#24313f]" [value]="formDia()" (input)="formDia.set($any($event.target).value)" />
+        <input type="number" min="1" max="31" class="num h-11 rounded-[11px] border border-bd bg-card2 px-3.5 text-sm font-normal text-tx outline-none focus:border-accent/40" [value]="formDia()" (input)="formDia.set($any($event.target).value)" />
       </label>
-      <label class="flex flex-col gap-1 text-xs font-bold">
+      <label class="flex flex-col gap-1.5 text-xs font-semibold text-tx2">
         Categoria
-        <input class="h-10 rounded-lg border border-[#dbe0e6] px-3 text-sm font-normal dark:border-[#2a3441] dark:bg-[#24313f]" placeholder="Ex: Renda, Moradia" [value]="formCategoria()" (input)="formCategoria.set($any($event.target).value)" />
+        <input class="h-11 rounded-[11px] border border-bd bg-card2 px-3.5 text-sm font-normal text-tx outline-none focus:border-accent/40" placeholder="Ex: Renda, Moradia" [value]="formCategoria()" (input)="formCategoria.set($any($event.target).value)" />
       </label>
-      <label class="flex flex-col gap-1 text-xs font-bold">
+      <label class="flex flex-col gap-1.5 text-xs font-semibold text-tx2">
         Conta (opcional)
-        <select class="h-10 rounded-lg border border-[#dbe0e6] px-3 text-sm font-normal dark:border-[#2a3441] dark:bg-[#24313f]" [value]="formContaId()" (change)="formContaId.set($any($event.target).value)">
+        <select class="h-11 rounded-[11px] border border-bd bg-card2 px-3.5 text-sm font-normal text-tx outline-none focus:border-accent/40" [value]="formContaId()" (change)="formContaId.set($any($event.target).value)">
           <option value="">Sem conta</option>
           <option *ngFor="let conta of contas()" [value]="conta.id">{{ conta.name }}</option>
         </select>
       </label>
     </div>
     <div class="mt-4 flex gap-2">
-      <button class="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white disabled:opacity-60" [disabled]="salvando()" (click)="salvar()">
+      <button class="rounded-xl bg-gradient-to-br from-accent2 to-accentstrong px-4 py-2 text-sm font-bold text-[#0f0f13] hover:opacity-90 disabled:opacity-60" [disabled]="salvando()" (click)="salvar()">
         {{ salvando() ? 'Salvando...' : 'Salvar' }}
       </button>
-      <button class="rounded-lg border border-[#dbe0e6] px-4 py-2 text-sm font-bold dark:border-[#2a3441]" (click)="fecharPainel()">Cancelar</button>
+      <button class="rounded-xl border border-bd px-4 py-2 text-sm font-semibold text-tx2 hover:border-accent/40" (click)="fecharPainel()">Cancelar</button>
     </div>
-  </article>
+  </div>
 
-  <div *ngIf="carregando()" class="py-16 text-center text-sm text-[#64748b]">Carregando recorrências...</div>
+  <div *ngIf="carregando()" class="py-16 text-center text-sm text-dim">Carregando recorrências...</div>
 
-  <div *ngIf="!carregando() && !recorrencias().length && !painelAberto()" class="rounded-xl border border-dashed border-[#dbe0e6] py-16 text-center text-sm text-[#64748b] dark:border-[#2a3441]">
+  <div *ngIf="!carregando() && !recorrencias().length && !painelAberto()" class="rounded-2xl border border-dashed border-bd py-16 text-center text-sm text-dim">
     Nenhuma recorrência cadastrada. Cadastre os salários e contas fixas para ver a projeção de saldo.
   </div>
 
-  <article *ngIf="!carregando() && recorrencias().length" class="overflow-hidden rounded-xl border border-[#e5e7eb] bg-white dark:border-[#2a3441] dark:bg-[#1a242f]">
-    <table class="w-full min-w-[720px] text-left">
-      <thead class="text-xs uppercase tracking-wider text-[#64748b]">
-        <tr>
-          <th class="px-5 py-3">Descrição</th>
-          <th class="px-5 py-3">Tipo</th>
-          <th class="px-5 py-3">Dia</th>
-          <th class="px-5 py-3">Conta</th>
-          <th class="px-5 py-3 text-right">Valor</th>
-          <th class="px-5 py-3">Status</th>
-          <th class="px-5 py-3 text-right">Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let r of recorrencias()" class="border-t border-[#eef2f6] dark:border-[#2a3441]" [ngClass]="{ 'opacity-50': !r.active }">
-          <td class="px-5 py-3 font-bold">{{ r.description }}<span class="ml-2 text-xs font-normal text-[#64748b]">{{ r.category }}</span></td>
-          <td class="px-5 py-3">
-            <span class="rounded-full px-2 py-0.5 text-xs font-bold" [ngClass]="r.transactionType === 'ENTRADA' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400'">
-              {{ r.transactionType === 'ENTRADA' ? 'Receita' : 'Despesa' }}
-            </span>
-          </td>
-          <td class="px-5 py-3">dia {{ r.dayOfMonth }}</td>
-          <td class="px-5 py-3 text-[#64748b]">{{ nomeConta(r.accountId) }}</td>
-          <td class="px-5 py-3 text-right font-semibold" [ngClass]="r.transactionType === 'ENTRADA' ? 'text-green-600' : 'text-red-500'">
-            {{ r.transactionType === 'ENTRADA' ? '+' : '-' }}{{ r.amount | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
-          </td>
-          <td class="px-5 py-3">
-            <span class="rounded-full px-2 py-0.5 text-xs font-bold" [ngClass]="r.active ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-[#eef2f6] text-[#64748b] dark:bg-[#24313f]'">
-              {{ r.active ? 'Ativa' : 'Inativa' }}
-            </span>
-          </td>
-          <td class="px-5 py-3">
-            <div class="flex justify-end gap-2">
-              <button class="rounded-lg border border-primary px-3 py-1.5 text-xs font-bold text-primary" (click)="abrirEdicao(r)">Editar</button>
-              <button class="rounded-lg border border-[#dbe0e6] px-3 py-1.5 text-xs font-bold dark:border-[#2a3441]" (click)="alternarStatus(r)">{{ r.active ? 'Desativar' : 'Ativar' }}</button>
-              <button class="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-bold text-red-500 dark:border-red-900/40" (click)="remover(r)">Excluir</button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </article>
+  <div *ngIf="!carregando() && recorrencias().length" class="overflow-hidden rounded-[16px] border border-bd bg-card shadow-card">
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[720px] text-left text-[12.5px]">
+        <thead class="text-[10.5px] uppercase tracking-wider text-dim">
+          <tr>
+            <th class="px-5 py-3 font-semibold">Descrição</th>
+            <th class="px-5 py-3 font-semibold">Tipo</th>
+            <th class="px-5 py-3 font-semibold">Dia</th>
+            <th class="px-5 py-3 font-semibold">Conta</th>
+            <th class="px-5 py-3 text-right font-semibold">Valor</th>
+            <th class="px-5 py-3 font-semibold">Status</th>
+            <th class="px-5 py-3 text-right font-semibold">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of recorrencias()" class="border-t border-bd2" [ngClass]="{ 'opacity-50': !r.active }">
+            <td class="px-5 py-3 font-semibold">{{ r.description }}<span class="ml-2 text-[11px] font-normal text-dim">{{ r.category }}</span></td>
+            <td class="px-5 py-3">
+              <span class="rounded-full px-2 py-0.5 text-[10.5px] font-semibold" [ngClass]="r.transactionType === 'ENTRADA' ? 'bg-pos/[0.14] text-pos' : 'bg-chip text-tx2'">
+                {{ r.transactionType === 'ENTRADA' ? 'Entrada' : 'Saída' }}
+              </span>
+            </td>
+            <td class="px-5 py-3 text-mut">dia {{ r.dayOfMonth }}</td>
+            <td class="px-5 py-3 text-mut">{{ nomeConta(r.accountId) }}</td>
+            <td class="num px-5 py-3 text-right font-semibold" [ngClass]="r.transactionType === 'ENTRADA' ? 'text-pos' : 'text-tx2'">
+              {{ r.transactionType === 'ENTRADA' ? '+' : '−' }}{{ r.amount | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+            </td>
+            <td class="px-5 py-3">
+              <span class="rounded-full px-2 py-0.5 text-[10.5px] font-semibold" [ngClass]="r.active ? 'bg-pos/[0.14] text-pos' : 'bg-chip text-dim'">
+                {{ r.active ? 'Ativa' : 'Inativa' }}
+              </span>
+            </td>
+            <td class="px-5 py-3">
+              <div class="flex justify-end gap-2">
+                <button class="rounded-lg border border-accent/40 px-3 py-1.5 text-[11px] font-semibold text-accent hover:bg-accent/[0.14]" (click)="abrirEdicao(r)">Editar</button>
+                <button class="rounded-lg border border-bd px-3 py-1.5 text-[11px] font-semibold text-tx2 hover:border-accent/40" (click)="alternarStatus(r)">{{ r.active ? 'Desativar' : 'Ativar' }}</button>
+                <button class="rounded-lg border border-neg/40 px-3 py-1.5 text-[11px] font-semibold text-neg hover:bg-neg/[0.12]" (click)="remover(r)">Excluir</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </section>

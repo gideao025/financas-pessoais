@@ -1,70 +1,78 @@
-<section class="mx-auto flex w-full max-w-6xl flex-col gap-6">
+<section class="mx-auto flex w-full max-w-[680px] flex-col gap-4 px-[30px] py-[22px]">
   <div>
-    <h2 class="text-3xl font-black tracking-tight">Configurações da Conta</h2>
-    <p class="text-sm text-[#64748b]">Gerencie perfil e preferências de notificação.</p>
+    <h2 class="text-[22px] font-bold tracking-tight">Configurações</h2>
+    <p class="text-[13px] text-dim">Perfil e preferências de notificação.</p>
   </div>
 
-  <p *ngIf="erro()" class="rounded-lg bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 dark:bg-red-900/20 dark:text-red-400">{{ erro() }}</p>
-  <p *ngIf="mensagem()" class="rounded-lg bg-green-50 px-4 py-2 text-sm font-semibold text-green-600 dark:bg-green-900/20 dark:text-green-400">{{ mensagem() }}</p>
-  <div *ngIf="carregando()" class="py-16 text-center text-sm text-[#64748b]">Carregando configurações...</div>
+  <p *ngIf="erro()" class="rounded-xl border border-neg/30 bg-neg/[0.12] px-4 py-2 text-sm font-semibold text-neg">{{ erro() }}</p>
+  <p *ngIf="mensagem()" class="rounded-xl border border-pos/30 bg-pos/[0.12] px-4 py-2 text-sm font-semibold text-pos">{{ mensagem() }}</p>
+  <div *ngIf="carregando()" class="py-16 text-center text-sm text-dim">Carregando configurações...</div>
 
   <ng-container *ngIf="!carregando()">
-    <article class="rounded-xl border border-[#e5e7eb] bg-white p-5 dark:border-[#2a3441] dark:bg-[#1a242f]">
-      <div class="flex flex-wrap items-center justify-between gap-4">
-        <div class="flex items-center gap-4">
-          <div class="flex size-20 items-center justify-center rounded-full bg-primary/10 text-2xl font-black text-primary">
-            {{ nome() ? nome()[0].toUpperCase() : '?' }}
-          </div>
-          <div>
-            <p class="text-xl font-bold">{{ nome() }}</p>
-            <p class="text-sm text-[#64748b]">{{ email() }}</p>
-          </div>
+    <!-- perfil -->
+    <div class="rounded-2xl border border-bd bg-card p-5 shadow-card">
+      <div class="flex items-center gap-3.5">
+        <div class="flex h-[52px] w-[52px] items-center justify-center rounded-[14px] bg-chip text-[17px] font-bold text-accentsoft">
+          {{ nome() ? nome()[0].toUpperCase() : '?' }}
         </div>
-        <button class="rounded-lg bg-primary px-3 py-2 text-sm font-bold text-white" [disabled]="salvando()" (click)="salvar()">
-          {{ salvando() ? 'Salvando...' : 'Salvar Alterações' }}
+        <div>
+          <div class="text-[15px] font-bold">{{ nome() }}</div>
+          <div class="text-[12.5px] text-mut">{{ email() }}</div>
+        </div>
+        <button class="ml-auto rounded-xl bg-gradient-to-br from-accent2 to-accentstrong px-4 py-2 text-[12.5px] font-bold text-[#0f0f13] hover:opacity-90" [disabled]="salvando()" (click)="salvar()">
+          {{ salvando() ? 'Salvando...' : 'Salvar' }}
         </button>
       </div>
-    </article>
+    </div>
 
-    <article class="grid grid-cols-1 gap-4 rounded-xl border border-[#e5e7eb] bg-white p-5 md:grid-cols-2 dark:border-[#2a3441] dark:bg-[#1a242f]">
-      <label class="flex flex-col gap-1">
-        <span class="text-xs font-bold">Nome</span>
-        <input class="h-10 w-full rounded-lg border border-[#dbe0e6] px-3 text-sm dark:border-[#2a3441] dark:bg-[#24313f]" [value]="nome()" (input)="nome.set($any($event.target).value)" />
+    <!-- dados -->
+    <div class="grid grid-cols-1 gap-4 rounded-2xl border border-bd bg-card p-5 shadow-card md:grid-cols-2">
+      <label class="flex flex-col gap-1.5">
+        <span class="text-xs font-semibold text-tx2">Nome</span>
+        <input class="h-11 rounded-[11px] border border-bd bg-card2 px-3.5 text-sm text-tx outline-none focus:border-accent/40" [value]="nome()" (input)="nome.set($any($event.target).value)" />
       </label>
-      <label class="flex flex-col gap-1">
-        <span class="text-xs font-bold">E-mail</span>
-        <input type="email" class="h-10 w-full rounded-lg border border-[#dbe0e6] px-3 text-sm dark:border-[#2a3441] dark:bg-[#24313f]" [value]="email()" (input)="email.set($any($event.target).value)" />
+      <label class="flex flex-col gap-1.5">
+        <span class="text-xs font-semibold text-tx2">E-mail</span>
+        <input type="email" class="h-11 rounded-[11px] border border-bd bg-card2 px-3.5 text-sm text-tx outline-none focus:border-accent/40" [value]="email()" (input)="email.set($any($event.target).value)" />
       </label>
-    </article>
+    </div>
 
-    <article class="rounded-xl border border-[#e5e7eb] bg-white dark:border-[#2a3441] dark:bg-[#1a242f]">
-      <div class="flex items-center justify-between border-b border-[#e5e7eb] p-4 dark:border-[#2a3441]">
+    <!-- preferências -->
+    <div class="overflow-hidden rounded-2xl border border-bd bg-card shadow-card">
+      <div class="border-b border-bd2 px-5 py-3.5 text-xs font-bold uppercase tracking-wider text-mut">Preferências</div>
+
+      <div class="flex cursor-pointer items-center gap-3.5 border-b border-bd2 px-5 py-4" (click)="alternarPreferencia('resumoMensal')">
+        <span class="material-symbols-outlined text-[21px] text-dim">summarize</span>
         <div>
-          <p class="text-sm font-bold">Resumos Mensais</p>
-          <p class="text-xs text-[#64748b]">Receba relatório detalhado por e-mail.</p>
+          <div class="text-[13.5px] font-semibold">Resumos mensais</div>
+          <div class="text-[11.5px] text-dim">Relatório detalhado por e-mail</div>
         </div>
-        <button class="text-sm font-bold" [ngClass]="resumoMensal() ? 'text-primary' : 'text-[#64748b]'" (click)="alternarPreferencia('resumoMensal')">
-          {{ resumoMensal() ? 'Ativado' : 'Desativado' }}
-        </button>
+        <div class="ml-auto h-[26px] w-11 rounded-full transition-colors" [ngClass]="resumoMensal() ? 'bg-accentstrong' : 'bg-chip'">
+          <div class="mt-[3px] h-5 w-5 rounded-full bg-white shadow transition-all" [ngClass]="resumoMensal() ? 'ml-[21px]' : 'ml-[3px]'"></div>
+        </div>
       </div>
-      <div class="flex items-center justify-between border-b border-[#e5e7eb] p-4 dark:border-[#2a3441]">
+
+      <div class="flex cursor-pointer items-center gap-3.5 border-b border-bd2 px-5 py-4" (click)="alternarPreferencia('alertaSaldo')">
+        <span class="material-symbols-outlined text-[21px] text-accent">notifications</span>
         <div>
-          <p class="text-sm font-bold">Alertas de Saldo Baixo</p>
-          <p class="text-xs text-[#64748b]">Aviso quando saldo for menor que R$ 500.</p>
+          <div class="text-[13.5px] font-semibold">Alertas de saldo negativo</div>
+          <div class="text-[11.5px] text-dim">Avisar quando a projeção ficar no vermelho</div>
         </div>
-        <button class="text-sm font-bold" [ngClass]="alertaSaldo() ? 'text-primary' : 'text-[#64748b]'" (click)="alternarPreferencia('alertaSaldo')">
-          {{ alertaSaldo() ? 'Ativado' : 'Desativado' }}
-        </button>
+        <div class="ml-auto h-[26px] w-11 rounded-full transition-colors" [ngClass]="alertaSaldo() ? 'bg-accentstrong' : 'bg-chip'">
+          <div class="mt-[3px] h-5 w-5 rounded-full bg-white shadow transition-all" [ngClass]="alertaSaldo() ? 'ml-[21px]' : 'ml-[3px]'"></div>
+        </div>
       </div>
-      <div class="flex items-center justify-between p-4">
+
+      <div class="flex cursor-pointer items-center gap-3.5 px-5 py-4" (click)="alternarPreferencia('alertaSeguranca')">
+        <span class="material-symbols-outlined text-[21px] text-dim">shield</span>
         <div>
-          <p class="text-sm font-bold">Avisos de Segurança</p>
-          <p class="text-xs text-[#64748b]">Alertas para login e atividade suspeita.</p>
+          <div class="text-[13.5px] font-semibold">Avisos de segurança</div>
+          <div class="text-[11.5px] text-dim">Alertas para login e atividade suspeita</div>
         </div>
-        <button class="text-sm font-bold" [ngClass]="alertaSeguranca() ? 'text-primary' : 'text-[#64748b]'" (click)="alternarPreferencia('alertaSeguranca')">
-          {{ alertaSeguranca() ? 'Ativado' : 'Desativado' }}
-        </button>
+        <div class="ml-auto h-[26px] w-11 rounded-full transition-colors" [ngClass]="alertaSeguranca() ? 'bg-accentstrong' : 'bg-chip'">
+          <div class="mt-[3px] h-5 w-5 rounded-full bg-white shadow transition-all" [ngClass]="alertaSeguranca() ? 'ml-[21px]' : 'ml-[3px]'"></div>
+        </div>
       </div>
-    </article>
+    </div>
   </ng-container>
 </section>

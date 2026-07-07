@@ -1,31 +1,33 @@
-<section class="mx-auto flex w-full max-w-6xl flex-col gap-6">
+<section class="mx-auto flex w-full max-w-[1200px] flex-col gap-4 px-[30px] py-[22px]">
   <div class="flex flex-wrap items-center justify-between gap-3">
     <div>
-      <h2 class="text-3xl font-black tracking-tight">Gerenciador de Cartões de Crédito</h2>
-      <p class="text-sm text-[#64748b]">Gerencie limites, fechamento, vencimento e fatura dos seus cartões.</p>
+      <h2 class="text-[22px] font-bold tracking-tight">Cartões de crédito</h2>
+      <p class="text-[13px] text-dim">Limites, fechamento, vencimento e fatura dos seus cartões.</p>
     </div>
-    <button class="rounded-xl bg-primary px-4 py-2 text-sm font-bold text-white" (click)="novoCartao()">Novo Cartão</button>
+    <button class="flex items-center gap-1.5 rounded-xl bg-gradient-to-br from-accent2 to-accentstrong px-4 py-2 text-[13px] font-bold text-[#0f0f13] hover:opacity-90" (click)="novoCartao()">
+      <span class="material-symbols-outlined text-[18px]">add</span> Novo cartão
+    </button>
   </div>
 
-  <p *ngIf="erro()" class="rounded-lg bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 dark:bg-red-900/20 dark:text-red-400">{{ erro() }}</p>
-  <p *ngIf="mensagem()" class="rounded-lg bg-green-50 px-4 py-2 text-sm font-semibold text-green-600 dark:bg-green-900/20 dark:text-green-400">{{ mensagem() }}</p>
+  <p *ngIf="erro()" class="rounded-xl border border-neg/30 bg-neg/[0.12] px-4 py-2 text-sm font-semibold text-neg">{{ erro() }}</p>
+  <p *ngIf="mensagem()" class="rounded-xl border border-pos/30 bg-pos/[0.12] px-4 py-2 text-sm font-semibold text-pos">{{ mensagem() }}</p>
 
-  <div *ngIf="carregando()" class="py-16 text-center text-sm text-[#64748b]">Carregando cartões...</div>
+  <div *ngIf="carregando()" class="py-16 text-center text-sm text-dim">Carregando cartões...</div>
 
-  <div *ngIf="!carregando() && !cartoes().length && !painelAberto()" class="rounded-xl border border-dashed border-[#dbe0e6] py-16 text-center text-sm text-[#64748b] dark:border-[#2a3441]">
-    Nenhum cartão cadastrado. Clique em <strong>Novo Cartão</strong> para adicionar.
+  <div *ngIf="!carregando() && !cartoes().length && !painelAberto()" class="rounded-2xl border border-dashed border-bd py-16 text-center text-sm text-dim">
+    Nenhum cartão cadastrado. Clique em <strong class="text-tx2">Novo cartão</strong> para adicionar.
   </div>
 
-  <article *ngIf="painelAberto()" class="rounded-xl border border-[#e5e7eb] bg-white p-5 dark:border-[#2a3441] dark:bg-[#1a242f]">
-    <h3 class="mb-4 text-lg font-bold">{{ editandoId() ? 'Editar Cartão' : 'Novo Cartão' }}</h3>
+  <div *ngIf="painelAberto()" class="rounded-[18px] border border-bd bg-card p-5 shadow-card">
+    <h3 class="mb-4 text-[13.5px] font-bold">{{ editandoId() ? 'Editar cartão' : 'Novo cartão' }}</h3>
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-      <label class="flex flex-col gap-1 text-xs font-bold">
+      <label class="flex flex-col gap-1.5 text-xs font-semibold text-tx2">
         Nome do cartão
-        <input class="h-10 rounded-lg border border-[#dbe0e6] px-3 text-sm font-normal dark:border-[#2a3441] dark:bg-[#24313f]" placeholder="Ex: Nubank Ultravioleta" [value]="formNome()" (input)="formNome.set($any($event.target).value)" />
+        <input class="h-11 rounded-[11px] border border-bd bg-card2 px-3.5 text-sm font-normal text-tx outline-none focus:border-accent/40" placeholder="Ex: Nubank Ultravioleta" [value]="formNome()" (input)="formNome.set($any($event.target).value)" />
       </label>
-      <label class="flex flex-col gap-1 text-xs font-bold">
+      <label class="flex flex-col gap-1.5 text-xs font-semibold text-tx2">
         Bandeira
-        <select class="h-10 rounded-lg border border-[#dbe0e6] px-3 text-sm font-normal dark:border-[#2a3441] dark:bg-[#24313f]" [value]="formBandeira()" (change)="formBandeira.set($any($event.target).value)">
+        <select class="h-11 rounded-[11px] border border-bd bg-card2 px-3.5 text-sm font-normal text-tx outline-none focus:border-accent/40" [value]="formBandeira()" (change)="formBandeira.set($any($event.target).value)">
           <option>Mastercard</option>
           <option>Visa</option>
           <option>Elo</option>
@@ -33,89 +35,101 @@
           <option>Hipercard</option>
         </select>
       </label>
-      <label class="flex flex-col gap-1 text-xs font-bold">
+      <label class="flex flex-col gap-1.5 text-xs font-semibold text-tx2">
         4 últimos dígitos
-        <input class="h-10 rounded-lg border border-[#dbe0e6] px-3 text-sm font-normal dark:border-[#2a3441] dark:bg-[#24313f]" placeholder="0000" maxlength="4" [value]="formFinal()" (input)="formFinal.set($any($event.target).value)" />
+        <input class="num h-11 rounded-[11px] border border-bd bg-card2 px-3.5 text-sm font-normal text-tx outline-none focus:border-accent/40" placeholder="0000" maxlength="4" [value]="formFinal()" (input)="formFinal.set($any($event.target).value)" />
       </label>
-      <label class="flex flex-col gap-1 text-xs font-bold">
+      <label class="flex flex-col gap-1.5 text-xs font-semibold text-tx2">
         Limite total (R$)
-        <input class="h-10 rounded-lg border border-[#dbe0e6] px-3 text-sm font-normal dark:border-[#2a3441] dark:bg-[#24313f]" placeholder="0,00" [value]="formLimite()" (input)="formLimite.set($any($event.target).value)" />
+        <input class="num h-11 rounded-[11px] border border-bd bg-card2 px-3.5 text-sm font-normal text-tx outline-none focus:border-accent/40" placeholder="0,00" [value]="formLimite()" (input)="formLimite.set($any($event.target).value)" />
       </label>
-      <label class="flex flex-col gap-1 text-xs font-bold">
+      <label class="flex flex-col gap-1.5 text-xs font-semibold text-tx2">
         Dia de fechamento
-        <input type="number" min="1" max="31" class="h-10 rounded-lg border border-[#dbe0e6] px-3 text-sm font-normal dark:border-[#2a3441] dark:bg-[#24313f]" [value]="formFechamento()" (input)="formFechamento.set($any($event.target).value)" />
+        <input type="number" min="1" max="31" class="num h-11 rounded-[11px] border border-bd bg-card2 px-3.5 text-sm font-normal text-tx outline-none focus:border-accent/40" [value]="formFechamento()" (input)="formFechamento.set($any($event.target).value)" />
       </label>
-      <label class="flex flex-col gap-1 text-xs font-bold">
+      <label class="flex flex-col gap-1.5 text-xs font-semibold text-tx2">
         Dia de vencimento
-        <input type="number" min="1" max="31" class="h-10 rounded-lg border border-[#dbe0e6] px-3 text-sm font-normal dark:border-[#2a3441] dark:bg-[#24313f]" [value]="formVencimento()" (input)="formVencimento.set($any($event.target).value)" />
+        <input type="number" min="1" max="31" class="num h-11 rounded-[11px] border border-bd bg-card2 px-3.5 text-sm font-normal text-tx outline-none focus:border-accent/40" [value]="formVencimento()" (input)="formVencimento.set($any($event.target).value)" />
       </label>
     </div>
-    <p class="mt-3 text-xs text-[#64748b]">O limite usado é calculado automaticamente a partir das compras lançadas no cartão.</p>
+    <p class="mt-3 text-[11px] text-dim">O limite usado é calculado automaticamente a partir das compras lançadas no cartão.</p>
     <div class="mt-4 flex gap-2">
-      <button class="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white" (click)="salvarCartao()">Salvar</button>
-      <button class="rounded-lg border border-[#dbe0e6] px-4 py-2 text-sm font-bold dark:border-[#2a3441]" (click)="fecharPainel()">Cancelar</button>
+      <button class="rounded-xl bg-gradient-to-br from-accent2 to-accentstrong px-4 py-2 text-sm font-bold text-[#0f0f13] hover:opacity-90" (click)="salvarCartao()">Salvar</button>
+      <button class="rounded-xl border border-bd px-4 py-2 text-sm font-semibold text-tx2 hover:border-accent/40" (click)="fecharPainel()">Cancelar</button>
     </div>
-  </article>
+  </div>
 
-  <div *ngIf="!carregando()" class="flex gap-6 overflow-x-auto pb-2">
+  <div *ngIf="!carregando()" class="flex gap-5 overflow-x-auto pb-2">
     <article *ngFor="let card of cartoes()" class="w-[360px] shrink-0 space-y-4">
-      <div class="h-52 rounded-2xl p-6 text-white shadow-xl" [ngClass]="card.blocked ? 'card-gradient-dark' : 'card-gradient-blue'">
+      <!-- cartão visual -->
+      <div class="relative h-52 overflow-hidden rounded-[18px] p-6 text-white shadow-[0_12px_30px_-12px_rgba(124,92,240,.6)]" [ngClass]="card.blocked ? 'card-gradient-dark' : 'card-gradient-blue'">
+        <div class="absolute -right-8 -top-8 h-36 w-36 rounded-full bg-white/[0.08]"></div>
         <div class="flex h-full flex-col justify-between">
           <div class="flex items-center justify-between">
-            <p class="text-xs uppercase tracking-widest">{{ card.brand }}</p>
-            <p class="text-lg font-black">{{ card.name }}</p>
+            <span class="text-[15px] font-bold">{{ card.name }}</span>
+            <span class="material-symbols-outlined text-[26px] opacity-85">contactless</span>
           </div>
-          <div>
-            <p class="text-xs opacity-80">Saldo Devedor</p>
-            <p class="text-4xl font-black">{{ card.usedLimit | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</p>
+          <div class="num text-[19px] tracking-[0.14em]">···· ···· ···· {{ card.lastFour }}</div>
+          <div class="flex items-end justify-between">
+            <div>
+              <div class="text-[10px] opacity-70">Fatura atual</div>
+              <div class="num text-xl font-semibold">{{ card.usedLimit | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</div>
+            </div>
+            <div class="text-right">
+              <div class="text-[10px] opacity-70">Fecha em</div>
+              <div class="num text-[13px] font-semibold">dia {{ card.closingDay }}</div>
+            </div>
           </div>
-          <p class="text-sm">**** {{ card.lastFour }}</p>
         </div>
       </div>
 
-      <div class="rounded-xl border border-[#e5e7eb] bg-white p-5 dark:border-[#2a3441] dark:bg-[#1a242f]">
-        <p class="text-xs font-bold uppercase tracking-wider text-[#64748b]">Saldo Disponível</p>
-        <p class="text-lg font-bold text-primary">{{ card.availableLimit | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }} / {{ card.creditLimit | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</p>
-        <div class="mt-3 h-2 rounded-full bg-[#eef2f6] dark:bg-[#24313f]"><div class="h-2 rounded-full bg-primary" [style.width.%]="card.creditLimit ? (card.usedLimit / card.creditLimit) * 100 : 0"></div></div>
-        <div class="mt-4 flex items-center justify-between text-sm text-[#64748b]">
+      <!-- info -->
+      <div class="rounded-[16px] border border-bd bg-card p-5 shadow-card">
+        <p class="text-[11px] font-semibold uppercase tracking-wider text-dim">Limite disponível</p>
+        <p class="num text-lg font-bold text-accent">{{ card.availableLimit | currency: 'BRL' : 'symbol' : '1.0-0' : 'pt-BR' }} <span class="text-mut">/ {{ card.creditLimit | currency: 'BRL' : 'symbol' : '1.0-0' : 'pt-BR' }}</span></p>
+        <div class="mt-3 h-2 overflow-hidden rounded-full bg-chip">
+          <div class="h-2 rounded-full" [ngClass]="card.creditLimit && card.usedLimit / card.creditLimit > 0.85 ? 'bg-neg' : 'bg-accent2'" [style.width.%]="card.creditLimit ? (card.usedLimit / card.creditLimit) * 100 : 0"></div>
+        </div>
+        <div class="mt-4 flex items-center justify-between text-[12.5px] text-mut">
           <span>Fecha dia {{ card.closingDay }}</span>
           <span>Vence dia {{ card.dueDay }}</span>
         </div>
         <div class="mt-4 flex flex-wrap items-center gap-2">
-          <button class="rounded-lg bg-primary px-3 py-1.5 text-xs font-bold text-white" (click)="verFatura(card)">{{ faturaCartaoId() === card.id ? 'Ocultar fatura' : 'Ver fatura' }}</button>
-          <button class="rounded-lg border border-[#dbe0e6] px-3 py-1.5 text-xs font-bold dark:border-[#2a3441]" (click)="editarCartao(card)">Editar</button>
-          <button class="rounded-lg border border-primary px-3 py-1.5 text-xs font-bold text-primary" (click)="alternarBloqueio(card.id)">{{ card.blocked ? 'Desbloquear' : 'Bloquear' }}</button>
+          <button class="rounded-lg bg-accent/[0.14] px-3 py-1.5 text-[11px] font-semibold text-accent hover:bg-accent/20" (click)="verFatura(card)">{{ faturaCartaoId() === card.id ? 'Ocultar fatura' : 'Ver fatura' }}</button>
+          <button class="rounded-lg border border-bd px-3 py-1.5 text-[11px] font-semibold text-tx2 hover:border-accent/40" (click)="editarCartao(card)">Editar</button>
+          <button class="rounded-lg border border-bd px-3 py-1.5 text-[11px] font-semibold text-tx2 hover:border-accent/40" (click)="alternarBloqueio(card.id)">{{ card.blocked ? 'Desbloquear' : 'Bloquear' }}</button>
         </div>
       </div>
 
-      <div *ngIf="faturaCartaoId() === card.id" class="rounded-xl border border-[#e5e7eb] bg-white p-5 dark:border-[#2a3441] dark:bg-[#1a242f]">
-        <div *ngIf="faturaCarregando()" class="py-6 text-center text-sm text-[#64748b]">Carregando fatura...</div>
+      <!-- fatura -->
+      <div *ngIf="faturaCartaoId() === card.id" class="rounded-[16px] border border-bd bg-card p-5 shadow-card">
+        <div *ngIf="faturaCarregando()" class="py-6 text-center text-sm text-dim">Carregando fatura...</div>
 
         <div *ngIf="!faturaCarregando() && fatura() as f">
           <div class="flex items-center justify-between">
-            <button class="rounded-lg p-1 hover:bg-[#eef2f6] dark:hover:bg-[#24313f]" (click)="navegarFatura(-1)">
-              <span class="material-symbols-outlined text-lg">chevron_left</span>
+            <button class="rounded-lg p-1 hover:bg-card2" (click)="navegarFatura(-1)">
+              <span class="material-symbols-outlined text-lg text-mut">chevron_left</span>
             </button>
             <div class="text-center">
               <p class="text-sm font-bold">Fatura {{ f.periodEnd | date: 'MMM/yyyy' : '' : 'pt-BR' }}</p>
-              <p class="text-xs text-[#64748b]">{{ f.periodStart | date: 'dd/MM' : '' : 'pt-BR' }} – {{ f.periodEnd | date: 'dd/MM' : '' : 'pt-BR' }} · vence {{ f.dueDate | date: 'dd/MM/yyyy' : '' : 'pt-BR' }}</p>
+              <p class="text-[11px] text-dim">{{ f.periodStart | date: 'dd/MM' : '' : 'pt-BR' }} – {{ f.periodEnd | date: 'dd/MM' : '' : 'pt-BR' }} · vence {{ f.dueDate | date: 'dd/MM/yyyy' : '' : 'pt-BR' }}</p>
             </div>
-            <button class="rounded-lg p-1 hover:bg-[#eef2f6] dark:hover:bg-[#24313f]" (click)="navegarFatura(1)">
-              <span class="material-symbols-outlined text-lg">chevron_right</span>
+            <button class="rounded-lg p-1 hover:bg-card2" (click)="navegarFatura(1)">
+              <span class="material-symbols-outlined text-lg text-mut">chevron_right</span>
             </button>
           </div>
 
-          <div class="my-3 flex items-baseline justify-between border-y border-[#eef2f6] py-2 dark:border-[#24313f]">
-            <span class="text-xs font-bold uppercase tracking-wider text-[#64748b]">Total da fatura</span>
-            <span class="text-xl font-black text-red-500">{{ f.total | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</span>
+          <div class="my-3 flex items-baseline justify-between border-y border-bd2 py-2.5">
+            <span class="text-[11px] font-semibold uppercase tracking-wider text-dim">Total da fatura</span>
+            <span class="num text-xl font-bold text-neg">{{ f.total | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</span>
           </div>
 
-          <p *ngIf="!f.transactions.length" class="py-4 text-center text-sm text-[#64748b]">Sem lançamentos nesta fatura.</p>
+          <p *ngIf="!f.transactions.length" class="py-4 text-center text-sm text-dim">Sem lançamentos nesta fatura.</p>
 
-          <ul *ngIf="f.transactions.length" class="divide-y divide-[#eef2f6] dark:divide-[#24313f]">
-            <li *ngFor="let t of f.transactions" class="flex items-center justify-between gap-2 py-2 text-sm">
+          <ul *ngIf="f.transactions.length" class="divide-y divide-bd2">
+            <li *ngFor="let t of f.transactions" class="flex items-center justify-between gap-2 py-2 text-[13px]">
               <span class="truncate">{{ t.description }}</span>
-              <span class="shrink-0 font-bold">{{ t.amount | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</span>
+              <span class="num shrink-0 font-semibold">{{ t.amount | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</span>
             </li>
           </ul>
         </div>

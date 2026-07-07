@@ -1,7 +1,7 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, tap } from 'rxjs';
+import { catchError, finalize, Observable, shareReplay, tap, throwError } from 'rxjs';
 
 import { resolveApiBaseUrl } from '../api.config';
 import type { AuthResponse, LoginRequest, RegisterRequest, UserSession } from '../models/api.models';
@@ -14,6 +14,8 @@ export class AuthService {
   private readonly storageKey = 'financas.session';
 
   private readonly sessionState = signal<UserSession | null>(this.readSession());
+  /** Requisição de refresh em andamento, compartilhada entre chamadas concorrentes. */
+  private refreshInFlight: Observable<AuthResponse> | null = null;
 
   readonly session = this.sessionState.asReadonly();
   readonly isAuthenticated = computed(() => !!this.sessionState()?.accessToken);
@@ -28,6 +30,35 @@ export class AuthService {
     return this.http
       .post<AuthResponse>(`${this.apiBaseUrl}/auth/register`, payload)
       .pipe(tap((response) => this.storeSession(response)));
+  }
+
+  hasRefreshToken(): boolean {
+    return !!this.sessionState()?.refreshToken;
+  }
+
+  /** Renova o access token usando o refresh token (rotacionado pelo backend). Compartilha uma única chamada. */
+  refresh(): Observable<AuthResponse> {
+    if (this.refreshInFlight) {
+      return this.refreshInFlight;
+    }
+    const refreshToken = this.sessionState()?.refreshToken;
+    if (!refreshToken) {
+      return throwError(() => new Error('Sessao sem refresh token.'));
+    }
+    this.refreshInFlight = this.http
+      .post<AuthResponse>(`${this.apiBaseUrl}/auth/refresh`, { refreshToken })
+      .pipe(
+        tap((response) => this.storeSession(response)),
+        finalize(() => {
+          this.refreshInFlight = null;
+        }),
+        shareReplay(1),
+        catchError((error) => {
+          this.clearSession();
+          return throwError(() => error);
+        })
+      );
+    return this.refreshInFlight;
   }
 
   logout(redirectToAuth = true): void {
