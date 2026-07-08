@@ -29,6 +29,7 @@ interface UiTransaction {
   restante: number;
   tipo: 'entrada' | 'saida';
   status: 'concluida' | 'pendente' | 'parcial';
+  atrasada: boolean;
   recorrente: boolean;
   vencimento: string | null;
 }
@@ -54,6 +55,7 @@ export class TransactionsPageComponent implements OnInit {
   protected readonly busca = signal('');
   protected readonly tipoSelecionado = signal<'todos' | 'entrada' | 'saida'>('todos');
   protected readonly statusSelecionado = signal<'todos' | 'concluida' | 'pendente'>('todos');
+  protected readonly situacao = signal<'todas' | 'pendentes' | 'pagas' | 'atrasadas'>('todas');
   protected readonly periodoSelecionado = signal<'esteMes' | 'todos'>('todos');
   protected readonly categoriaSelecionada = signal<'todas' | string>('todas');
   protected readonly contaSelecionada = signal<'todas' | string>('todas');
@@ -101,7 +103,15 @@ export class TransactionsPageComponent implements OnInit {
       const bateConta = this.contaSelecionada() === 'todas' || item.conta === this.contaSelecionada();
       const bateCartao =
         this.cartaoSelecionado() === 'todos' || item.cartaoId === this.cartaoSelecionado();
-      return bateBusca && bateTipo && bateStatus && batePeriodo && bateCategoria && bateConta && bateCartao;
+      const s = this.situacao();
+      const bateSituacao =
+        s === 'todas' ||
+        (s === 'pagas' && item.status === 'concluida') ||
+        (s === 'pendentes' && item.status !== 'concluida') ||
+        (s === 'atrasadas' && item.atrasada);
+      return (
+        bateBusca && bateTipo && bateStatus && batePeriodo && bateCategoria && bateConta && bateCartao && bateSituacao
+      );
     })
   );
 
@@ -191,6 +201,16 @@ export class TransactionsPageComponent implements OnInit {
     this.periodoSelecionado.set(valor);
     this.pageIndex.set(1);
     this.carregarDados();
+  }
+
+  /** Troca a situação; "atrasadas" força período "todos" para incluir vencidas de meses anteriores. */
+  protected trocarSituacao(valor: 'todas' | 'pendentes' | 'pagas' | 'atrasadas'): void {
+    this.situacao.set(valor);
+    this.pageIndex.set(1);
+    if (valor === 'atrasadas' && this.periodoSelecionado() !== 'todos') {
+      this.periodoSelecionado.set('todos');
+      this.carregarDados();
+    }
   }
 
   /** Intervalo enviado ao backend conforme o período selecionado. */
@@ -432,8 +452,14 @@ export class TransactionsPageComponent implements OnInit {
       tipo: item.transactionType === 'ENTRADA' ? 'entrada' : 'saida',
       status:
         item.status === 'CONCLUIDA' ? 'concluida' : item.status === 'PARCIAL' ? 'parcial' : 'pendente',
+      atrasada:
+        item.status !== 'CONCLUIDA' && (item.dueDate ?? item.transactionDate) < this.hojeIso(),
       recorrente: !!item.recurrenceId,
       vencimento: item.dueDate
     };
+  }
+
+  private hojeIso(): string {
+    return this.iso(new Date());
   }
 }

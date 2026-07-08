@@ -64,6 +64,12 @@
       <option value="todos">Cartão: todos</option>
       <option *ngFor="let cartao of cartoes()" [value]="cartao.id">{{ cartao.name }}</option>
     </select>
+    <select class="h-[38px] rounded-[11px] border border-bd bg-card px-3 text-[12.5px] font-semibold text-tx2 outline-none focus:border-accent/40" [value]="situacao()" (change)="trocarSituacao(($any($event.target)).value)">
+      <option value="todas">Situação: todas</option>
+      <option value="pendentes">A pagar</option>
+      <option value="atrasadas">Atrasadas</option>
+      <option value="pagas">Pagas</option>
+    </select>
     <select class="h-[38px] rounded-[11px] border border-bd bg-card px-3 text-[12.5px] font-semibold text-tx2 outline-none focus:border-accent/40" [value]="periodoSelecionado()" (change)="trocarPeriodo(($any($event.target)).value)">
       <option value="esteMes">Período: este mês</option>
       <option value="todos">Período: todos</option>
@@ -104,13 +110,15 @@
                     </div>
                     <span
                       class="w-fit rounded-full px-1.5 py-0.5 text-[9.5px] font-semibold"
-                      [ngClass]="item.status === 'concluida' ? 'bg-pos/[0.14] text-pos' : item.status === 'parcial' ? 'bg-accent/[0.14] text-accent' : 'bg-neg/[0.14] text-neg'"
+                      [ngClass]="item.status === 'concluida' ? 'bg-pos/[0.14] text-pos' : item.atrasada ? 'bg-neg/[0.14] text-neg' : item.status === 'parcial' ? 'bg-accent/[0.14] text-accent' : 'bg-neg/[0.14] text-neg'"
                     >{{
                       item.status === 'concluida'
                         ? 'paga'
-                        : item.status === 'parcial'
-                          ? ('parcial · pago ' + (item.pago | currency: 'BRL' : 'symbol' : '1.0-0' : 'pt-BR') + ' de ' + (item.valor | currency: 'BRL' : 'symbol' : '1.0-0' : 'pt-BR'))
-                          : (item.vencimento ? 'pendente · vence ' + (item.vencimento | date: 'dd/MM' : '' : 'pt-BR') : 'pendente')
+                        : item.atrasada
+                          ? ('atrasada · venceu ' + (item.vencimento ?? item.data | date: 'dd/MM' : '' : 'pt-BR') + (item.status === 'parcial' ? ' · resta ' + (item.restante | currency: 'BRL' : 'symbol' : '1.0-0' : 'pt-BR') : ''))
+                          : item.status === 'parcial'
+                            ? ('parcial · pago ' + (item.pago | currency: 'BRL' : 'symbol' : '1.0-0' : 'pt-BR') + ' de ' + (item.valor | currency: 'BRL' : 'symbol' : '1.0-0' : 'pt-BR'))
+                            : (item.vencimento ? 'pendente · vence ' + (item.vencimento | date: 'dd/MM' : '' : 'pt-BR') : 'pendente')
                     }}</span>
                   </div>
                 </div>
