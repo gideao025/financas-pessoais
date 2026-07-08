@@ -50,15 +50,17 @@ O que já resolve "quais já paguei / quais faltam".
   a usar `paid_amount`** (modelo unificado: cada pagamento debita só a parcela paga).
 - **Front**: badge "parcial · pago X de Y" + input inline de pagamento (total ou parcial).
 
-### Fase 3 — Atraso e rollover  ·  **M–G (depende de regra de negócio)**
-Parte mais aberta; exige **decisões de produto** antes de estimar com precisão.
+### Fase 3 — Atraso  ·  ✅ **CONCLUÍDA (versão simplificada)**
+Decisões de produto tomadas: (1) **só sinaliza**, sem custo automático; (2) **sem multa/juros** —
+a diferença é lançada manualmente ao pagar; (3) o valor em aberto **continua no mesmo lançamento**.
 
-- Status `ATRASADA` (ou derivar de `due_date < hoje && não quitada`).
-- **Rollover**: o saldo não pago vira cobrança no mês seguinte? Como item novo ligado ao
-  original, ou o mesmo item que permanece em aberto?
-- **Custo por atraso**: multa fixa? percentual? juros por dia? Isso vira campo(s) na recorrência
-  (ex.: `late_fee`, `interest_rate`) + lógica de cálculo na virada/consulta.
-- **Cash-flow**: refletir atrasado + multa na projeção.
+Resultado: **nenhuma migration nem mudança de backend**. "Atrasada" é derivada no front
+(`pendente/parcial` + `vencimento < hoje`).
+- Badge "atrasada · venceu dd/MM" (+ "resta X" se parcial), em vermelho.
+- Filtro "Situação" (todas / a pagar / atrasadas / pagas); "Atrasadas" força período "todos"
+  para trazer vencidas de meses anteriores.
+
+Fora de escopo por decisão do produto: rollover automático, multa/juros e reflexo no cash-flow.
 
 ## Decisões de produto necessárias (antes da Fase 3)
 
@@ -77,11 +79,11 @@ Parte mais aberta; exige **decisões de produto** antes de estimar com precisão
 
 ## Resumo
 
-| Fase | Entrega | Esforço | Bloqueio |
+| Fase | Entrega | Esforço | Status |
 |---|---|---|---|
-| 1 | Conta fixa vira lançamento do mês; pago/pendente | **M** | — |
-| 2 | Pagamento parcial | **M** | — |
-| 3 | Atraso + rollover + multa/juros | **M–G** | precisa das 4 decisões de produto |
+| 1 | Conta fixa vira lançamento do mês; pago/pendente | **M** | ✅ concluída |
+| 2 | Pagamento parcial | **M** | ✅ concluída |
+| 3 | Atraso (só sinaliza) | **P** | ✅ concluída |
 
 Recomendação: fazer a **Fase 1** primeiro (resolve 80% da dor: ver e marcar o que já foi pago),
 validar, e só então Fase 2/3 conforme as regras de atraso forem definidas.
