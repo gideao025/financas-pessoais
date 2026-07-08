@@ -4,7 +4,7 @@ services:
     environment:
       POSTGRES_DB: financas
       POSTGRES_USER: financas
-      POSTGRES_PASSWORD: financas
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-financas}
     ports:
       - "5433:5432"
     volumes:
@@ -23,8 +23,12 @@ services:
     environment:
       DB_URL: jdbc:postgresql://postgres:5432/financas
       DB_USER: financas
-      DB_PASSWORD: financas
+      DB_PASSWORD: ${DB_PASSWORD:-financas}
       SERVER_PORT: 8080
+      # dev por padrão (carrega o seed). Em produção: SPRING_PROFILES_ACTIVE=prd no .env
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      # em prd, o app recusa subir se este segredo for o default (ver ProductionSecurityGuard)
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production-change-me-in-production-change-me}
     ports:
       - "9091:8080"
     depends_on:

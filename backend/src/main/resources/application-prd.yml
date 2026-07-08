@@ -1,0 +1,4 @@
+# Perfil PRD (produção) — NÃO carrega o seed; exige JWT_SECRET forte (ver ProductionSecurityGuard).
+spring:
+  flyway:
+    locations: classpath:db/migration

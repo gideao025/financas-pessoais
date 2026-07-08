@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -16,6 +17,12 @@ public class GlobalExceptionHandler {
   public ResponseEntity<ApiError> handleBusiness(BusinessException ex, HttpServletRequest request) {
     return ResponseEntity.status(ex.getStatus())
         .body(new ApiError(Instant.now(), ex.getStatus().value(), ex.getStatus().getReasonPhrase(), ex.getMessage(), request.getRequestURI()));
+  }
+
+  @ExceptionHandler(AuthenticationException.class)
+  public ResponseEntity<ApiError> handleAuth(AuthenticationException ex, HttpServletRequest request) {
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+        .body(new ApiError(Instant.now(), 401, "Unauthorized", "Credenciais inválidas.", request.getRequestURI()));
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
